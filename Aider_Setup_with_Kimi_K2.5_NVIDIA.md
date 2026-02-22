@@ -12,7 +12,9 @@ Aider is a terminal-based AI pair-programming tool that edits code in your local
 
 ### A) Python 3.9 - 3.12
 
-Aider requires **Python 3.9 through 3.12**. It does **not** work with Python 3.13+.
+Aider requires **Python 3.9 through 3.12** when installed via `pip install aider-chat`. It does **not** run on Python 3.13+ in that mode.
+
+If you already have Python 3.13 installed, use the **one-liner installer** or **aider-install** below -- both install a separate Python 3.12 environment for Aider.
 
 **Check if you already have it:**
 
@@ -98,13 +100,15 @@ Open PowerShell and run:
 
 ### Option A: One-liner installer (recommended for beginners)
 
+Works even if your system Python is 3.13 -- it installs its own Python 3.12.
+
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://aider.chat/install.ps1 | iex"
 ```
 
 This downloads and installs Aider automatically, handling Python version management for you.
 
-### Option B: Via pip
+### Option B: Via pip (requires Python 3.9-3.12)
 
 ```powershell
 python -m pip install aider-chat
@@ -165,6 +169,8 @@ Navigate to any project folder and run:
 cd C:\path\to\your\project
 aider --model openai/moonshotai/kimi-k2-5
 ```
+
+The `openai/` prefix tells Aider to use the OpenAI-compatible API base.
 
 If the folder isn't a Git repo yet, initialize one first:
 

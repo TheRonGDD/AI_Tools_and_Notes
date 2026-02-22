@@ -74,8 +74,10 @@ opencode --version
 OpenCode uses a config file at:
 
 ```
-C:\Users\YOUR_USERNAME\.config\opencode\config.json
+C:\Users\YOUR_USERNAME\.config\opencode\opencode.json
 ```
+
+You can name it `opencode.jsonc` instead if you want to add comments.
 
 Create or edit that file with the following content, replacing the API key with yours:
 
@@ -182,7 +184,7 @@ Kimi K2.5 uses chain-of-thought reasoning by default. Responses may take a few s
 The NVIDIA Developer Program provides free API access with rate limits. If you get a 429 error, wait a minute and retry. Check current limits at the [model card page](https://build.nvidia.com/moonshotai/kimi-k2.5/modelcard).
 
 ### Keep your API key out of git
-Your API key is stored in plain text in `config.json`. Make sure `~/.config/opencode/` is not inside a git repository, or add it to your global `.gitignore`.
+Your API key is stored in plain text in `opencode.json`. Make sure `~/.config/opencode/` is not inside a git repository, or add it to your global `.gitignore`.
 
 ---
 
@@ -245,7 +247,7 @@ Add it inside the `profiles.list` array in settings.json.
 # 2. Install OpenCode
 npm install -g opencode-ai
 
-# 3. Create config file at C:\Users\YOUR_USERNAME\.config\opencode\config.json
+# 3. Create config file at C:\Users\YOUR_USERNAME\.config\opencode\opencode.json
 #    (see Section 4 above for the full contents)
 
 # 4. Launch OpenCode in your project directory
@@ -260,12 +262,12 @@ opencode
 | Problem | Solution |
 |---|---|
 | `opencode is not recognized` | Close/reopen terminal. If still broken, add npm global bin to PATH: run `npm config get prefix` and add its `\bin` folder to system PATH |
-| `/models` doesn't show NVIDIA NIM | Check that `config.json` is valid JSON (no trailing commas, correct path) |
-| API returns 401 Unauthorized | Double-check your `nvapi-` key in config.json |
+| `/models` doesn't show NVIDIA NIM | Check that `opencode.json` is valid JSON (no trailing commas, correct path) |
+| API returns 401 Unauthorized | Double-check your `nvapi-` key in opencode.json |
 | API returns 404 Not Found | Verify the model ID is exactly `moonshotai/kimi-k2.5` |
 | API returns 429 Too Many Requests | Hit free tier rate limit — wait 60 seconds and retry |
 | Slow responses | Normal for thinking mode — Kimi K2.5 reasons before responding |
-| Config changes not picked up | Restart OpenCode after editing config.json |
+| Config changes not picked up | Restart OpenCode after editing opencode.json |
 
 ---
 
