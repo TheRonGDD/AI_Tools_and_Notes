@@ -179,7 +179,7 @@ Both are free local AI tools. Here is when to choose one over the other:
 
 | | LM Studio | Ollama |
 |---|---|---|
-| Interface | GUI + CLI | CLI only |
+| Interface | Full desktop GUI + CLI | System tray GUI + CLI |
 | Model format | GGUF (Hugging Face) | Ollama library + GGUF import |
 | Model browser | Built-in GUI browser | Command line pull |
 | API server | Yes (port 1234) | Yes (port 11434) |

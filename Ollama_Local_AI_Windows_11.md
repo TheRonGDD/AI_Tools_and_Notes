@@ -39,6 +39,17 @@ ollama --version
 
 > Ollama runs as a system tray app and background service. It starts automatically with Windows. You do not need to manually start it before running commands.
 
+### System Tray GUI
+
+After installing, Ollama appears in the Windows system tray (bottom-right corner of the taskbar). Right-clicking the icon gives you quick access to:
+
+- View and manage running models
+- Restart or stop the Ollama service
+- Open the model library in your browser
+- Check for updates
+
+This is a lightweight management GUI — it does not include a chat interface. For a full chat UI, use `ollama run <model>` in the terminal, or pair Ollama with a front-end like Open WebUI (see references).
+
 ---
 
 ## 3. Download and Run a Model
@@ -207,6 +218,29 @@ ollama run llama3.2
 | Port 11434 not responding | Run `ollama serve` to start the server manually |
 | GPU not being used | Verify NVIDIA drivers are up to date and `nvidia-smi` works |
 | Download stuck or slow | Large models (7B+) are several GB — give it time |
+
+---
+
+## Ollama vs LM Studio
+
+Both are free local AI tools. Here is when to choose one over the other:
+
+| | Ollama | LM Studio |
+|---|---|---|
+| Interface | System tray GUI + CLI | Full desktop GUI + CLI |
+| Chat UI | Terminal (`ollama run`) | Built-in GUI chat interface |
+| Model browser | CLI (`ollama pull`) + web library | Built-in GUI browser |
+| API server | Yes (port 11434) | Yes (port 1234) |
+| AMD GPU support | Limited on Windows | Better |
+| Beginner friendly | Slightly more technical | Easier — visual interface |
+| Custom models | Requires Modelfile | Easy GGUF drag-and-drop |
+| Headless/server use | Better suited | Possible via `lms` CLI |
+| Automation/scripting | Easier | Possible but less common |
+
+**Use Ollama** if you prefer CLI workflows, want simpler automation, or are running on a server or headless machine.
+**Use LM Studio** if you want a full visual interface, prefer browsing and managing models in a GUI, or are on AMD.
+
+Both can run simultaneously on different ports and be used with the same tools (Aider, OpenCode, etc.).
 
 ---
 
