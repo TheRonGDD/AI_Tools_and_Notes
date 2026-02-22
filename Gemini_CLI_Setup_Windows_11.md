@@ -72,7 +72,6 @@ gemini
 
 Your credentials are cached locally for future sessions.
 
-
 ---
 
 ## 4. Run Gemini CLI

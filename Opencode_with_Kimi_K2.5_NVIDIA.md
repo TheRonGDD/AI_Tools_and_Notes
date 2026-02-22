@@ -55,13 +55,13 @@ Keep this key handy for the configuration step below.
 
 Open PowerShell or Git Bash and run:
 
-```bash
+```powershell
 npm install -g opencode-ai
 ```
 
 **Verify it installed:**
 
-```bash
+```powershell
 opencode --version
 ```
 
@@ -126,8 +126,8 @@ Add a `model` field at the top level to make it your default:
 
 Navigate to any project folder and run:
 
-```bash
-cd /path/to/your/project
+```powershell
+cd C:\path\to\your\project
 opencode
 ```
 
@@ -212,8 +212,8 @@ If you get a response with a `choices` array containing a message, your key is w
 
 ### Test OpenCode end-to-end
 
-```bash
-cd /path/to/your/project
+```powershell
+cd C:\path\to\your\project
 opencode
 ```
 
@@ -241,7 +241,7 @@ Add it inside the `profiles.list` array in settings.json.
 
 ## Quick Start Summary
 
-```bash
+```powershell
 # 1. Install Node.js from https://nodejs.org (LTS version)
 
 # 2. Install OpenCode
@@ -251,7 +251,7 @@ npm install -g opencode-ai
 #    (see Section 4 above for the full contents)
 
 # 4. Launch OpenCode in your project directory
-cd /path/to/your/project
+cd C:\path\to\your\project
 opencode
 ```
 
