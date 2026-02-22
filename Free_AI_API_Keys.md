@@ -185,3 +185,16 @@ Free tier models vary widely in context window size. Kimi K2.5 (262k) and Gemini
 
 **Keep API keys out of code**
 Store keys as environment variables or in config files outside your git repos. Never commit them.
+
+**Datacenter location vs. model origin**
+All providers listed in this guide operate US or EU-based datacenters — your prompts and data are processed on Western infrastructure. However, some popular models were created by Chinese organizations:
+
+| Model | Made by | Served via (in this guide) | Data goes to |
+|---|---|---|---|
+| Kimi K2.5 | Moonshot AI (China) | NVIDIA NIM (US) | US |
+| DeepSeek R1 | DeepSeek (China) | SambaNova, Groq (US) | US |
+| Qwen | Alibaba (China) | Ollama (local) or US providers | Local or US |
+
+The model weights being of Chinese origin does not mean your data leaves US/EU infrastructure when using the providers above. The distinction matters if you are working with sensitive or proprietary code.
+
+**One exception to be aware of:** DeepSeek offers their own direct API at `api.deepseek.com`. That endpoint is hosted in China — data sent there goes to Chinese servers. The guides in this repo do not use that endpoint, but it is worth knowing if you encounter it elsewhere.
