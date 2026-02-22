@@ -125,7 +125,7 @@ Add a `model` field at the top level to make it your default:
 Navigate to any project folder and run:
 
 ```bash
-cd /j/AI_Files
+cd /path/to/your/project
 opencode
 ```
 
@@ -211,7 +211,7 @@ If you get a response with a `choices` array containing a message, your key is w
 ### Test OpenCode end-to-end
 
 ```bash
-cd /j/AI_Files
+cd /path/to/your/project
 opencode
 ```
 
@@ -249,7 +249,7 @@ npm install -g opencode-ai
 #    (see Section 4 above for the full contents)
 
 # 4. Launch OpenCode in your project directory
-cd /j/AI_Files
+cd /path/to/your/project
 opencode
 ```
 
