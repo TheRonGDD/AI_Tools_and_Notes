@@ -34,7 +34,7 @@ Free access to a large catalog of hosted models via the NVIDIA Developer Program
 - **OpenAI-compatible:** Yes — `https://integrate.api.nvidia.com/v1`
 - **Key prefix:** `nvapi-`
 - **Rate limits:** Per-model, varies — check each model's page
-- **Guides in this repo:** [Aider + Kimi K2.5](Aider_Setup_with_Kimi_K2.5_NVIDIA.md) · [OpenCode + Kimi K2.5](Opencode_with_Kimi_K2.5_NVIDIA.md)
+- **Guides in this repo:** [Aider + Kimi K2.5](Aider_Setup_with_Kimi_K2.5_NVIDIA.md) | [OpenCode + Kimi K2.5](Opencode_with_Kimi_K2.5_NVIDIA.md)
 
 ---
 
