@@ -48,7 +48,7 @@ After installing, Ollama appears in the Windows system tray (bottom-right corner
 - Open the model library in your browser
 - Check for updates
 
-This is a lightweight management GUI — it does not include a chat interface. For a full chat UI, use `ollama run <model>` in the terminal, or pair Ollama with a front-end like Open WebUI (see references).
+The GUI includes a built-in chat interface as well as model management. You can chat directly from the app without opening a terminal.
 
 ---
 
@@ -228,7 +228,7 @@ Both are free local AI tools. Here is when to choose one over the other:
 | | Ollama | LM Studio |
 |---|---|---|
 | Interface | System tray GUI + CLI | Full desktop GUI + CLI |
-| Chat UI | Terminal (`ollama run`) | Built-in GUI chat interface |
+| Chat UI | GUI chat + terminal (`ollama run`) | Built-in GUI chat interface |
 | Model browser | CLI (`ollama pull`) + web library | Built-in GUI browser |
 | API server | Yes (port 11434) | Yes (port 1234) |
 | AMD GPU support | Limited on Windows | Better |
