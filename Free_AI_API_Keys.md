@@ -186,7 +186,7 @@ Free tier models vary widely in context window size. Kimi K2.5 (262k) and Gemini
 **Keep API keys out of code**
 Store keys as environment variables or in config files outside your git repos. Never commit them.
 
-**Datacenter location vs. model origin**
+## Datacenter Location vs. Model Origin
 All providers listed in this guide operate US or EU-based datacenters — your prompts and data are processed on Western infrastructure. However, some popular models were created by Chinese organizations:
 
 | Model | Made by | Served via (in this guide) | Data goes to |
