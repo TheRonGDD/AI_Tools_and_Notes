@@ -11,6 +11,8 @@ A collection of free and open-source AI CLI tools, setup guides, and notes. Ever
 | Guide | Description |
 |---|---|
 | [Free AI API Keys](Free_AI_API_Keys.md) | Reference guide to free AI API providers — NVIDIA, Groq, Google, Cerebras, and more |
+| [Ollama — Local AI (Windows 11)](Ollama_Local_AI_Windows_11.md) | Run AI models locally with no API key, no rate limits, and no internet required |
+| [LM Studio — Local AI (Windows 11)](LM_Studio_Local_AI_Windows_11.md) | GUI app for running local AI models with a built-in OpenAI-compatible API server |
 | [Aider + Kimi K2.5 (NVIDIA)](Aider_Setup_with_Kimi_K2.5_NVIDIA.md) | Set up Aider AI pair-programmer with Kimi K2.5 via NVIDIA's free API |
 | [OpenCode + Kimi K2.5 (NVIDIA)](Opencode_with_Kimi_K2.5_NVIDIA.md) | Set up OpenCode TUI with Kimi K2.5 via NVIDIA's free API |
 | [Gemini CLI (Windows 11)](Gemini_CLI_Setup_Windows_11.md) | Set up Google's Gemini CLI on Windows 11 using a free Google account |
@@ -35,3 +37,5 @@ This repo exists to document free or accessible AI tooling — the kind of stuff
 - **[Cerebras](https://cloud.cerebras.ai)** — Free fast inference on Llama models
 - **[SambaNova](https://cloud.sambanova.ai)** — Free access to large models including DeepSeek R1 671B
 - **[OpenRouter](https://openrouter.ai)** — Single API key for many providers, free models available
+- **[Ollama](https://ollama.com)** — Run open-source models locally, fully offline, OpenAI-compatible API
+- **[LM Studio](https://lmstudio.ai)** — GUI app for local AI, built-in model browser, OpenAI-compatible API server
