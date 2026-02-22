@@ -167,7 +167,7 @@ Navigate to any project folder and run:
 
 ```powershell
 cd C:\path\to\your\project
-aider --model openai/moonshotai/kimi-k2-5
+aider --model openai/moonshotai/kimi-k2.5
 ```
 
 The `openai/` prefix tells Aider to use the OpenAI-compatible API base.
@@ -177,13 +177,13 @@ If the folder isn't a Git repo yet, initialize one first:
 ```powershell
 cd C:\path\to\your\project
 git init
-aider --model openai/moonshotai/kimi-k2-5
+aider --model openai/moonshotai/kimi-k2.5
 ```
 
 Aider may show warnings about an unfamiliar model -- this is normal. To suppress them:
 
 ```powershell
-aider --model openai/moonshotai/kimi-k2-5 --no-show-model-warnings
+aider --model openai/moonshotai/kimi-k2.5 --no-show-model-warnings
 ```
 
 ---
@@ -195,7 +195,7 @@ Create a file called `.aider.conf.yml` in your project folder with this content:
 ```yaml
 # .aider.conf.yml
 
-model: openai/moonshotai/kimi-k2-5
+model: openai/moonshotai/kimi-k2.5
 show-model-warnings: false
 auto-commits: true
 show-diffs: true
@@ -257,7 +257,7 @@ The NVIDIA Developer Program provides free API access. If you hit rate limits, w
 If Kimi K2.5 has trouble producing correct code edits, try the `whole` format:
 
 ```powershell
-aider --model openai/moonshotai/kimi-k2-5 --edit-format whole
+aider --model openai/moonshotai/kimi-k2.5 --edit-format whole
 ```
 
 This makes the model output entire files instead of diffs. Uses more tokens but is more reliable with non-standard models.
@@ -276,7 +276,7 @@ $headers = @{
     "Content-Type"  = "application/json"
 }
 $body = @{
-    model      = "moonshotai/kimi-k2-5"
+    model      = "moonshotai/kimi-k2.5"
     messages   = @(@{ role = "user"; content = "Say hello in one sentence." })
     max_tokens = 50
 } | ConvertTo-Json -Depth 3
@@ -294,7 +294,7 @@ cd C:\temp\aider-test
 git init
 echo "# Test" > README.md
 git add . && git commit -m "init"
-aider --model openai/moonshotai/kimi-k2-5 --no-show-model-warnings
+aider --model openai/moonshotai/kimi-k2.5 --no-show-model-warnings
 ```
 
 Then type: `Create a hello.py that prints "Hello World"` and press Enter.
@@ -318,7 +318,7 @@ setx OPENAI_API_KEY "nvapi-YOUR_KEY_HERE"
 
 # 5. Use it (after restarting terminal)
 cd C:\your\project
-aider --model openai/moonshotai/kimi-k2-5
+aider --model openai/moonshotai/kimi-k2.5
 ```
 
 ---
