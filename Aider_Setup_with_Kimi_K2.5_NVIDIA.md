@@ -10,9 +10,9 @@ Aider is a terminal-based AI pair-programming tool that edits code in your local
 
 ## 1. Prerequisites (Install These First)
 
-### A) Python 3.9 - 3.12
+### A) Python 3.10 - 3.12
 
-Aider requires **Python 3.9 through 3.12** when installed via `pip install aider-chat`. It does **not** run on Python 3.13+ in that mode.
+Aider requires **Python 3.10 through 3.12** when installed via `pip install aider-chat`. It does **not** run on Python 3.13+ in that mode.
 
 If you already have Python 3.13 installed, use the **one-liner installer** or **aider-install** below -- both install a separate Python 3.12 environment for Aider.
 
@@ -108,7 +108,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://aider.chat/install.ps1 | iex"
 
 This downloads and installs Aider automatically, handling Python version management for you.
 
-### Option B: Via pip (requires Python 3.9-3.12)
+### Option B: Via pip (requires Python 3.10-3.12)
 
 ```powershell
 python -m pip install aider-chat
@@ -304,7 +304,7 @@ Then type: `Create a hello.py that prints "Hello World"` and press Enter.
 ## Quick Start Summary
 
 ```powershell
-# 1. Install Python 3.12 from https://www.python.org/downloads/
+# 1. Install Python 3.10-3.12 from https://www.python.org/downloads/
 #    (check "Add python.exe to PATH" during install)
 
 # 2. Install Git from https://git-scm.com/download/win

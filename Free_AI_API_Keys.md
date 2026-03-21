@@ -12,7 +12,7 @@ A reference guide to AI providers offering free API access — no credit card re
 |---|---|---|---|
 | [NVIDIA NIM](#nvidia-nim) | Kimi K2.5, Llama, Mistral, and more | Yes | No |
 | [Groq](#groq) | Llama 3, Gemma, Mixtral, and more | Yes | No |
-| [Google AI Studio](#google-ai-studio) | Gemini 2.0 Flash, Gemini 1.5 Pro, and more | Yes (OpenAI compat endpoint) | No |
+| [Google AI Studio](#google-ai-studio) | Gemini 2.5 Flash, Gemini 2.5 Pro, and more | Yes (OpenAI compat endpoint) | No |
 | [Cerebras](#cerebras) | Llama 3.1, Llama 3.3 | Yes | No |
 | [SambaNova](#sambanova) | Llama 3.1, DeepSeek R1, and more | Yes | No |
 | [OpenRouter](#openrouter) | Many (`:free` tagged models) | Yes | No |
@@ -60,11 +60,11 @@ Extremely fast inference (runs on custom LPU hardware). One of the fastest free 
 Google's developer portal for Gemini models. Generous free tier, especially for Gemini Flash.
 
 - **Sign-up:** Google account, no credit card
-- **Notable free models:** Gemini 2.0 Flash, Gemini 1.5 Flash, Gemini 1.5 Pro (limited)
+- **Notable free models:** Gemini 2.5 Flash, Gemini 2.5 Flash-Lite, Gemini 2.5 Pro (limited)
 - **OpenAI-compatible:** Yes — `https://generativelanguage.googleapis.com/v1beta/openai/`
 - **Key prefix:** `AIza`
-- **Rate limits:** 15 requests/min and 1,500 requests/day on free tier for Flash models
-- **Standout feature:** Gemini 2.0 Flash has a 1M token context window on the free tier
+- **Rate limits:** 10 requests/min and 250 requests/day for 2.5 Flash; 15 RPM and 1,000 RPD for 2.5 Flash-Lite; 5 RPM and 100 RPD for 2.5 Pro
+- **Standout feature:** All Gemini 2.5 models have a 1M token context window on the free tier
 
 ---
 

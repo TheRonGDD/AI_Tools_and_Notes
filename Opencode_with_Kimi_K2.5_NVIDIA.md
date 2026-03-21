@@ -1,32 +1,14 @@
 # OpenCode Setup with Kimi K2.5 via NVIDIA Free API (Windows 11)
 
-OpenCode is a terminal-based AI coding assistant with a rich TUI (terminal user interface). It supports any OpenAI-compatible API — including NVIDIA's free Kimi K2.5 endpoint.
+OpenCode is an open-source AI coding agent with a rich TUI (terminal user interface). It supports any OpenAI-compatible API — including NVIDIA's free Kimi K2.5 endpoint.
 
-**OpenCode runs natively on Windows 11** via Node.js/npm. No WSL needed.
+**OpenCode runs on Windows 11.** For the best experience, the developers recommend using WSL (Windows Subsystem for Linux). Native Windows support is improving — npm install works natively, and you can also download the binary directly.
 
 ---
 
 ## 1. Prerequisites
 
-### A) Node.js (v18 or later)
-
-OpenCode is an npm package and requires Node.js.
-
-**Check if you already have it:**
-
-```powershell
-node --version
-npm --version
-```
-
-If you don't have Node.js:
-
-1. Go to [https://nodejs.org](https://nodejs.org)
-2. Download the **LTS** version
-3. Run the installer with all default options
-4. Close and reopen your terminal, then verify with the commands above
-
-### B) Git
+### A) Git
 
 OpenCode uses Git for project context. Most workflows require it.
 
@@ -37,6 +19,17 @@ git --version
 ```
 
 If not installed, download from [https://git-scm.com/download/win](https://git-scm.com/download/win) and use all default options.
+
+### B) Node.js (only needed for npm install method)
+
+If you plan to install via npm, you need Node.js v18 or later:
+
+1. Go to [https://nodejs.org](https://nodejs.org)
+2. Download the **LTS** version
+3. Run the installer with all default options
+4. Close and reopen your terminal
+
+If you install via binary download instead, Node.js is not required.
 
 ---
 
@@ -53,10 +46,24 @@ Keep this key handy for the configuration step below.
 
 ## 3. Install OpenCode
 
-Open PowerShell or Git Bash and run:
+OpenCode is a Go binary with multiple install methods. Pick one:
+
+### Option A: npm (if you already have Node.js)
 
 ```powershell
 npm install -g opencode-ai
+```
+
+### Option B: Download the binary (no Node.js needed)
+
+Go to the [GitHub releases page](https://github.com/opencode-ai/opencode/releases) and download the Windows binary. Place it somewhere in your PATH.
+
+### Option C: WSL (recommended by OpenCode for best Windows experience)
+
+If you have WSL set up:
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
 ```
 
 **Verify it installed:**
@@ -65,7 +72,7 @@ npm install -g opencode-ai
 opencode --version
 ```
 
-> **"opencode is not recognized" error:** Close and reopen your terminal. If it still fails, npm's global bin folder isn't in your PATH. Run `npm config get prefix` to find the folder, then add its `bin` subdirectory to your system PATH.
+> **"opencode is not recognized" error:** Close and reopen your terminal. If using npm and it still fails, run `npm config get prefix` and add its `\bin` folder to your system PATH.
 
 ---
 
@@ -242,15 +249,14 @@ Add it inside the `profiles.list` array in settings.json.
 ## Quick Start Summary
 
 ```powershell
-# 1. Install Node.js from https://nodejs.org (LTS version)
+# 1. Install OpenCode (pick one)
+npm install -g opencode-ai          # if you have Node.js
+# OR download binary from https://github.com/opencode-ai/opencode/releases
 
-# 2. Install OpenCode
-npm install -g opencode-ai
-
-# 3. Create config file at C:\Users\YOUR_USERNAME\.config\opencode\opencode.json
+# 2. Create config file at C:\Users\YOUR_USERNAME\.config\opencode\opencode.json
 #    (see Section 4 above for the full contents)
 
-# 4. Launch OpenCode in your project directory
+# 3. Launch OpenCode in your project directory
 cd C:\path\to\your\project
 opencode
 ```
@@ -261,7 +267,7 @@ opencode
 
 | Problem | Solution |
 |---|---|
-| `opencode is not recognized` | Close/reopen terminal. If still broken, add npm global bin to PATH: run `npm config get prefix` and add its `\bin` folder to system PATH |
+| `opencode is not recognized` | Close/reopen terminal. If using npm install, add npm global bin to PATH: run `npm config get prefix` and add its `\bin` folder to system PATH. If using binary, ensure it's in a PATH directory |
 | `/models` doesn't show NVIDIA NIM | Check that `opencode.json` is valid JSON (no trailing commas, correct path) |
 | API returns 401 Unauthorized | Double-check your `nvapi-` key in opencode.json |
 | API returns 404 Not Found | Verify the model ID is exactly `moonshotai/kimi-k2.5` |
@@ -274,6 +280,8 @@ opencode
 ## References
 
 - [OpenCode Official Site](https://opencode.ai)
+- [OpenCode GitHub](https://github.com/opencode-ai/opencode)
+- [OpenCode Download / Install](https://opencode.ai/download)
 - [OpenCode Docs: Providers](https://opencode.ai/docs/providers)
 - [OpenCode Docs: Config](https://opencode.ai/docs/config)
 - [OpenCode Docs: Models](https://opencode.ai/docs/models)
