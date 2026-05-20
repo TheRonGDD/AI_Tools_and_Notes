@@ -56,17 +56,22 @@ Models come in different quantized sizes. Higher Q = better quality but more RAM
 
 **Rule of thumb:** Start with **Q4_K_M** of your chosen model.
 
-### Recommended models to start with
+### Recommended models to start with (May 2026)
 
 | Model | Size (Q4) | Best for |
 |---|---|---|
 | Llama 3.2 3B | ~2GB | Fast, everyday tasks |
-| Llama 3.1 8B | ~5GB | Good all-rounder |
-| Mistral 7B | ~4GB | Coding and reasoning |
-| Phi-3 Mini | ~2GB | Fast, good coding ability |
-| DeepSeek R1 7B | ~5GB | Reasoning with thinking mode |
-| Qwen 2.5 Coder 7B | ~5GB | Code-focused tasks |
-| Gemma 2 2B | ~2GB | Fast, lightweight |
+| Gemma 3 4B | ~3GB | Latest small Google model, multimodal |
+| Qwen 3 8B | ~5GB | Strong all-around at 8B |
+| Llama 3.1 8B | ~5GB | Reliable general-purpose |
+| DeepSeek R1 8B | ~5GB | Reasoning with visible thinking mode |
+| Phi-4 14B | ~9GB | Microsoft's reasoning model |
+| Qwen 3 14B | ~9GB | Best mid-range generalist |
+| Devstral Small 24B | ~14GB | Purpose-built for agentic coding |
+| Qwen 3 Coder 30B | ~18GB | Best local coding model right now |
+| Llama 4 Scout 17B (MoE) | ~10GB | Meta's 2026 release |
+
+> **For local coding specifically:** Qwen 3 Coder is the current top pick. Devstral Small is a close second and specifically tuned for agentic workflows.
 
 ---
 

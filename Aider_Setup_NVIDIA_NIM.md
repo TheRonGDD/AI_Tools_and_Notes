@@ -1,31 +1,29 @@
-# Aider Setup with Kimi K2.5 via NVIDIA Free API (Windows 11)
+# Aider Setup with NVIDIA NIM Free API (Windows 11)
 
-Aider is a terminal-based AI pair-programming tool that edits code in your local repo, makes git commits, and works with any OpenAI-compatible API -- including NVIDIA's free Kimi K2.5 endpoint.
+Aider is a terminal-based AI pair-programming tool that edits code in your local repo, makes git commits, and works with any OpenAI-compatible API — including NVIDIA's free NIM (NVIDIA Inference Microservices) endpoints, which host 100+ frontier models for free.
 
 **Aider runs natively on Windows 11.** No WSL (Windows Subsystem for Linux) needed. Everything below uses PowerShell, which comes built into Windows 11.
 
-> **Note on WSL:** Windows 11 does NOT come with Linux/WSL enabled by default. The `wsl` command exists as a stub, but you'd have to install a distro. You do not need it for any of this.
+> **Recommended model (May 2026):** `deepseek-ai/deepseek-v4-flash` — DeepSeek's 284B MoE coding model with a 1M-token context window. Free on NVIDIA NIM, optimized for coding and agentic tasks. The Kimi K2.5 model previously featured in this guide was retired in April 2026; the configuration steps below work the same for any NVIDIA-hosted model — just swap the model ID.
 
 ---
 
 ## 1. Prerequisites (Install These First)
 
-### A) Python 3.10 - 3.12
+### A) Python 3.10 - 3.13
 
-Aider requires **Python 3.10 through 3.12** when installed via `pip install aider-chat`. It does **not** run on Python 3.13+ in that mode.
+Aider supports **Python 3.10 - 3.13**. The recommended install method (`uv tool` or `aider-install`) handles Python automatically if you have a newer or older system Python.
 
-If you already have Python 3.13 installed, use the **one-liner installer** or **aider-install** below -- both install a separate Python 3.12 environment for Aider.
-
-**Check if you already have it:**
+**Check if you already have Python:**
 
 ```powershell
 python --version
 ```
 
-If you don't have Python, or have the wrong version:
+If you don't have Python at all:
 
 1. Go to [https://www.python.org/downloads/](https://www.python.org/downloads/)
-2. Download **Python 3.12.x** (the latest 3.12 release)
+2. Download **Python 3.12.x** (the most compatible release)
 3. Run the installer
 4. **IMPORTANT:** Check the box that says **"Add python.exe to PATH"** at the bottom of the first screen
 5. Click "Install Now"
@@ -33,10 +31,7 @@ If you don't have Python, or have the wrong version:
 
 ```powershell
 python --version
-# Should show: Python 3.12.x
-
 pip --version
-# Should show pip and a path inside your Python install
 ```
 
 > **Microsoft Store Python:** If `python` opens the Microsoft Store instead of running, go to **Settings > Apps > Advanced app execution aliases** and turn OFF the "App Installer" entries for `python.exe` and `python3.exe`.
@@ -60,7 +55,6 @@ If you don't have Git:
 
 ```powershell
 git --version
-# Should show: git version 2.x.x
 ```
 
 **First-time Git setup** (if you've never used Git on this machine):
@@ -85,40 +79,53 @@ Most users will NOT need this step. Only do it if you see the error.
 
 ## 2. Get Your Free NVIDIA API Key
 
-1. Go to [https://build.nvidia.com/moonshotai/kimi-k2.5](https://build.nvidia.com/moonshotai/kimi-k2.5)
-2. Sign in or create a free NVIDIA Developer account
-3. Click **"Get API Key"** (or "Build with this NIM")
-4. Copy the key -- it starts with `nvapi-`
+1. Go to [https://build.nvidia.com](https://build.nvidia.com)
+2. Sign in or create a free NVIDIA Developer account (just an email — no credit card)
+3. Pick any model — for example [DeepSeek V4 Flash](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash)
+4. Click **"Get API Key"** (or "Build with this NIM")
+5. Copy the key — it starts with `nvapi-`
 
-Keep this key handy for the next steps.
+A single `nvapi-` key works for all 100+ models on NVIDIA's free tier. You do not need a different key per model.
 
 ---
 
 ## 3. Install Aider
 
-Open PowerShell and run:
+Open PowerShell and run **one** of these:
 
-### Option A: One-liner installer (recommended for beginners)
+### Option A: uv (recommended — fastest, handles Python for you)
 
-Works even if your system Python is 3.13 -- it installs its own Python 3.12.
+If you don't have uv:
+
+```powershell
+python -m pip install uv
+```
+
+Then install Aider in its own managed environment:
+
+```powershell
+uv tool install --force --python python3.12 --with pip aider-chat@latest
+```
+
+### Option B: One-liner installer
+
+Works even if your system Python is 3.14+ — it installs its own Python 3.12.
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://aider.chat/install.ps1 | iex"
 ```
 
-This downloads and installs Aider automatically, handling Python version management for you.
-
-### Option B: Via pip (requires Python 3.10-3.12)
-
-```powershell
-python -m pip install aider-chat
-```
-
-### Option C: Via the aider-install helper
+### Option C: aider-install helper
 
 ```powershell
 python -m pip install aider-install
 aider-install
+```
+
+### Option D: Plain pip (Python 3.10-3.13)
+
+```powershell
+python -m pip install aider-chat
 ```
 
 **Verify it installed:**
@@ -146,10 +153,7 @@ Verify they stuck:
 
 ```powershell
 echo $env:OPENAI_API_BASE
-# Should show: https://integrate.api.nvidia.com/v1
-
 echo $env:OPENAI_API_KEY
-# Should show: nvapi-YOUR_KEY_HERE
 ```
 
 ### Option B: Set per-session (temporary, gone when you close the window)
@@ -167,35 +171,58 @@ Navigate to any project folder and run:
 
 ```powershell
 cd C:\path\to\your\project
-aider --model openai/moonshotai/kimi-k2.5
+aider --model openai/deepseek-ai/deepseek-v4-flash
 ```
 
-The `openai/` prefix tells Aider to use the OpenAI-compatible API base.
+The `openai/` prefix tells Aider to use the OpenAI-compatible API base. The rest is the NVIDIA model ID.
 
 If the folder isn't a Git repo yet, initialize one first:
 
 ```powershell
 cd C:\path\to\your\project
 git init
-aider --model openai/moonshotai/kimi-k2.5
+aider --model openai/deepseek-ai/deepseek-v4-flash
 ```
 
-Aider may show warnings about an unfamiliar model -- this is normal. To suppress them:
+Aider may show warnings about an unfamiliar model — this is normal. To suppress them:
 
 ```powershell
-aider --model openai/moonshotai/kimi-k2.5 --no-show-model-warnings
+aider --model openai/deepseek-ai/deepseek-v4-flash --no-show-model-warnings
 ```
 
 ---
 
-## 6. Project Config File (So You Don't Have to Type Flags Every Time)
+## 6. Picking a Model
+
+NVIDIA NIM hosts 100+ free models. Browse the full catalog at [https://build.nvidia.com/models](https://build.nvidia.com/models). Some good picks for coding (May 2026):
+
+| Model ID | Best for |
+|---|---|
+| `deepseek-ai/deepseek-v4-flash` | Default recommendation — fast, 1M context, strong coding |
+| `deepseek-ai/deepseek-v4-pro` | Higher quality on hard problems, slower (1.6T MoE) |
+| `moonshotai/kimi-k2.6` | Long-horizon agentic coding (256K context) — but slow latency |
+| `qwen/qwen3-coder-480b-a35b-instruct` | Code-specialist Qwen3 |
+| `nvidia/llama-3.3-nemotron-super-49b` | NVIDIA-tuned Llama 3.3 |
+| `meta/llama-4-maverick-17b-128e-instruct` | Meta's latest |
+
+To use any of these with Aider, just swap the model ID:
+
+```powershell
+aider --model openai/qwen/qwen3-coder-480b-a35b-instruct
+```
+
+> Model IDs change over time. The authoritative list is the URL slug on the model card page on build.nvidia.com.
+
+---
+
+## 7. Project Config File (So You Don't Have to Type Flags Every Time)
 
 Create a file called `.aider.conf.yml` in your project folder with this content:
 
 ```yaml
 # .aider.conf.yml
 
-model: openai/moonshotai/kimi-k2.5
+model: openai/deepseek-ai/deepseek-v4-flash
 show-model-warnings: false
 auto-commits: true
 show-diffs: true
@@ -207,7 +234,7 @@ With this file in place, just run `aider` with no flags from that directory.
 
 ---
 
-## 7. Essential Aider Commands
+## 8. Essential Aider Commands
 
 Once inside an aider session, these are the commands you'll use most:
 
@@ -228,7 +255,7 @@ Once inside an aider session, these are the commands you'll use most:
 | `/architect` | Enable architect mode (two-model workflow) |
 | `/exit` | Quit aider |
 
-### Basic workflow example:
+### Basic workflow example
 
 ```
 > /add src/main.py
@@ -242,29 +269,33 @@ You type plain English to describe what you want changed. Aider edits the files 
 
 ---
 
-## 8. Tips for Kimi K2.5
+## 9. Tips
 
-### Thinking mode (default)
-Kimi K2.5 runs in "thinking mode" by default, which includes chain-of-thought reasoning. This is the strongest mode.
+### Free tier rate limits
+NVIDIA's free tier is roughly **40 requests per minute** across all models, but limits vary by model. If you get a 429 error, wait a minute and retry.
 
-### Context window
-Kimi K2.5 supports **262,144 tokens** of context -- more than enough for large repos.
-
-### Free tier limits
-The NVIDIA Developer Program provides free API access. If you hit rate limits, wait a minute and retry. For heavy usage, check the [model card page](https://build.nvidia.com/moonshotai/kimi-k2.5/modelcard) for current limits.
+### Context windows
+DeepSeek V4 Flash and Pro both support **1,000,000 tokens** of context — enough for most full repos. Kimi K2.6 gives you 256K. Free Llama models on NVIDIA are typically capped at 128K.
 
 ### Edit format
-If Kimi K2.5 has trouble producing correct code edits, try the `whole` format:
+If a model has trouble producing correct code edits (often happens with smaller / older models), try the `whole` format:
 
 ```powershell
-aider --model openai/moonshotai/kimi-k2.5 --edit-format whole
+aider --model openai/deepseek-ai/deepseek-v4-flash --edit-format whole
 ```
 
-This makes the model output entire files instead of diffs. Uses more tokens but is more reliable with non-standard models.
+This makes the model output entire files instead of diffs. Uses more tokens but is more reliable.
+
+### Architect mode (two-model workflow)
+Aider can use one model to plan and another to apply edits. This often produces better results:
+
+```powershell
+aider --model openai/deepseek-ai/deepseek-v4-pro --editor-model openai/deepseek-ai/deepseek-v4-flash
+```
 
 ---
 
-## 9. Verify Everything Works
+## 10. Verify Everything Works
 
 ### Test your API key (before even installing Aider)
 
@@ -276,7 +307,7 @@ $headers = @{
     "Content-Type"  = "application/json"
 }
 $body = @{
-    model      = "moonshotai/kimi-k2.5"
+    model      = "deepseek-ai/deepseek-v4-flash"
     messages   = @(@{ role = "user"; content = "Say hello in one sentence." })
     max_tokens = 50
 } | ConvertTo-Json -Depth 3
@@ -294,7 +325,7 @@ cd C:\temp\aider-test
 git init
 echo "# Test" > README.md
 git add . && git commit -m "init"
-aider --model openai/moonshotai/kimi-k2.5 --no-show-model-warnings
+aider --model openai/deepseek-ai/deepseek-v4-flash --no-show-model-warnings
 ```
 
 Then type: `Create a hello.py that prints "Hello World"` and press Enter.
@@ -304,13 +335,14 @@ Then type: `Create a hello.py that prints "Hello World"` and press Enter.
 ## Quick Start Summary
 
 ```powershell
-# 1. Install Python 3.10-3.12 from https://www.python.org/downloads/
+# 1. Install Python 3.10-3.13 from https://www.python.org/downloads/
 #    (check "Add python.exe to PATH" during install)
 
 # 2. Install Git from https://git-scm.com/download/win
 
-# 3. Install Aider
-powershell -ExecutionPolicy ByPass -c "irm https://aider.chat/install.ps1 | iex"
+# 3. Install Aider via uv (recommended)
+python -m pip install uv
+uv tool install --force --python python3.12 --with pip aider-chat@latest
 
 # 4. Set your NVIDIA API key (restart terminal after this)
 setx OPENAI_API_BASE "https://integrate.api.nvidia.com/v1"
@@ -318,7 +350,7 @@ setx OPENAI_API_KEY "nvapi-YOUR_KEY_HERE"
 
 # 5. Use it (after restarting terminal)
 cd C:\your\project
-aider --model openai/moonshotai/kimi-k2.5
+aider --model openai/deepseek-ai/deepseek-v4-flash
 ```
 
 ---
@@ -332,7 +364,10 @@ aider --model openai/moonshotai/kimi-k2.5
 | `pip` not found | Reinstall Python and check "Add python.exe to PATH" |
 | Install fails with "Visual C++ 14.0 required" | Install [Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with "Desktop development with C++" |
 | `setx` variables not working | You must close and reopen PowerShell after running setx |
-| API returns 401 Unauthorized | Double-check your `nvapi-` key is correct and hasn't expired |
+| API returns 401 Unauthorized | Double-check your `nvapi-` key is correct |
+| API returns 404 Not Found | Model ID may be wrong or model retired — check build.nvidia.com for current ID |
+| API returns 410 Gone | Model has been deprecated — pick a different one |
+| API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM) — wait 60 seconds and retry |
 | Aider shows model warnings | Add `--no-show-model-warnings` or set `show-model-warnings: false` in config |
 | Edits are garbled or wrong | Try `--edit-format whole` for more reliable (but token-heavy) edits |
 
@@ -345,8 +380,8 @@ aider --model openai/moonshotai/kimi-k2.5
 - [Aider OpenAI-Compatible API Docs](https://aider.chat/docs/llms/openai-compat.html)
 - [Aider Configuration](https://aider.chat/docs/config/aider_conf.html)
 - [Aider In-Chat Commands](https://aider.chat/docs/usage/commands.html)
+- [NVIDIA NIM Model Catalog](https://build.nvidia.com/models)
+- [DeepSeek V4 Flash on NVIDIA NIM](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash)
+- [NVIDIA NIM API Reference](https://docs.api.nvidia.com/nim/reference)
 - [Python Downloads](https://www.python.org/downloads/)
 - [Git for Windows](https://git-scm.com/download/win)
-- [NVIDIA Kimi K2.5 Model Card](https://build.nvidia.com/moonshotai/kimi-k2.5/modelcard)
-- [NVIDIA Kimi K2.5 API Reference](https://docs.api.nvidia.com/nim/reference/moonshotai-kimi-k2-5)
-- [NVIDIA Blog: Kimi K2.5 Endpoints](https://developer.nvidia.com/blog/build-with-kimi-k2-5-multimodal-vlm-using-nvidia-gpu-accelerated-endpoints/)

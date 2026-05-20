@@ -84,22 +84,30 @@ ollama rm llama3.2
 
 ---
 
-## 4. Recommended Free Models
+## 4. Recommended Free Models (May 2026)
 
 | Model | Pull command | Size | Best for |
 |---|---|---|---|
-| Llama 3.2 3B | `ollama pull llama3.2` | ~2GB | Fast, everyday tasks, low RAM |
 | Llama 3.2 1B | `ollama pull llama3.2:1b` | ~1GB | Very fast, minimal hardware |
-| Llama 3.1 8B | `ollama pull llama3.1` | ~5GB | Good balance of speed and quality |
-| Llama 3.1 70B | `ollama pull llama3.1:70b` | ~40GB | High quality, needs strong GPU |
-| Mistral 7B | `ollama pull mistral` | ~4GB | Good coding and reasoning |
-| Phi-3 Mini | `ollama pull phi3` | ~2GB | Fast, Microsoft model, good for coding |
-| Gemma 2 2B | `ollama pull gemma2:2b` | ~2GB | Fast, Google model |
-| DeepSeek R1 7B | `ollama pull deepseek-r1` | ~5GB | Reasoning model with thinking mode |
-| Qwen 2.5 Coder | `ollama pull qwen2.5-coder` | ~4GB | Specialized for code |
-| CodeLlama | `ollama pull codellama` | ~4GB | Code generation and completion |
+| Llama 3.2 3B | `ollama pull llama3.2` | ~2GB | Fast everyday tasks, low RAM |
+| Gemma 3 4B | `ollama pull gemma3:4b` | ~3GB | Google's latest small multimodal model |
+| Qwen 3 8B | `ollama pull qwen3:8b` | ~5GB | Strong all-around coding/reasoning at 8B |
+| Llama 3.1 8B | `ollama pull llama3.1` | ~5GB | Reliable general-purpose model |
+| DeepSeek R1 8B | `ollama pull deepseek-r1:8b` | ~5GB | Reasoning model with visible thinking |
+| Phi-4 14B | `ollama pull phi4` | ~9GB | Microsoft model, strong reasoning/coding |
+| Qwen 3 14B | `ollama pull qwen3:14b` | ~9GB | Best mid-range generalist |
+| Devstral Small 24B | `ollama pull devstral` | ~14GB | Purpose-built for agentic coding (multi-file edits) |
+| Qwen 3 Coder 30B | `ollama pull qwen3-coder` | ~18GB | Code-specialist Qwen3 — best local coding model |
+| Llama 4 Scout 17B | `ollama pull llama4:scout` | ~10GB (MoE) | Meta's 2026 release, MoE so VRAM-friendly |
+| Kimi K2.6 | `ollama pull kimi-k2.6` | huge | Long-horizon agentic — heavy hardware only |
 
-> **Not sure what fits your hardware?** A rough guide: 8GB RAM → stick to 3B or smaller. 16GB RAM → 7B/8B models run comfortably. 32GB+ RAM or a GPU with 8GB+ VRAM → 13B+ models.
+> **Not sure what fits your hardware?** A rough guide at Q4 quantization:
+> - 8GB RAM/VRAM → 3B or smaller
+> - 16GB RAM/VRAM → 7B–8B comfortably
+> - 24GB+ VRAM → 13B–32B
+> - 48GB+ VRAM → 70B models
+>
+> **For local coding specifically:** Qwen 3 Coder is the current top pick. Devstral Small is a close second and specifically tuned for agentic workflows (read → reason → edit → verify loop).
 
 Browse all available models at [https://ollama.com/library](https://ollama.com/library).
 
