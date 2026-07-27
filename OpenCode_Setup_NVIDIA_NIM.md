@@ -1,10 +1,12 @@
 # OpenCode Setup with NVIDIA NIM Free API (Windows 11)
 
-OpenCode is an open-source AI coding agent with a rich TUI (terminal user interface). It supports any OpenAI-compatible API — including NVIDIA's free NIM (NVIDIA Inference Microservices) endpoints, which host 100+ frontier models for free.
+OpenCode is an open-source (MIT) AI coding agent from Anomaly. It supports any OpenAI-compatible API — including NVIDIA's free NIM (NVIDIA Inference Microservices) endpoints, which host 100+ frontier models for free.
 
 **OpenCode runs natively on Windows 11** via Scoop, Chocolatey, or the universal installer. WSL is not required.
 
-> **Recommended model (May 2026):** `deepseek-ai/deepseek-v4-flash` — DeepSeek's 284B MoE coding model with a 1M-token context window. Free on NVIDIA NIM, optimized for coding and agentic tasks. The Kimi K2.5 model previously featured in this guide was retired in April 2026; the configuration steps below work the same for any NVIDIA-hosted model — just swap the model ID.
+> **Recommended model (July 2026):** `deepseek-ai/deepseek-v4-flash` — DeepSeek's 284B MoE coding model with a 1M-token context window. Free on NVIDIA NIM, optimized for coding and agentic tasks. The Kimi K2.5 model previously featured in this guide was retired in April 2026; the configuration steps below work the same for any NVIDIA-hosted model — just swap the model ID.
+
+> **What's new since this guide was first written:** OpenCode is now at **v1.18.x** (July 2026) and is no longer terminal-only. It ships as a **TUI, a desktop app, and an IDE extension**, and the desktop beta has tabs for managing multiple sessions. The project has grown past 160K stars. There is also **OpenCode Zen**, a curated managed-access set of models the team has benchmarked specifically for coding agents — separate from the free NVIDIA NIM setup described here.
 
 ---
 
@@ -38,12 +40,14 @@ Skip this if you install via Scoop, Chocolatey, or the binary download.
 ## 2. Get Your Free NVIDIA API Key
 
 1. Go to [https://build.nvidia.com](https://build.nvidia.com)
-2. Sign in or create a free NVIDIA Developer account (just an email — no credit card)
+2. Sign in or create a free NVIDIA Developer account (email plus **phone verification** — still no credit card)
 3. Pick any model — for example [DeepSeek V4 Flash](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash)
 4. Click **"Get API Key"** (or "Build with this NIM")
 5. Copy the key — it starts with `nvapi-`
 
 A single `nvapi-` key works for all 100+ models on NVIDIA's free tier.
+
+> **If a model 403s or hangs forever:** some model families need a one-time per-family registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. Newer models like `kimi-k2.6` and `deepseek-v4-pro` are the usual culprits, and the symptom is often an indefinite hang rather than a clean error.
 
 ---
 
@@ -86,6 +90,8 @@ Go to the [GitHub releases page](https://github.com/anomalyco/opencode/releases)
 ```powershell
 opencode --version
 ```
+
+> **Not just a terminal app anymore.** OpenCode also ships a desktop app and an IDE extension. The NVIDIA NIM provider config in Section 4 is shared across all three, so setting it up once covers whichever surface you use.
 
 > **"opencode is not recognized" error:** Close and reopen your terminal. If using npm and it still fails, run `npm config get prefix` and add its `\bin` folder to your system PATH.
 
@@ -142,6 +148,13 @@ Create or edit that file with the following content, replacing the API key with 
             "context": 262144,
             "output": 32768
           }
+        },
+        "zai-org/glm-5.2": {
+          "name": "GLM-5.2",
+          "limit": {
+            "context": 204800,
+            "output": 32768
+          }
         }
       }
     }
@@ -194,20 +207,21 @@ Or type `/models` directly in the chat input.
 
 ## 7. Picking a Model
 
-NVIDIA NIM hosts 100+ free models. Browse the full catalog at [https://build.nvidia.com/models](https://build.nvidia.com/models). Some good picks for coding (May 2026):
+NVIDIA NIM hosts 120+ models, roughly 99 of them free-tier callable. Browse the full catalog at [https://build.nvidia.com/models](https://build.nvidia.com/models). Some good picks for coding (July 2026):
 
 | Model ID | Best for |
 |---|---|
 | `deepseek-ai/deepseek-v4-flash` | Default recommendation — fast, 1M context, strong coding |
 | `deepseek-ai/deepseek-v4-pro` | Higher quality on hard problems, slower (1.6T MoE) |
-| `moonshotai/kimi-k2.6` | Long-horizon agentic coding (256K context) — but slow latency |
+| `zai-org/glm-5.2` | Current strongest open-weight agentic coder |
 | `qwen/qwen3-coder-480b-a35b-instruct` | Code-specialist Qwen3 |
-| `nvidia/llama-3.3-nemotron-super-49b` | NVIDIA-tuned Llama 3.3 |
+| `nvidia/nemotron-3-super-120b-a12b` | NVIDIA's own flagship MoE, good general coder |
+| `moonshotai/kimi-k2.6` | Long-horizon agentic coding (256K context) — but slow latency |
 | `meta/llama-4-maverick-17b-128e-instruct` | Meta's latest |
 
 To add more models, just add entries to the `models` map in `opencode.json` and restart OpenCode.
 
-> Model IDs change over time. The authoritative list is the URL slug on the model card page on build.nvidia.com.
+> Model IDs change over time. The authoritative list is the URL slug on the model card page on build.nvidia.com. New models land quickly — GLM-5.2 showed up on NIM about two weeks after its public release.
 
 ---
 
@@ -249,7 +263,7 @@ OpenCode edits files directly. Review changes in your editor or with `git diff`.
 ## 9. Tips
 
 ### Free tier rate limits
-NVIDIA's free tier is roughly **40 requests per minute** across all models, but limits vary by model. If you get a 429 error, wait a minute and retry.
+NVIDIA's free tier is roughly **40 requests per minute**, and that budget is **shared across all models** rather than allocated per model. If you get a 429, wait a minute and retry. Agentic tools like OpenCode burn requests faster than chat does, so this is a real ceiling on long autonomous runs.
 
 ### Context window
 DeepSeek V4 Flash and Pro both support **1,000,000 tokens** of context — enough for most full repos. OpenCode automatically includes relevant files.
@@ -340,8 +354,9 @@ opencode
 | `/models` doesn't show NVIDIA NIM | Check that `opencode.json` is valid JSON (no trailing commas, correct path) |
 | API returns 401 Unauthorized | Double-check your `nvapi-` key in opencode.json |
 | API returns 404 Not Found | Verify the model ID matches a current model on build.nvidia.com |
+| API returns 403, or request hangs forever | Model family needs one-time registration — open its page on build.nvidia.com and click "Try API", then retry |
 | API returns 410 Gone | Model has been deprecated — pick a different one |
-| API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM) — wait 60 seconds and retry |
+| API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM, shared across models) — wait 60 seconds and retry |
 | Slow responses | Normal for reasoning models. Try DeepSeek V4 Flash for faster responses |
 | Config changes not picked up | Restart OpenCode after editing opencode.json |
 

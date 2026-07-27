@@ -84,30 +84,32 @@ ollama rm llama3.2
 
 ---
 
-## 4. Recommended Free Models (May 2026)
+## 4. Recommended Free Models (July 2026)
 
 | Model | Pull command | Size | Best for |
 |---|---|---|---|
-| Llama 3.2 1B | `ollama pull llama3.2:1b` | ~1GB | Very fast, minimal hardware |
+| Qwen 3.5 0.8B | `ollama pull qwen3.5:0.8b` | ~1GB | Very fast, minimal hardware |
 | Llama 3.2 3B | `ollama pull llama3.2` | ~2GB | Fast everyday tasks, low RAM |
-| Gemma 3 4B | `ollama pull gemma3:4b` | ~3GB | Google's latest small multimodal model |
-| Qwen 3 8B | `ollama pull qwen3:8b` | ~5GB | Strong all-around coding/reasoning at 8B |
-| Llama 3.1 8B | `ollama pull llama3.1` | ~5GB | Reliable general-purpose model |
+| Qwen 3.5 4B | `ollama pull qwen3.5:4b` | ~3GB | Best tiny generalist right now |
+| Qwen 3.5 9B | `ollama pull qwen3.5:9b` | ~6GB | Strong all-around coding/reasoning at single-GPU size |
 | DeepSeek R1 8B | `ollama pull deepseek-r1:8b` | ~5GB | Reasoning model with visible thinking |
-| Phi-4 14B | `ollama pull phi4` | ~9GB | Microsoft model, strong reasoning/coding |
-| Qwen 3 14B | `ollama pull qwen3:14b` | ~9GB | Best mid-range generalist |
-| Devstral Small 24B | `ollama pull devstral` | ~14GB | Purpose-built for agentic coding (multi-file edits) |
-| Qwen 3 Coder 30B | `ollama pull qwen3-coder` | ~18GB | Code-specialist Qwen3 — best local coding model |
-| Llama 4 Scout 17B | `ollama pull llama4:scout` | ~10GB (MoE) | Meta's 2026 release, MoE so VRAM-friendly |
-| Kimi K2.6 | `ollama pull kimi-k2.6` | huge | Long-horizon agentic — heavy hardware only |
+| Gemma 4 12B | `ollama pull gemma4:12b` | ~8GB | Google's 2026 multimodal flagship, smallest size |
+| GPT-OSS 20B | `ollama pull gpt-oss:20b` | ~13GB | OpenAI open weights, MXFP4, 128K context — great 16GB pick |
+| Devstral Small 2 24B | `ollama pull devstral-small-2` | ~14GB | Agentic coding, now with vision + tools |
+| Gemma 4 26B | `ollama pull gemma4:26b` | ~16GB | Frontier-ish quality on a 24GB card |
+| Qwen 3.6 27B | `ollama pull qwen3.6:27b` | ~17GB | Best mid-range generalist |
+| Qwen 3 Coder 30B | `ollama pull qwen3-coder` | ~19GB | Code specialist, 256K context — best local coding model |
+| Devstral 2 123B | `ollama pull devstral-2` | ~70GB | Large agentic coder, multi-GPU territory |
 
 > **Not sure what fits your hardware?** A rough guide at Q4 quantization:
-> - 8GB RAM/VRAM → 3B or smaller
-> - 16GB RAM/VRAM → 7B–8B comfortably
-> - 24GB+ VRAM → 13B–32B
-> - 48GB+ VRAM → 70B models
+> - 8GB RAM/VRAM → 4B or smaller
+> - 16GB RAM/VRAM → 9B–20B (`gpt-oss:20b` is the standout here)
+> - 24GB+ VRAM → 24B–32B
+> - 48GB+ VRAM → 70B and up
 >
-> **For local coding specifically:** Qwen 3 Coder is the current top pick. Devstral Small is a close second and specifically tuned for agentic workflows (read → reason → edit → verify loop).
+> **For local coding specifically:** `qwen3-coder:30b` is still the top pick for raw code quality. `devstral-small-2` is the pick for agentic workflows (read → reason → edit → verify loop) and is the only local coder with a published agentic benchmark, at 46.8% SWE-Bench Verified in 14GB.
+>
+> **Note on the very large models:** GLM-5.2 and Kimi K2.6 lead the open-weight benchmarks, but GLM-5.2 is a ~753B/40B-active MoE that needs multi-GPU servers or a 256GB+ unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally.
 
 Browse all available models at [https://ollama.com/library](https://ollama.com/library).
 

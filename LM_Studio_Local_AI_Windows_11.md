@@ -56,22 +56,24 @@ Models come in different quantized sizes. Higher Q = better quality but more RAM
 
 **Rule of thumb:** Start with **Q4_K_M** of your chosen model.
 
-### Recommended models to start with (May 2026)
+### Recommended models to start with (July 2026)
 
 | Model | Size (Q4) | Best for |
 |---|---|---|
 | Llama 3.2 3B | ~2GB | Fast, everyday tasks |
-| Gemma 3 4B | ~3GB | Latest small Google model, multimodal |
-| Qwen 3 8B | ~5GB | Strong all-around at 8B |
-| Llama 3.1 8B | ~5GB | Reliable general-purpose |
+| Qwen 3.5 4B | ~3GB | Best tiny generalist right now |
+| Qwen 3.5 9B | ~6GB | Strong all-around at single-GPU size |
 | DeepSeek R1 8B | ~5GB | Reasoning with visible thinking mode |
-| Phi-4 14B | ~9GB | Microsoft's reasoning model |
-| Qwen 3 14B | ~9GB | Best mid-range generalist |
-| Devstral Small 24B | ~14GB | Purpose-built for agentic coding |
-| Qwen 3 Coder 30B | ~18GB | Best local coding model right now |
-| Llama 4 Scout 17B (MoE) | ~10GB | Meta's 2026 release |
+| Gemma 4 12B | ~8GB | Google's 2026 multimodal flagship, smallest size |
+| GPT-OSS 20B | ~13GB | OpenAI open weights, 128K context — great 16GB pick |
+| Devstral Small 2 24B | ~14GB | Agentic coding, with vision + tools |
+| Gemma 4 26B | ~16GB | Frontier-ish quality on a 24GB card |
+| Qwen 3.6 27B | ~17GB | Best mid-range generalist |
+| Qwen 3 Coder 30B | ~19GB | Best local coding model right now |
 
-> **For local coding specifically:** Qwen 3 Coder is the current top pick. Devstral Small is a close second and specifically tuned for agentic workflows.
+> **For local coding specifically:** Qwen 3 Coder is the current top pick for code quality. Devstral Small 2 is the pick for agentic workflows, and is the only local coder with a published agentic score (46.8% SWE-Bench Verified at 14GB).
+
+> **GGUF availability lags Ollama.** LM Studio pulls from Hugging Face, so a brand-new model is usable here as soon as someone publishes a GGUF quant — which is often the same week, but occasionally not at all for very large MoE models. If a model in this table does not appear in Discover yet, check back or use Ollama for that one.
 
 ---
 

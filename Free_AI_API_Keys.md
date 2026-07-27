@@ -2,7 +2,9 @@
 
 A reference guide to AI providers offering free API access — no credit card required (unless noted). All entries have ongoing free tiers, not just one-time trial credits.
 
-> **Note:** Rate limits, model availability, and free tier terms change frequently. Always verify current limits on the provider's pricing page before building on a free tier. Last reviewed May 2026.
+> **Note:** Rate limits, model availability, and free tier terms change frequently. Always verify current limits on the provider's pricing page before building on a free tier. Last reviewed July 2026.
+
+> **Free tiers tightened noticeably in mid-2026.** Cerebras cut its free catalog from about a dozen models to two, OpenRouter dropped unfunded accounts to 50 requests/day, and Google's consumer CLI free tier moved to a much smaller compute-based quota. The numbers below reflect that; anything you read from early 2026 is likely too generous.
 
 ---
 
@@ -10,10 +12,10 @@ A reference guide to AI providers offering free API access — no credit card re
 
 | Provider | Notable Free Models | OpenAI-Compatible | Credit Card Required |
 |---|---|---|---|
-| [NVIDIA NIM](#nvidia-nim) | DeepSeek V4 Flash/Pro, Kimi K2.6, Qwen3 Coder, Llama 4, GLM-5.1, 100+ more | Yes | No |
+| [NVIDIA NIM](#nvidia-nim) | DeepSeek V4 Flash/Pro, GLM-5.2, Qwen3.5, Kimi K2.6, Nemotron 3 Super 120B, 100+ more | Yes | No (phone verification) |
 | [Groq](#groq) | GPT-OSS 120B/20B, Llama 3.3 70B, Llama 4 Scout | Yes | No |
-| [Google AI Studio](#google-ai-studio) | Gemini 3 Flash, Gemini 3.1 Flash-Lite, Gemini 2.5 Flash | Yes | No |
-| [Cerebras](#cerebras) | Llama 3.3 70B, Qwen3 32B/235B, GPT-OSS 120B | Yes | No |
+| [Google AI Studio](#google-ai-studio) | Gemini 3.5 Flash, Gemini 3.1 Flash-Lite | Yes | No |
+| [Cerebras](#cerebras) | GPT-OSS 120B, GLM-4.7 (only two on free tier) | Yes | No |
 | [SambaNova](#sambanova) | Llama 4 Scout/Maverick, DeepSeek V3.1, QwQ-32B | Yes | No |
 | [OpenRouter](#openrouter) | Many (`:free` tagged models) | Yes | No |
 | [Hugging Face](#hugging-face) | Thousands of models | Partial | No |
@@ -27,24 +29,27 @@ A reference guide to AI providers offering free API access — no credit card re
 
 **URL:** https://build.nvidia.com
 
-The largest free catalog around — 100+ frontier hosted models via the NVIDIA Developer Program. As of May 2026 the lineup includes the new DeepSeek V4 family, Kimi K2.6, Qwen3 series, Llama 4, GLM-5.1, MiniMax M2.7, and many Nemotron variants.
+The largest free catalog around — 120+ frontier hosted models via the NVIDIA Developer Program, of which roughly 99 are free-tier callable. As of July 2026 the lineup includes the DeepSeek V4 family, GLM-5.2, the Qwen3.5 series, Kimi K2.6, Llama 4, and many Nemotron variants. New models land fast: GLM-5.2 appeared about two weeks after its public release.
 
-- **Sign-up:** Free NVIDIA Developer account, no credit card
+- **Sign-up:** Free NVIDIA Developer account. No credit card, but **phone verification is now required** at signup.
 - **Notable free models:**
   - `deepseek-ai/deepseek-v4-flash` (284B MoE, 1M context, coding/agentic)
   - `deepseek-ai/deepseek-v4-pro` (1.6T MoE, 1M context)
-  - `moonshotai/kimi-k2.6` (256K context, long-horizon agentic)
+  - `zai-org/glm-5.2` (current top-tier open-weight agentic model)
   - `qwen/qwen3-coder-480b-a35b-instruct` (code specialist)
+  - `moonshotai/kimi-k2.6` (256K context, long-horizon agentic)
+  - `nvidia/nemotron-3-super-120b-a12b` (NVIDIA's own flagship MoE)
   - `meta/llama-4-maverick-17b-128e-instruct`, `meta/llama-4-scout-17b-16e-instruct`
-  - `zai-org/glm-5.1-air` (agentic workflows)
-  - `nvidia/llama-3.3-nemotron-super-49b`
 - **OpenAI-compatible:** Yes — `https://integrate.api.nvidia.com/v1`
 - **Key prefix:** `nvapi-`
-- **Rate limits:** ~40 requests/min on free tier, varies by model
+- **Rate limits:** ~40 requests/min, shared across all models rather than per-model
+- **Context range:** 8K to 1M tokens depending on model
 - **Standout feature:** One API key, 100+ models. Largest free hosted catalog available.
 - **Guides in this repo:** [Aider + NVIDIA NIM](Aider_Setup_NVIDIA_NIM.md) | [OpenCode + NVIDIA NIM](OpenCode_Setup_NVIDIA_NIM.md)
 
-> **Heads-up on retired models:** Moonshot's Kimi K2.5 and K2 (Instruct/Thinking) were retired from NVIDIA NIM in April–May 2026. K2.6 is the current Kimi offering but has noticeably higher latency than DeepSeek or Qwen alternatives.
+> **The 403 / hang gotcha (important):** Some model families need a separate per-family registration before your standard `nvapi-` key can call them. The model shows in the catalog, but requests 404, 403, or hang indefinitely. Newer models like `kimi-k2.6` and `deepseek-v4-pro` are common culprits. **Fix:** open that model's page on build.nvidia.com and click **"Try API"** once to register your account for the family, then retry.
+
+> **Heads-up on retired models:** Moonshot's Kimi K2.5 and K2 (Instruct/Thinking) were retired from NVIDIA NIM in April–May 2026. K2.6 is the current Kimi offering but has noticeably higher latency than the DeepSeek, GLM, or Qwen alternatives.
 
 ---
 
@@ -65,8 +70,11 @@ Extremely fast inference (custom LPU hardware). One of the fastest free APIs ava
 - **OpenAI-compatible:** Yes — `https://api.groq.com/openai/v1`
 - **Key prefix:** `gsk_`
 - **Context window:** 131,072 tokens on production models
-- **Rate limits:** Per-model per-minute and per-day token limits (generous for personal use)
-- **Standout feature:** Lowest latency of any free provider — perfect for chat or interactive agents
+- **Rate limits (July 2026):** Roughly **30 requests/min, 1,000 requests/day** per model on the default free tier, with per-model token caps (`llama-3.3-70b-versatile` at 12K TPM / 100K TPD, `openai/gpt-oss-120b` at 8K TPM / 200K TPD). Llama 4 Maverick runs at half quota (15 RPM / 500 RPD).
+- **Important:** limits are enforced **per organization, not per API key**. Extra keys under the same org share one bucket.
+- **Standout feature:** Lowest latency of any free provider — perfect for chat or interactive agents. Every model is available on the free tier; you are gated by rate limits only, with no credits system and no per-token charge.
+
+> **Cheap upgrade:** adding a credit card with zero minimum spend unlocks up to 10x the free rate limits plus a 25% token discount. Worth knowing if 30 RPM is your only blocker.
 
 ---
 
@@ -77,17 +85,19 @@ Extremely fast inference (custom LPU hardware). One of the fastest free APIs ava
 Google's developer portal for Gemini models.
 
 - **Sign-up:** Google account, no credit card
-- **Notable free models (May 2026):**
-  - `gemini-3.1-flash-lite` (GA, 1M context, fastest)
-  - `gemini-3-flash` (newer Flash model)
-  - `gemini-2.5-flash` (still around, very reliable)
-  - `gemini-2.5-flash-lite` (cheapest)
+- **Notable free models (July 2026):**
+  - `gemini-3.5-flash` (current flagship Flash, 15 RPM / 1,500 RPD)
+  - `gemini-3.1-flash-lite` (1M context, fastest and cheapest)
 - **OpenAI-compatible:** Yes — `https://generativelanguage.googleapis.com/v1beta/openai/`
 - **Key prefix:** `AIza`
-- **Rate limits:** 5–15 requests/min and 100–1,500 requests/day depending on model; 250K tokens/min cap
-- **Standout feature:** 1M-token context on all Gemini 3 Flash and 2.5 Flash models, free
+- **Rate limits:** 15 requests/min and up to 1,500 requests/day on Gemini 3.5 Flash; lower on some models
+- **Standout feature:** 1M-token context on the free Flash models, and the free tier is permanent rather than trial-based
 
-> **Important policy change (April 1, 2026):** Google moved all **Pro** models behind the paid tier. `gemini-2.5-pro`, `gemini-3.1-pro`, and other Pro variants are **no longer free**. Only Flash and Flash-Lite remain on the free tier.
+> **Pro models are paid (since April 1, 2026).** `gemini-3.1-pro`, `gemini-2.5-pro`, and the image-generation models are paid-only. Only Flash and Flash-Lite remain free.
+
+> **Privacy caveat:** Google may use free-tier inputs and outputs to improve its models. Commercial use is allowed, but if your prompts are sensitive, use the paid tier or Vertex AI, neither of which trains on your data.
+
+> **Not the same as the CLI.** The Google AI Studio *API* free tier is alive and well. It was the consumer **Gemini CLI** that shut down on June 18, 2026 — see the [Antigravity CLI guide](Antigravity_CLI_Setup_Windows_11.md).
 
 ---
 
@@ -98,12 +108,14 @@ Google's developer portal for Gemini models.
 Fast inference on Cerebras wafer-scale chips. Among the fastest publicly available, especially for Llama models.
 
 - **Sign-up:** Free account, no credit card
-- **Notable free models:** `llama-3.3-70b`, `qwen-3-32b`, `qwen-3-235b-a22b`, `gpt-oss-120b`
+- **Notable free models:** `gpt-oss-120b` and `glm-4.7` — **that is the whole free catalog now**
 - **OpenAI-compatible:** Yes — `https://api.cerebras.ai/v1`
 - **Key prefix:** `csk-`
-- **Rate limits:** 30 requests/min, 60K tokens/min, **1M tokens/day** — does not expire
-- **Caveat:** Free tier has an 8,192-token context cap across all models. Paid tier unlocks full context.
-- **Standout feature:** Among the fastest inference speeds available publicly. 2,600+ tokens/sec on Llama 4 Scout.
+- **Rate limits:** 5 requests/min, 30K tokens/min, **1M tokens/day** — resets daily, does not expire
+- **Caveat:** Free tier caps context at 8,192 tokens on these models. Paid unlocks full context (up to 131K).
+- **Standout feature:** Still among the fastest inference available publicly, at 2,600+ tokens/sec.
+
+> **Major downgrade (May 31, 2026):** Cerebras collapsed its free catalog from roughly a dozen models to **two**, and cut free-tier throughput to 5 RPM / 30K TPM. The Llama 3.3 70B, Qwen3 32B, and Qwen3 235B free endpoints this guide previously listed are gone. The 1M tokens/day headline number survived, but you can no longer spend it quickly or on the model of your choice.
 
 ---
 
@@ -133,12 +145,14 @@ Free access to large open-weight models on Cerebras-like high-speed accelerators
 
 A routing layer that aggregates many providers. Has a set of permanently free models tagged with `:free`.
 
-- **Sign-up:** Free account, no credit card for free models
-- **Notable free models:** Various Llama, Qwen, Gemma, DeepSeek, GLM and other `:free`-tagged endpoints (search for `:free` on their models page)
+- **Sign-up:** Free account, no credit card needed to sign up or to call `:free` models at a $0 balance
+- **Notable free models:** 18–28 `:free`-tagged endpoints at any given time, including DeepSeek R1, Llama 3.3 70B, Qwen3 Coder 480B (262K context), Gemma 3, and Gemini Flash
 - **OpenAI-compatible:** Yes — `https://openrouter.ai/api/v1`
 - **Key prefix:** `sk-or-`
-- **Rate limits:** 20 requests/min, 200 requests/day on free tier (paid credits raise this significantly)
+- **Rate limits:** 20 requests/min always, plus **50 requests/day on an unfunded account**
 - **Standout feature:** Single API key works across dozens of models and providers — great for testing many models without juggling keys
+
+> **The $10 lever:** buying $10 in credits **once** raises the daily cap from 50 to 1,000 requests/day permanently, and the credits never expire. This is the single best value unlock among the providers in this guide. (Minimum purchase is $5, but $10 is the threshold that moves the daily limit.)
 
 ---
 
@@ -203,19 +217,25 @@ Specializes in text generation, embeddings, and retrieval. Good free trial keys 
 ## Tips for Using Free APIs
 
 **Rotate providers to avoid rate limits**
-Most tools (Aider, OpenCode, Gemini CLI, etc.) let you switch models mid-session. If you hit a rate limit on one provider, switch to another. Cerebras/Groq are great for speed; NVIDIA NIM for variety; SambaNova for the biggest open-weight models.
+Most tools (Aider, OpenCode, etc.) let you switch models mid-session. If you hit a rate limit on one provider, switch to another. Groq is great for speed; NVIDIA NIM for variety and context length; SambaNova for the biggest open-weight models.
 
 **Prefer OpenAI-compatible providers**
-Tools like Aider, OpenCode, Codex, and Gemini CLI work out of the box with any OpenAI-compatible endpoint — just set `OPENAI_BASE_URL` and `OPENAI_API_KEY`.
+Tools like Aider, OpenCode, and Codex work out of the box with any OpenAI-compatible endpoint — just set `OPENAI_BASE_URL` and `OPENAI_API_KEY`.
 
 **Watch for context window differences**
-Free-tier context limits vary widely. DeepSeek V4 Flash (1M), Kimi K2.6 (256K), and Gemini Flash (1M) are among the largest. Cerebras free tier currently caps at 8,192 tokens — useful for speed but not for long context.
+Free-tier context limits vary widely. DeepSeek V4 Flash/Pro (1M), Gemini Flash (1M), and Kimi K2.6 (256K) are among the largest. Cerebras free tier caps at 8,192 tokens, which is fine for quick chat but useless for feeding it a repo.
+
+**Check the daily cap, not just the per-minute one**
+The requests-per-minute number is rarely what stops you. The daily ceiling is: OpenRouter at 50/day unfunded, Groq at ~1,000/day per model, Google at 1,500/day. Budget against that.
 
 **Keep API keys out of code**
 Store keys as environment variables or in config files outside your git repos. Never commit them. Many providers (NVIDIA, Groq, Gemini) will rotate / revoke keys that get leaked publicly.
 
 **Pin to model IDs that exist on the model card page today**
-Free hosted models churn quickly. Kimi K2.5 was retired this past spring; older Llama and Mistral models get rotated out too. If you see a 404 or 410, check the provider's model catalog page for a current ID.
+Free hosted models churn quickly. Kimi K2.5 was retired in spring 2026, and Cerebras dropped most of its free catalog on May 31. If you see a 404 or 410, check the provider's model catalog page for a current ID. On NVIDIA NIM specifically, a 403 or an indefinite hang usually means the model family needs a one-time "Try API" registration rather than a dead ID.
+
+**Assume free tiers shrink**
+Every provider in this guide that changed its free tier in 2026 made it smaller, not larger. If a free tier is load-bearing for something you care about, have a second provider configured before you need it.
 
 ---
 
@@ -227,8 +247,8 @@ All providers listed in this guide operate US or EU-based datacenters — your p
 |---|---|---|---|
 | Kimi K2.6 | Moonshot AI (China) | NVIDIA NIM (US) | US |
 | DeepSeek V4 / R1 | DeepSeek (China) | NVIDIA NIM, SambaNova (US) | US |
-| Qwen 3 | Alibaba (China) | NVIDIA NIM, Cerebras, SambaNova (US) or Ollama (local) | Local or US |
-| GLM-5.1 | Zhipu AI (China) | NVIDIA NIM (US) | US |
+| Qwen 3 / 3.5 | Alibaba (China) | NVIDIA NIM, SambaNova (US) or Ollama (local) | Local or US |
+| GLM-4.7 / GLM-5.2 | Zhipu AI (China) | NVIDIA NIM, Cerebras (US) | US |
 
 The model weights being of Chinese origin does not mean your data leaves US/EU infrastructure when using the providers above. The distinction matters if you are working with sensitive or proprietary code and your compliance team has views on either model lineage or data location.
 

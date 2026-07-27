@@ -4,15 +4,19 @@ Aider is a terminal-based AI pair-programming tool that edits code in your local
 
 **Aider runs natively on Windows 11.** No WSL (Windows Subsystem for Linux) needed. Everything below uses PowerShell, which comes built into Windows 11.
 
-> **Recommended model (May 2026):** `deepseek-ai/deepseek-v4-flash` — DeepSeek's 284B MoE coding model with a 1M-token context window. Free on NVIDIA NIM, optimized for coding and agentic tasks. The Kimi K2.5 model previously featured in this guide was retired in April 2026; the configuration steps below work the same for any NVIDIA-hosted model — just swap the model ID.
+> **Recommended model (July 2026):** `deepseek-ai/deepseek-v4-flash` — DeepSeek's 284B MoE coding model with a 1M-token context window. Free on NVIDIA NIM, optimized for coding and agentic tasks. The Kimi K2.5 model previously featured in this guide was retired in April 2026; the configuration steps below work the same for any NVIDIA-hosted model — just swap the model ID.
+
+> **Aider version note (July 2026):** the current release is **0.86.2** (February 2026). Aider has not shipped a release in several months, so treat 0.86.2 as the stable target rather than waiting on a newer one.
 
 ---
 
 ## 1. Prerequisites (Install These First)
 
-### A) Python 3.10 - 3.13
+### A) Python 3.10 - 3.12
 
-Aider supports **Python 3.10 - 3.13**. The recommended install method (`uv tool` or `aider-install`) handles Python automatically if you have a newer or older system Python.
+Aider requires **Python >=3.10, <3.13**. Python 3.13 and 3.14 are **not** supported by the current release (0.86.2) despite what some older write-ups claim — the package metadata caps it below 3.13.
+
+If your system Python is 3.13+, use the `uv tool` or `aider-install` methods below, which install a compatible Python (3.12) for Aider in an isolated environment rather than fighting your system install.
 
 **Check if you already have Python:**
 
@@ -80,12 +84,14 @@ Most users will NOT need this step. Only do it if you see the error.
 ## 2. Get Your Free NVIDIA API Key
 
 1. Go to [https://build.nvidia.com](https://build.nvidia.com)
-2. Sign in or create a free NVIDIA Developer account (just an email — no credit card)
+2. Sign in or create a free NVIDIA Developer account (email plus **phone verification** — still no credit card)
 3. Pick any model — for example [DeepSeek V4 Flash](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash)
 4. Click **"Get API Key"** (or "Build with this NIM")
 5. Copy the key — it starts with `nvapi-`
 
 A single `nvapi-` key works for all 100+ models on NVIDIA's free tier. You do not need a different key per model.
+
+> **If a model 403s or hangs forever:** some model families need a one-time per-family registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. This trips people up most often on newer models like `kimi-k2.6` and `deepseek-v4-pro`, where the symptom is an indefinite hang rather than a clean error.
 
 ---
 
@@ -109,7 +115,7 @@ uv tool install --force --python python3.12 --with pip aider-chat@latest
 
 ### Option B: One-liner installer
 
-Works even if your system Python is 3.14+ — it installs its own Python 3.12.
+Works even if your system Python is 3.13+ — it installs its own Python 3.12.
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://aider.chat/install.ps1 | iex"
@@ -122,7 +128,7 @@ python -m pip install aider-install
 aider-install
 ```
 
-### Option D: Plain pip (Python 3.10-3.13)
+### Option D: Plain pip (Python 3.10-3.12 only)
 
 ```powershell
 python -m pip install aider-chat
@@ -194,15 +200,16 @@ aider --model openai/deepseek-ai/deepseek-v4-flash --no-show-model-warnings
 
 ## 6. Picking a Model
 
-NVIDIA NIM hosts 100+ free models. Browse the full catalog at [https://build.nvidia.com/models](https://build.nvidia.com/models). Some good picks for coding (May 2026):
+NVIDIA NIM hosts 120+ models, roughly 99 of them free-tier callable. Browse the full catalog at [https://build.nvidia.com/models](https://build.nvidia.com/models). Some good picks for coding (July 2026):
 
 | Model ID | Best for |
 |---|---|
 | `deepseek-ai/deepseek-v4-flash` | Default recommendation — fast, 1M context, strong coding |
 | `deepseek-ai/deepseek-v4-pro` | Higher quality on hard problems, slower (1.6T MoE) |
-| `moonshotai/kimi-k2.6` | Long-horizon agentic coding (256K context) — but slow latency |
+| `zai-org/glm-5.2` | Current strongest open-weight agentic coder |
 | `qwen/qwen3-coder-480b-a35b-instruct` | Code-specialist Qwen3 |
-| `nvidia/llama-3.3-nemotron-super-49b` | NVIDIA-tuned Llama 3.3 |
+| `nvidia/nemotron-3-super-120b-a12b` | NVIDIA's own flagship MoE, good general coder |
+| `moonshotai/kimi-k2.6` | Long-horizon agentic coding (256K context) — but slow latency |
 | `meta/llama-4-maverick-17b-128e-instruct` | Meta's latest |
 
 To use any of these with Aider, just swap the model ID:
@@ -211,7 +218,7 @@ To use any of these with Aider, just swap the model ID:
 aider --model openai/qwen/qwen3-coder-480b-a35b-instruct
 ```
 
-> Model IDs change over time. The authoritative list is the URL slug on the model card page on build.nvidia.com.
+> Model IDs change over time. The authoritative list is the URL slug on the model card page on build.nvidia.com. New models land quickly — GLM-5.2 showed up on NIM about two weeks after its public release.
 
 ---
 
@@ -272,10 +279,10 @@ You type plain English to describe what you want changed. Aider edits the files 
 ## 9. Tips
 
 ### Free tier rate limits
-NVIDIA's free tier is roughly **40 requests per minute** across all models, but limits vary by model. If you get a 429 error, wait a minute and retry.
+NVIDIA's free tier is roughly **40 requests per minute**, and that budget is **shared across all models** rather than allocated per model. If you get a 429, wait a minute and retry.
 
 ### Context windows
-DeepSeek V4 Flash and Pro both support **1,000,000 tokens** of context — enough for most full repos. Kimi K2.6 gives you 256K. Free Llama models on NVIDIA are typically capped at 128K.
+DeepSeek V4 Flash and Pro both support **1,000,000 tokens** of context — enough for most full repos. Kimi K2.6 gives you 256K. Free Llama models on NVIDIA are typically capped at 128K. Across the whole catalog the range is 8K to 1M, so check the model card before assuming you can feed it a large repo.
 
 ### Edit format
 If a model has trouble producing correct code edits (often happens with smaller / older models), try the `whole` format:
@@ -335,8 +342,9 @@ Then type: `Create a hello.py that prints "Hello World"` and press Enter.
 ## Quick Start Summary
 
 ```powershell
-# 1. Install Python 3.10-3.13 from https://www.python.org/downloads/
+# 1. Install Python 3.10-3.12 from https://www.python.org/downloads/
 #    (check "Add python.exe to PATH" during install)
+#    3.13+ is NOT supported by aider 0.86.2 — uv handles this for you
 
 # 2. Install Git from https://git-scm.com/download/win
 
@@ -366,8 +374,10 @@ aider --model openai/deepseek-ai/deepseek-v4-flash
 | `setx` variables not working | You must close and reopen PowerShell after running setx |
 | API returns 401 Unauthorized | Double-check your `nvapi-` key is correct |
 | API returns 404 Not Found | Model ID may be wrong or model retired — check build.nvidia.com for current ID |
+| API returns 403, or request hangs forever | Model family needs one-time registration — open its page on build.nvidia.com and click "Try API", then retry |
 | API returns 410 Gone | Model has been deprecated — pick a different one |
-| API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM) — wait 60 seconds and retry |
+| API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM, shared across models) — wait 60 seconds and retry |
+| `pip install aider-chat` fails on Python 3.13+ | Aider 0.86.2 requires Python <3.13. Use the uv or `aider-install` method, which brings its own 3.12 |
 | Aider shows model warnings | Add `--no-show-model-warnings` or set `show-model-warnings: false` in config |
 | Edits are garbled or wrong | Try `--edit-format whole` for more reliable (but token-heavy) edits |
 
