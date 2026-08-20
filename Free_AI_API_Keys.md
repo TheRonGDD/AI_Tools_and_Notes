@@ -41,7 +41,7 @@ The largest free catalog around. A live call to `GET /v1/models` on 2026-08-20 r
   - `nvidia/nemotron-3-super-120b-a12b` (120B / 12B active, 1M context)
   - `nvidia/nemotron-3-ultra-550b-a55b` (550B / 55B active, 262K context)
   - `nvidia/nemotron-3.5-lightning-30b-a3b` (small, fast, low-latency)
-  - `openai/gpt-oss-20b` (`openai/gpt-oss-120b` also exists but needed the "Try API" registration below on a fresh key: it hung for 240 seconds without responding)
+  - `openai/gpt-oss-20b` (`openai/gpt-oss-120b` also exists, but needed the "Try API" registration below on a fresh key)
 - **OpenAI-compatible:** Yes — `https://integrate.api.nvidia.com/v1`
 - **Key prefix:** `nvapi-`
 - **Rate limits:** ~40 requests/min, shared across all models rather than per-model. You can apply for a 200 RPM increase through the NVIDIA Developer Forums.
@@ -65,7 +65,7 @@ NVIDIA's failure modes look similar from the outside but mean very different thi
 
 > **Recently retired on NIM (confirmed by live `410` responses):** `deepseek-ai/deepseek-v4-flash` and `deepseek-ai/deepseek-v4-pro` (both EOL 2026-08-07), `meta/llama-4-maverick-17b-128e-instruct` (2026-07-27), `qwen/qwen3-coder-480b-a35b-instruct` (2026-06-11), `moonshotai/kimi-k2-instruct` (2026-05-12). Kimi K2.5 no longer resolves at all. NVIDIA appears to have cleared capacity for Kimi K3 and the updated DeepSeek build.
 
-> **`moonshotai/kimi-k2.6` is still listed but gated.** It appears in the `/v1/models` catalog but returns `Function ... Not found for account` until you click "Try API" on its model page. Kimi K3 is the better choice anyway.
+> **Expect to hit the registration gate on a fresh key.** This is not a rare edge case. Testing a brand-new key on 2026-08-20, four of the catalog's most popular models were unreachable on a key not yet registered for them: `openai/gpt-oss-120b`, `google/gemma-4-31b-it`, and `meta/llama-3.3-70b-instruct` each hung for a full four minutes with no response at all, and `moonshotai/kimi-k2.6` returned `Function ... Not found for account`. All of them are listed in `/v1/models`, so the catalog is not a reliable guide to what your key can actually call. Click "Try API" once on each model page you plan to use, before you wire it into a config. (The hang and the `Not found for account` error were both reproduced directly; the "Try API" step is NVIDIA's documented remedy for them.)
 
 ---
 

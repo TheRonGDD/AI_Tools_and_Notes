@@ -51,7 +51,7 @@ A single `nvapi-` key works for all 100+ models on NVIDIA's free tier.
 
 > **Choose your key's expiry deliberately.** NVIDIA now asks for a time-to-live when you generate a key, from one hour up to "never expires." Pick something long and note the date. An expired key returns `403 Authorization failed` on every live model, which reads like a catalog problem rather than an auth problem.
 
-> **If a model 404s or hangs forever:** some models need a one-time per-account registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. Verified on a fresh key on 2026-08-20: `openai/gpt-oss-120b` hung for four minutes with no response, and `moonshotai/kimi-k2.6` returned `Function '<uuid>': Not found for account`. Both are fixed by the "Try API" click.
+> **If a model 404s or hangs forever:** some models need a one-time per-account registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. Expect this on a fresh key: it is common, not an edge case. On a brand-new key tested 2026-08-20, `openai/gpt-oss-120b`, `google/gemma-4-31b-it`, and `meta/llama-3.3-70b-instruct` each hung for a full four minutes with no response, and `moonshotai/kimi-k2.6` returned `Function '<uuid>': Not found for account`. All four are listed in the catalog, so `/v1/models` is not a reliable guide to what your key can actually call.
 
 ### Decoding NVIDIA's error responses
 
