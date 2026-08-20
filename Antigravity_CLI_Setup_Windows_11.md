@@ -44,6 +44,8 @@ The Antigravity desktop app bundles the CLI.
 agy --version
 ```
 
+Current version as of 2026-08-20 is **1.1.15**. On Windows the binary installs under `%LOCALAPPDATA%`, in the `agy\bin` subfolder.
+
 > **"agy is not recognized" error:** Close and reopen PowerShell so the PATH change takes effect. The binary is `agy`, not `antigravity` and not `gemini`.
 
 ---
@@ -80,7 +82,19 @@ Practical notes:
 - Hitting the weekly ceiling can mean a multi-day cooldown, not a five-hour one.
 - Reports of the 5-hour refresh not landing on schedule are common.
 
+### If you need more quota
+
+| Plan | Cost | Roughly |
+|---|---|---|
+| Free | $0 | ~20 agent requests/day |
+| Google AI Pro | $20/mo | Baseline paid quota |
+| Google AI Ultra | $100/mo | ~5x Pro |
+| Google AI Ultra Max | $200/mo | ~20x Pro |
+| Credits | ~$0.01 each | Bulk, roughly $199 for 20,000 |
+
 Treat the free tier as enough to evaluate the multi-agent workflow, not as a daily driver. If you want a free terminal coding agent you can lean on all day, use [Aider](Aider_Setup_NVIDIA_NIM.md) or [OpenCode](OpenCode_Setup_NVIDIA_NIM.md) against NVIDIA NIM instead.
+
+> **The 20/day figure is not new, and not a Gemini CLI migration penalty.** Antigravity launched in November 2025 with 250 requests/day and was cut to ~20/day by December 2025, six months before Gemini CLI shut down. What changed in June 2026 is that Gemini CLI users lost their 1,000/day and landed on a quota that had already been reduced.
 
 ---
 

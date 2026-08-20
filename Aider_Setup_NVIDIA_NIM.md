@@ -4,9 +4,11 @@ Aider is a terminal-based AI pair-programming tool that edits code in your local
 
 **Aider runs natively on Windows 11.** No WSL (Windows Subsystem for Linux) needed. Everything below uses PowerShell, which comes built into Windows 11.
 
-> **Recommended model (July 2026):** `deepseek-ai/deepseek-v4-flash` — DeepSeek's 284B MoE coding model with a 1M-token context window. Free on NVIDIA NIM, optimized for coding and agentic tasks. The Kimi K2.5 model previously featured in this guide was retired in April 2026; the configuration steps below work the same for any NVIDIA-hosted model — just swap the model ID.
+> **Recommended model (August 2026):** `deepseek-ai/deepseek-v4-flash-0731` for everyday coding, or `moonshotai/kimi-k3` when you need the strongest free model available. Both are free on NVIDIA NIM with 1M-token context windows.
+>
+> **If you followed the July version of this guide, your config is broken.** `deepseek-ai/deepseek-v4-flash` and `deepseek-ai/deepseek-v4-pro` both reached end of life on **2026-08-07** and now return `410 Gone`. Replace the model ID with `deepseek-ai/deepseek-v4-flash-0731`, which is the direct successor and benchmarks better than either retired model (Artificial Analysis Intelligence Index 50, against 40 for the old V4 Flash).
 
-> **Aider version note (July 2026):** the current release is **0.86.2** (February 2026). Aider has not shipped a release in several months, so treat 0.86.2 as the stable target rather than waiting on a newer one.
+> **Aider version note (August 2026):** the current release is still **0.86.2** (2026-02-12), and the last commit to `main` was 2026-05-22. Aider has not shipped a release in roughly six months. It still works well and remains the best git-native option, but treat it as maintenance-mode software rather than something that will gain features soon.
 
 ---
 
@@ -85,13 +87,25 @@ Most users will NOT need this step. Only do it if you see the error.
 
 1. Go to [https://build.nvidia.com](https://build.nvidia.com)
 2. Sign in or create a free NVIDIA Developer account (email plus **phone verification** — still no credit card)
-3. Pick any model — for example [DeepSeek V4 Flash](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash)
+3. Pick any model, for example [Kimi K3](https://build.nvidia.com/moonshotai/kimi-k3)
 4. Click **"Get API Key"** (or "Build with this NIM")
 5. Copy the key — it starts with `nvapi-`
 
 A single `nvapi-` key works for all 100+ models on NVIDIA's free tier. You do not need a different key per model.
 
-> **If a model 403s or hangs forever:** some model families need a one-time per-family registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. This trips people up most often on newer models like `kimi-k2.6` and `deepseek-v4-pro`, where the symptom is an indefinite hang rather than a clean error.
+> **Choose your key's expiry deliberately.** NVIDIA now asks for a time-to-live when you generate a key, anywhere from one hour to "never expires." Pick something long, and write down the date. An expired key is genuinely confusing to diagnose, see the table below.
+
+> **If a model 404s or hangs forever:** some models need a one-time per-account registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. Testing on a fresh key on 2026-08-20, `openai/gpt-oss-120b` and `moonshotai/kimi-k2.6` both needed this; the first hung for four minutes with no response, the second returned `Function '<uuid>': Not found for account`.
+
+### Decoding NVIDIA's error responses
+
+| Response | Meaning | Fix |
+|---|---|---|
+| `410 Gone` with an EOL date | Model is retired. Returned even if your key is bad, since the EOL check runs before auth. | Use a current model ID |
+| `404 page not found` | Slug does not exist, often a wrong org prefix | Verify the slug on build.nvidia.com |
+| `404` + `Function '<uuid>': Not found for account` | Model exists, your account is not registered for it | Click "Try API" on its model page |
+| `403 Authorization failed` on **every** live model | Key is invalid or expired | Generate a new key |
+| Hangs with no response | Same registration gap, failing silently | Click "Try API" on its model page |
 
 ---
 
@@ -177,7 +191,7 @@ Navigate to any project folder and run:
 
 ```powershell
 cd C:\path\to\your\project
-aider --model openai/deepseek-ai/deepseek-v4-flash
+aider --model openai/deepseek-ai/deepseek-v4-flash-0731
 ```
 
 The `openai/` prefix tells Aider to use the OpenAI-compatible API base. The rest is the NVIDIA model ID.
@@ -187,38 +201,53 @@ If the folder isn't a Git repo yet, initialize one first:
 ```powershell
 cd C:\path\to\your\project
 git init
-aider --model openai/deepseek-ai/deepseek-v4-flash
+aider --model openai/deepseek-ai/deepseek-v4-flash-0731
 ```
 
 Aider may show warnings about an unfamiliar model — this is normal. To suppress them:
 
 ```powershell
-aider --model openai/deepseek-ai/deepseek-v4-flash --no-show-model-warnings
+aider --model openai/deepseek-ai/deepseek-v4-flash-0731 --no-show-model-warnings
 ```
 
 ---
 
 ## 6. Picking a Model
 
-NVIDIA NIM hosts 120+ models, roughly 99 of them free-tier callable. Browse the full catalog at [https://build.nvidia.com/models](https://build.nvidia.com/models). Some good picks for coding (July 2026):
+NVIDIA NIM hosts 100+ models. A live catalog call on 2026-08-20 returned 103. Browse the full list at [https://build.nvidia.com/models](https://build.nvidia.com/models). These were verified callable on that date:
 
-| Model ID | Best for |
-|---|---|
-| `deepseek-ai/deepseek-v4-flash` | Default recommendation — fast, 1M context, strong coding |
-| `deepseek-ai/deepseek-v4-pro` | Higher quality on hard problems, slower (1.6T MoE) |
-| `zai-org/glm-5.2` | Current strongest open-weight agentic coder |
-| `qwen/qwen3-coder-480b-a35b-instruct` | Code-specialist Qwen3 |
-| `nvidia/nemotron-3-super-120b-a12b` | NVIDIA's own flagship MoE, good general coder |
-| `moonshotai/kimi-k2.6` | Long-horizon agentic coding (256K context) — but slow latency |
-| `meta/llama-4-maverick-17b-128e-instruct` | Meta's latest |
+| Model ID | Context | Best for |
+|---|---|---|
+| `deepseek-ai/deepseek-v4-flash-0731` | 1M | **Default recommendation.** Fast, strong coding, 284B MoE / 13B active |
+| `moonshotai/kimi-k3` | 1M | **Best available free model.** 2.8T params, multimodal, long-horizon agentic work. Slower than DeepSeek |
+| `z-ai/glm-5.2` | 1M | Excellent agentic coder, MIT-licensed, 744B MoE / 40B active |
+| `minimaxai/minimax-m3` | 1M | 428B MoE / 23B active, multimodal, 59% on SWE-Bench Pro |
+| `nvidia/nemotron-3-super-120b-a12b` | 1M | NVIDIA's own MoE, good general coder, low latency |
+| `nvidia/nemotron-3-ultra-550b-a55b` | 262K | NVIDIA's largest, 550B / 55B active |
+| `nvidia/nemotron-3.5-lightning-30b-a3b` | — | Fastest responses in the catalog, good for quick edits |
+| `stepfun-ai/step-3.7-flash` | 256K | 198B MoE with a vision encoder |
+| `openai/gpt-oss-20b` | 131K | Small, fast, OpenAI open weights |
 
-To use any of these with Aider, just swap the model ID:
+To use any of these with Aider, swap the model ID:
 
 ```powershell
-aider --model openai/qwen/qwen3-coder-480b-a35b-instruct
+aider --model openai/moonshotai/kimi-k3
 ```
 
-> Model IDs change over time. The authoritative list is the URL slug on the model card page on build.nvidia.com. New models land quickly — GLM-5.2 showed up on NIM about two weeks after its public release.
+### Retired, do not use
+
+These model IDs appeared in earlier versions of this guide and now fail. Confirmed by live `410 Gone` responses on 2026-08-20:
+
+| Dead model ID | EOL date | Use instead |
+|---|---|---|
+| `deepseek-ai/deepseek-v4-flash` | 2026-08-07 | `deepseek-ai/deepseek-v4-flash-0731` |
+| `deepseek-ai/deepseek-v4-pro` | 2026-08-07 | `moonshotai/kimi-k3` or `z-ai/glm-5.2` |
+| `meta/llama-4-maverick-17b-128e-instruct` | 2026-07-27 | `nvidia/nemotron-3-super-120b-a12b` |
+| `qwen/qwen3-coder-480b-a35b-instruct` | 2026-06-11 | `z-ai/glm-5.2` |
+| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `moonshotai/kimi-k3` |
+| `zai-org/glm-5.2` | never existed | `z-ai/glm-5.2` (note the hyphen) |
+
+> Model IDs change often, and they change without much warning. The authoritative list is the URL slug on the model card page at build.nvidia.com. Before committing a model ID into a config, send it one throwaway request: a `410` names the retirement date, a `404` means the slug is wrong.
 
 ---
 
@@ -229,7 +258,7 @@ Create a file called `.aider.conf.yml` in your project folder with this content:
 ```yaml
 # .aider.conf.yml
 
-model: openai/deepseek-ai/deepseek-v4-flash
+model: openai/deepseek-ai/deepseek-v4-flash-0731
 show-model-warnings: false
 auto-commits: true
 show-diffs: true
@@ -282,13 +311,13 @@ You type plain English to describe what you want changed. Aider edits the files 
 NVIDIA's free tier is roughly **40 requests per minute**, and that budget is **shared across all models** rather than allocated per model. If you get a 429, wait a minute and retry.
 
 ### Context windows
-DeepSeek V4 Flash and Pro both support **1,000,000 tokens** of context — enough for most full repos. Kimi K2.6 gives you 256K. Free Llama models on NVIDIA are typically capped at 128K. Across the whole catalog the range is 8K to 1M, so check the model card before assuming you can feed it a large repo.
+DeepSeek V4 Flash 0731, Kimi K3, GLM-5.2, MiniMax M3, and Nemotron 3 Super all support **1,000,000 tokens** of context, which is enough for most full repos. Step 3.7 Flash and Nemotron 3 Ultra sit around 256K, and GPT-OSS at 131K. Across the whole catalog the range runs from 4K to 1M, so check the model card before assuming you can feed it a large repo.
 
 ### Edit format
 If a model has trouble producing correct code edits (often happens with smaller / older models), try the `whole` format:
 
 ```powershell
-aider --model openai/deepseek-ai/deepseek-v4-flash --edit-format whole
+aider --model openai/deepseek-ai/deepseek-v4-flash-0731 --edit-format whole
 ```
 
 This makes the model output entire files instead of diffs. Uses more tokens but is more reliable.
@@ -297,8 +326,10 @@ This makes the model output entire files instead of diffs. Uses more tokens but 
 Aider can use one model to plan and another to apply edits. This often produces better results:
 
 ```powershell
-aider --model openai/deepseek-ai/deepseek-v4-pro --editor-model openai/deepseek-ai/deepseek-v4-flash
+aider --model openai/moonshotai/kimi-k3 --editor-model openai/deepseek-ai/deepseek-v4-flash-0731
 ```
+
+Kimi K3 plans, DeepSeek V4 Flash 0731 applies the edits. You get K3's reasoning without paying its latency on every mechanical file write.
 
 ---
 
@@ -314,7 +345,7 @@ $headers = @{
     "Content-Type"  = "application/json"
 }
 $body = @{
-    model      = "deepseek-ai/deepseek-v4-flash"
+    model      = "deepseek-ai/deepseek-v4-flash-0731"
     messages   = @(@{ role = "user"; content = "Say hello in one sentence." })
     max_tokens = 50
 } | ConvertTo-Json -Depth 3
@@ -332,7 +363,7 @@ cd C:\temp\aider-test
 git init
 echo "# Test" > README.md
 git add . && git commit -m "init"
-aider --model openai/deepseek-ai/deepseek-v4-flash --no-show-model-warnings
+aider --model openai/deepseek-ai/deepseek-v4-flash-0731 --no-show-model-warnings
 ```
 
 Then type: `Create a hello.py that prints "Hello World"` and press Enter.
@@ -358,7 +389,7 @@ setx OPENAI_API_KEY "nvapi-YOUR_KEY_HERE"
 
 # 5. Use it (after restarting terminal)
 cd C:\your\project
-aider --model openai/deepseek-ai/deepseek-v4-flash
+aider --model openai/deepseek-ai/deepseek-v4-flash-0731
 ```
 
 ---
@@ -373,11 +404,13 @@ aider --model openai/deepseek-ai/deepseek-v4-flash
 | Install fails with "Visual C++ 14.0 required" | Install [Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with "Desktop development with C++" |
 | `setx` variables not working | You must close and reopen PowerShell after running setx |
 | API returns 401 Unauthorized | Double-check your `nvapi-` key is correct |
-| API returns 404 Not Found | Model ID may be wrong or model retired — check build.nvidia.com for current ID |
-| API returns 403, or request hangs forever | Model family needs one-time registration — open its page on build.nvidia.com and click "Try API", then retry |
-| API returns 410 Gone | Model has been deprecated — pick a different one |
+| API returns 404 Not Found | Model slug is wrong. Check the URL slug on build.nvidia.com. A common one: it is `z-ai/glm-5.2`, not `zai-org/glm-5.2` |
+| API returns 404 with `Function '<uuid>': Not found for account` | Model exists but your account is not registered for it. Click "Try API" on its model page |
+| Request hangs forever with no response | Same registration gap, failing silently. Click "Try API" on its model page |
+| API returns 403 on **every** model you try | Your key is invalid or expired, not a model problem. Generate a new one |
+| API returns 410 Gone | Model is retired. The error names the EOL date. See the retired-models table in Section 6 |
 | API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM, shared across models) — wait 60 seconds and retry |
-| `pip install aider-chat` fails on Python 3.13+ | Aider 0.86.2 requires Python <3.13. Use the uv or `aider-install` method, which brings its own 3.12 |
+| `pip install aider-chat` fails on Python 3.13+ | Aider 0.86.2 requires Python <3.13 (its metadata pins `>=3.10,<3.13`). Use the uv or `aider-install` method, which brings its own 3.12 |
 | Aider shows model warnings | Add `--no-show-model-warnings` or set `show-model-warnings: false` in config |
 | Edits are garbled or wrong | Try `--edit-format whole` for more reliable (but token-heavy) edits |
 
@@ -390,8 +423,10 @@ aider --model openai/deepseek-ai/deepseek-v4-flash
 - [Aider OpenAI-Compatible API Docs](https://aider.chat/docs/llms/openai-compat.html)
 - [Aider Configuration](https://aider.chat/docs/config/aider_conf.html)
 - [Aider In-Chat Commands](https://aider.chat/docs/usage/commands.html)
+- [Aider Release History](https://aider.chat/HISTORY.html)
 - [NVIDIA NIM Model Catalog](https://build.nvidia.com/models)
-- [DeepSeek V4 Flash on NVIDIA NIM](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash)
+- [Kimi K3 on NVIDIA NIM](https://build.nvidia.com/moonshotai/kimi-k3)
+- [DeepSeek V4 Flash 0731 on NVIDIA NIM](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash-0731)
 - [NVIDIA NIM API Reference](https://docs.api.nvidia.com/nim/reference)
 - [Python Downloads](https://www.python.org/downloads/)
 - [Git for Windows](https://git-scm.com/download/win)

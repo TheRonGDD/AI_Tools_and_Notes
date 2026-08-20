@@ -2,7 +2,11 @@
 
 LM Studio is a desktop application for running AI models locally. It provides a user-friendly GUI for downloading and chatting with models, and also runs a local OpenAI-compatible API server so tools like Aider and OpenCode can use your local models.
 
-Completely free for personal use. No API key, no internet required once models are downloaded, no rate limits.
+Free for personal **and commercial** use. No API key, no internet required once models are downloaded, no rate limits.
+
+> **Current version (August 2026):** 0.4.16, released 2026-06-08. Recent releases added tensor parallelism for splitting one model across multiple GPUs (0.4.15), stable MTP speculative decoding for faster generation on models with multi-token-prediction heads (0.4.14), and OAuth support for MCP servers (0.4.10). 0.4.16 raised the default context length to 8K and shipped "Locally," a companion iPhone and iPad app.
+
+> **It has been free for work use since July 2025.** The old requirement to request a separate commercial license is gone. There is a paid LM Studio Enterprise tier for organizations wanting SSO, model and MCP gating, and private collaboration, but the app itself is free.
 
 ---
 
@@ -56,22 +60,23 @@ Models come in different quantized sizes. Higher Q = better quality but more RAM
 
 **Rule of thumb:** Start with **Q4_K_M** of your chosen model.
 
-### Recommended models to start with (July 2026)
+### Recommended models to start with (August 2026)
 
 | Model | Size (Q4) | Best for |
 |---|---|---|
 | Llama 3.2 3B | ~2GB | Fast, everyday tasks |
 | Qwen 3.5 4B | ~3GB | Best tiny generalist right now |
-| Qwen 3.5 9B | ~6GB | Strong all-around at single-GPU size |
 | DeepSeek R1 8B | ~5GB | Reasoning with visible thinking mode |
+| Qwen 3.5 9B | ~7GB | Strong all-around at single-GPU size |
 | Gemma 4 12B | ~8GB | Google's 2026 multimodal flagship, smallest size |
-| GPT-OSS 20B | ~13GB | OpenAI open weights, 128K context — great 16GB pick |
-| Devstral Small 2 24B | ~14GB | Agentic coding, with vision + tools |
-| Gemma 4 26B | ~16GB | Frontier-ish quality on a 24GB card |
+| GPT-OSS 20B | ~14GB | OpenAI open weights, 128K context. Great 16GB pick |
+| Devstral Small 2 24B | ~15GB | Agentic coding, with vision + tools |
 | Qwen 3.6 27B | ~17GB | Best mid-range generalist |
+| Gemma 4 26B | ~18GB | Frontier-ish quality on a 24GB card |
 | Qwen 3 Coder 30B | ~19GB | Best local coding model right now |
+| Gemma 4 31B | ~20GB | Largest Gemma 4, needs a 24GB card |
 
-> **For local coding specifically:** Qwen 3 Coder is the current top pick for code quality. Devstral Small 2 is the pick for agentic workflows, and is the only local coder with a published agentic score (46.8% SWE-Bench Verified at 14GB).
+> **For local coding specifically:** Qwen 3 Coder is the current top pick for code quality. Devstral Small 2 is the pick for agentic workflows, and is the only local coder with a published agentic score (46.8% SWE-Bench Verified at ~15GB).
 
 > **GGUF availability lags Ollama.** LM Studio pulls from Hugging Face, so a brand-new model is usable here as soon as someone publishes a GGUF quant — which is often the same week, but occasionally not at all for very large MoE models. If a model in this table does not appear in Discover yet, check back or use Ollama for that one.
 
@@ -187,6 +192,7 @@ Both are free local AI tools. Here is when to choose one over the other:
 | | LM Studio | Ollama |
 |---|---|---|
 | Interface | Full desktop GUI + CLI | Desktop GUI (system tray) + CLI |
+| Multi-GPU | Tensor parallelism (0.4.15+) | Layer split across GPUs |
 | Model format | GGUF (Hugging Face) | Ollama library + GGUF import |
 | Model browser | Built-in GUI browser | Command line pull |
 | API server | Yes (port 1234) | Yes (port 11434) |
@@ -235,5 +241,6 @@ Both can run simultaneously on different ports.
 
 - [LM Studio Official Site](https://lmstudio.ai)
 - [LM Studio Documentation](https://lmstudio.ai/docs)
+- [LM Studio Release Notes](https://lmstudio.ai/blog)
 - [LM Studio GitHub](https://github.com/lmstudio-ai)
 - [GGUF Models on Hugging Face](https://huggingface.co/models?library=gguf)

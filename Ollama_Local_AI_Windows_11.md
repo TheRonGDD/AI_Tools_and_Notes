@@ -39,6 +39,8 @@ ollama --version
 
 > Ollama runs as a system tray app and background service. It starts automatically with Windows. You do not need to manually start it before running commands.
 
+> **Current version as of this writing:** 0.32.14 (released 2026-08-15). Ollama updates itself; `ollama --version` shows what you have.
+
 ### System Tray GUI
 
 After installing, Ollama appears in the Windows system tray (bottom-right corner of the taskbar). Right-clicking the icon gives you quick access to:
@@ -84,32 +86,37 @@ ollama rm llama3.2
 
 ---
 
-## 4. Recommended Free Models (July 2026)
+## 4. Recommended Free Models (August 2026)
+
+Sizes below are actual download sizes pulled from the Ollama registry on 2026-08-20, not estimates. Every tag was verified to exist.
 
 | Model | Pull command | Size | Best for |
 |---|---|---|---|
 | Qwen 3.5 0.8B | `ollama pull qwen3.5:0.8b` | ~1GB | Very fast, minimal hardware |
 | Llama 3.2 3B | `ollama pull llama3.2` | ~2GB | Fast everyday tasks, low RAM |
 | Qwen 3.5 4B | `ollama pull qwen3.5:4b` | ~3GB | Best tiny generalist right now |
-| Qwen 3.5 9B | `ollama pull qwen3.5:9b` | ~6GB | Strong all-around coding/reasoning at single-GPU size |
 | DeepSeek R1 8B | `ollama pull deepseek-r1:8b` | ~5GB | Reasoning model with visible thinking |
-| Gemma 4 12B | `ollama pull gemma4:12b` | ~8GB | Google's 2026 multimodal flagship, smallest size |
-| GPT-OSS 20B | `ollama pull gpt-oss:20b` | ~13GB | OpenAI open weights, MXFP4, 128K context — great 16GB pick |
-| Devstral Small 2 24B | `ollama pull devstral-small-2` | ~14GB | Agentic coding, now with vision + tools |
-| Gemma 4 26B | `ollama pull gemma4:26b` | ~16GB | Frontier-ish quality on a 24GB card |
-| Qwen 3.6 27B | `ollama pull qwen3.6:27b` | ~17GB | Best mid-range generalist |
-| Qwen 3 Coder 30B | `ollama pull qwen3-coder` | ~19GB | Code specialist, 256K context — best local coding model |
-| Devstral 2 123B | `ollama pull devstral-2` | ~70GB | Large agentic coder, multi-GPU territory |
+| Qwen 3.5 9B | `ollama pull qwen3.5:9b` | 6.6GB | Strong all-around coding/reasoning at single-GPU size |
+| Gemma 4 12B | `ollama pull gemma4:12b` | 7.6GB | Google's 2026 multimodal flagship, smallest size |
+| GPT-OSS 20B | `ollama pull gpt-oss:20b` | 13.8GB | OpenAI open weights, MXFP4, 128K context. Great 16GB pick |
+| Devstral Small 2 24B | `ollama pull devstral-small-2` | 15.2GB | Agentic coding, with vision + tools |
+| Qwen 3.6 27B | `ollama pull qwen3.6:27b` | 17.4GB | Best mid-range generalist |
+| Gemma 4 26B | `ollama pull gemma4:26b` | 18.0GB | Frontier-ish quality on a 24GB card |
+| Qwen 3 Coder 30B | `ollama pull qwen3-coder` | 18.6GB | Code specialist, 256K context. Best local coding model |
+| Gemma 4 31B | `ollama pull gemma4:31b` | 19.9GB | Largest Gemma 4, needs a 24GB card |
+| Qwen 3.5 35B / Qwen 3.6 35B | `ollama pull qwen3.5:35b` / `qwen3.6:35b` | 23.9GB | Top of the single-24GB-card range, tight fit |
+| Devstral 2 123B | `ollama pull devstral-2` | 74.9GB | Large agentic coder, multi-GPU territory |
+| Qwen 3.5 122B | `ollama pull qwen3.5:122b` | ~70GB | Largest Qwen 3.5, multi-GPU territory |
 
 > **Not sure what fits your hardware?** A rough guide at Q4 quantization:
 > - 8GB RAM/VRAM → 4B or smaller
 > - 16GB RAM/VRAM → 9B–20B (`gpt-oss:20b` is the standout here)
-> - 24GB+ VRAM → 24B–32B
+> - 24GB+ VRAM → 24B–31B
 > - 48GB+ VRAM → 70B and up
 >
-> **For local coding specifically:** `qwen3-coder:30b` is still the top pick for raw code quality. `devstral-small-2` is the pick for agentic workflows (read → reason → edit → verify loop) and is the only local coder with a published agentic benchmark, at 46.8% SWE-Bench Verified in 14GB.
+> **For local coding specifically:** `qwen3-coder:30b` is still the top pick for raw code quality. `devstral-small-2` is the pick for agentic workflows (the read, reason, edit, verify loop) and is the only local coder with a published agentic benchmark, at 46.8% SWE-Bench Verified in 15GB.
 >
-> **Note on the very large models:** GLM-5.2 and Kimi K2.6 lead the open-weight benchmarks, but GLM-5.2 is a ~753B/40B-active MoE that needs multi-GPU servers or a 256GB+ unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally.
+> **Note on the very large models:** GLM-5.2 and Kimi K3 lead the open-weight benchmarks, but GLM-5.2 is a ~744B/40B-active MoE and Kimi K3 is 2.8T parameters. Both need multi-GPU servers or a very large unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally.
 
 Browse all available models at [https://ollama.com/library](https://ollama.com/library).
 

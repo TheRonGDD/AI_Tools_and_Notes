@@ -1,8 +1,8 @@
 # AI Tools and Notes
 
-A collection of free and open-source AI CLI tools, setup guides, and notes. Everything here uses free tiers, open models, or open-source tooling — no paid subscriptions required.
+A collection of free and open-source AI CLI tools, setup guides, and notes. Everything here uses free tiers, open models, or open-source tooling, with no paid subscriptions required.
 
-*Last updated: July 2026.*
+*Last updated: August 2026.*
 
 ---
 
@@ -12,12 +12,12 @@ A collection of free and open-source AI CLI tools, setup guides, and notes. Ever
 
 | Guide | Description |
 |---|---|
-| [Free AI API Keys](Free_AI_API_Keys.md) | Reference guide to free AI API providers — NVIDIA, Groq, Google, Cerebras, SambaNova, and more |
+| [Free AI API Keys](Free_AI_API_Keys.md) | Reference guide to free AI API providers: NVIDIA, Groq, Google, SambaNova, OpenRouter, and more |
 | [Ollama — Local AI (Windows 11)](Ollama_Local_AI_Windows_11.md) | Run AI models locally with no API key, no rate limits, no internet required |
 | [LM Studio — Local AI (Windows 11)](LM_Studio_Local_AI_Windows_11.md) | GUI app for running local AI models with a built-in OpenAI-compatible API server |
-| [Aider + NVIDIA NIM](Aider_Setup_NVIDIA_NIM.md) | Set up Aider AI pair-programmer with NVIDIA's free 100+ model catalog (DeepSeek V4, GLM-5.2, Qwen3 Coder, etc.) |
+| [Aider + NVIDIA NIM](Aider_Setup_NVIDIA_NIM.md) | Set up Aider AI pair-programmer with NVIDIA's free 100+ model catalog (Kimi K3, DeepSeek V4 Flash 0731, GLM-5.2) |
 | [OpenCode + NVIDIA NIM](OpenCode_Setup_NVIDIA_NIM.md) | Set up OpenCode (TUI, desktop, or IDE) with NVIDIA's free 100+ model catalog |
-| [Antigravity CLI (Windows 11)](Antigravity_CLI_Setup_Windows_11.md) | Google's replacement for the retired Gemini CLI — install, quota reality check, and migration notes |
+| [Antigravity CLI (Windows 11)](Antigravity_CLI_Setup_Windows_11.md) | Google's replacement for the retired Gemini CLI: install, quota reality check, and migration notes |
 
 ---
 
@@ -25,49 +25,59 @@ A collection of free and open-source AI CLI tools, setup guides, and notes. Ever
 
 | If you want… | Use |
 |---|---|
-| AI pair-programmer that edits files & makes git commits | **Aider** |
+| AI pair-programmer that edits files and makes git commits | **Aider** |
 | A full coding agent (TUI, desktop app, or IDE extension) | **OpenCode** |
 | A free coding agent you can use all day | **Aider** or **OpenCode** on NVIDIA NIM |
-| Google's agent in a terminal | **Antigravity CLI** — but see the quota warning below |
+| Google's agent in a terminal | **Antigravity CLI**, but see the quota warning first |
 | To run AI locally, no internet | **Ollama** (CLI) or **LM Studio** (GUI) |
 | To call AI from your own scripts | Pick a provider from the [Free AI API Keys](Free_AI_API_Keys.md) list |
 
 ---
 
-## What's New (July 2026)
+## What's New (August 2026)
 
-The free-tier landscape moved a lot in mid-2026, and mostly in one direction. Highlights:
+Model IDs and rate limits below were verified against live API calls on 2026-08-20, not taken from vendor blog posts.
 
-- **Gemini CLI is dead for consumers.** It stopped serving free, Pro, and Ultra accounts on **June 18, 2026**, replaced by the closed-source, Go-based [Antigravity CLI](Antigravity_CLI_Setup_Windows_11.md) (binary: `agy`). Enterprise Code Assist licenses were unaffected. The free quota regressed hard: from 1,000 requests/day to roughly **20 agent requests/day** on a compute-based weekly cap.
-- **Cerebras gutted its free tier** (May 31, 2026) from about a dozen models down to **two** (`gpt-oss-120b`, `glm-4.7`), at 5 RPM instead of 30.
-- **OpenRouter free accounts dropped to 50 requests/day.** A one-time $10 credit purchase permanently raises it to 1,000/day.
-- **NVIDIA NIM is now the clear best free option** — 120+ models, ~40 RPM, up to 1M context. Signup now requires phone verification, and some model families need a one-time "Try API" click before your key works on them.
-- **New models worth knowing:** GLM-5.2, Qwen3.5 / Qwen3.6, Gemma 4, DeepSeek V4 Pro, Nemotron 3 Super 120B.
-- **Aider is at 0.86.2** and still requires **Python 3.10–3.12** (not 3.13+, despite what some guides claim).
-- **OpenCode is at v1.18.x**, past 160K stars, and is no longer terminal-only — it now ships a desktop app and IDE extension alongside the TUI.
+- **NVIDIA retired DeepSeek V4 Flash and V4 Pro on 2026-08-07.** Both now return `410 Gone`. These were the headline recommendation in the previous version of these guides, so anyone following the July instructions has a dead config. The successor is **`deepseek-ai/deepseek-v4-flash-0731`**, and it is an upgrade rather than a sidegrade: same 284B/13B-active architecture and 1M context, but re-post-trained for agentic work, scoring 50 on the Artificial Analysis Intelligence Index against 40 for the model it replaces.
+- **Kimi K3 landed on NVIDIA NIM** as `moonshotai/kimi-k3`. At 2.8T parameters it is the largest open-weight model released to date, with a 1M-token context window and native multimodality. Free on NIM, and currently the strongest free option in the catalog for long-horizon agentic coding.
+- **GLM-5.2's model ID was wrong in every previous version of these guides.** It is `z-ai/glm-5.2`, not `zai-org/glm-5.2` (the latter returns a bare `404 page not found`). Its context window is **1M**, not the ~200K previously listed.
+- **Cerebras is no longer a free provider.** The open free tier ended **2026-08-17**. Accounts moved to a credit model that requires adding a payment method to unlock $5 in credits, which then expire after 30 days. That fails this repo's "ongoing free tier, no credit card" bar, so Cerebras has moved to the retired list.
+- **Groq dropped every Llama chat model.** A live catalog call now returns 13 models, and the only Meta entries left are `llama-prompt-guard-2` safety classifiers. `llama-3.3-70b-versatile` and `llama-3.1-8b-instant`, both recommended here in July, are gone. Groq's usable free chat models are now `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.6-27b`, and the `groq/compound` pair.
+- **Qwen3 Coder 480B and Llama 4 Maverick are gone from NVIDIA too** (EOL 2026-06-11 and 2026-07-27). Both were listed as live in the July refresh, which means that refresh shipped two already-dead model IDs. Hence the live-verification pass this time.
+- **New on NVIDIA NIM this cycle:** `minimaxai/minimax-m3` (428B MoE, 1M context, multimodal), `stepfun-ai/step-3.7-flash` (198B MoE, 256K, vision), `nvidia/nemotron-3-ultra-550b-a55b`, and `nvidia/nemotron-3.5-lightning-30b-a3b`.
+- **NVIDIA API keys now carry an expiry you pick at generation time.** An expired key is easy to misdiagnose, because NVIDIA returns `403 Authorization failed` on every *live* model while *retired* models still return their `410 Gone` notice. See the [403 vs 410 diagnostic](Free_AI_API_Keys.md#nvidia-nim).
+- **Aider has not shipped a release since 0.86.2** (2026-02-12), and the last commit to `main` was 2026-05-22. Still usable, still the best git-native option, but treat it as maintenance-mode software.
+- **OpenCode is at v1.18.19** and has passed **199K stars**, up from 160K in July.
+- **LM Studio 0.4.16** added tensor parallelism (splitting a model across multiple GPUs) and stable MTP speculative decoding. It has also been free for commercial use since July 2025, which the previous version of that guide understated as "free for personal use."
 
-> **General lesson from this refresh:** every free tier in this repo that changed in 2026 got smaller. If a free tier is load-bearing for you, configure a backup provider before you need it.
+> **General lesson, again:** every free tier tracked in this repo that changed during 2026 got smaller, and this month two of them (Cerebras, and Groq's entire Llama line) shrank without an announcement most people saw. Verify model IDs with a live API call before building on them. `410` and `404` are cheap to test for and will save you a genuinely confusing debugging session.
+
+### Considered and excluded this cycle
+
+- **[Grok Bot](https://x.ai/news/introducing-grok-bot)** (xAI, announced 2026-08-11). Persistent agents that each get their own cloud computer with a browser, filesystem, and terminal, sign into your existing tools, and work unsupervised. Genuinely interesting, but it fails this repo's criteria on three counts: access requires SuperGrok Heavy ($300/mo), Cursor Ultra ($200/mo), or Cursor Teams Premium ($120/seat/mo); it is closed source; and it is a desktop and iOS product rather than a CLI or an OpenAI-compatible endpoint you can point Aider or OpenCode at.
+- **xAI's API in general.** New accounts get $25 in promotional credits that expire after 30 days, with no ongoing free allowance. That is trial credit, not a free tier. xAI also retired eight models in May 2026, including `grok-3`, `grok-4-fast`, and `grok-code-fast-1`, so older configs pointing at those will fail.
 
 ---
 
 ## Philosophy
 
-This repo exists to document free or accessible AI tooling — the kind of stuff that doesn't require a credit card or a subscription to get started. Contributions, corrections, and additions welcome.
+This repo exists to document free or accessible AI tooling: the kind of thing that doesn't require a credit card or a subscription to get started. Contributions, corrections, and additions welcome.
 
 ---
 
 ## Free Resources Covered
 
-- **[NVIDIA NIM](https://build.nvidia.com)** — Free API access to 120+ frontier models (DeepSeek V4, GLM-5.2, Qwen3.5, Kimi K2.6, Llama 4, Nemotron, and more). Best free option available.
+- **[NVIDIA NIM](https://build.nvidia.com)** — Free API access to 100+ frontier models (Kimi K3, DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Nemotron 3, GPT-OSS). Best free option available, by a wide margin.
 - **[Aider](https://aider.chat)** — Open-source AI pair-programmer, works with any OpenAI-compatible API
 - **[OpenCode](https://opencode.ai)** — Open-source (MIT) AI coding agent: TUI, desktop app, and IDE extension
 - **[Antigravity CLI](https://antigravity.google)** — Google's closed-source successor to Gemini CLI (`agy`). Small free quota.
-- **[Groq](https://groq.com)** — Fastest free inference API (LPU hardware), no credit card, every model on the free tier
-- **[Google AI Studio](https://aistudio.google.com)** — Free Gemini 3.5 Flash API access with a 1M-token context window
-- **[Cerebras](https://cloud.cerebras.ai)** — Very fast inference, 1M tokens/day, but only two free models since May 2026
-- **[SambaNova](https://cloud.sambanova.ai)** — Free access to Llama 4, DeepSeek V3.1, and other large models
-- **[OpenRouter](https://openrouter.ai)** — Single API key for many providers; 50 req/day free, 1,000 after a one-time $10
+- **[Groq](https://groq.com)** — Fastest free inference API (LPU hardware), no credit card. Catalog is much smaller than it was.
+- **[Google AI Studio](https://aistudio.google.com)** — Free Gemini Flash API access with a 1M-token context window
+- **[SambaNova](https://cloud.sambanova.ai)** — Free developer tier, no credit card. MiniMax M2.7, DeepSeek V3.1, Llama 3.3 70B, GPT-OSS 120B.
+- **[OpenRouter](https://openrouter.ai)** — Single API key across many providers; 50 req/day free, 1,000 after a one-time $10
 - **[Ollama](https://ollama.com)** — Run open-source models locally, fully offline, OpenAI-compatible API
 - **[LM Studio](https://lmstudio.ai)** — GUI app for local AI, built-in model browser, OpenAI-compatible API server
 
-> **Retired:** [Gemini CLI](https://github.com/google-gemini/gemini-cli) — shut down for free and consumer accounts on June 18, 2026.
+> **Retired:**
+> - [Gemini CLI](https://github.com/google-gemini/gemini-cli) — shut down for free and consumer accounts on 2026-06-18.
+> - [Cerebras](https://cloud.cerebras.ai) free tier — ended 2026-08-17, replaced by a payment-method-gated $5 trial credit that expires after 30 days.
