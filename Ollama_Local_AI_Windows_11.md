@@ -116,7 +116,7 @@ Sizes below are actual download sizes pulled from the Ollama registry on 2026-08
 >
 > **For local coding specifically:** `qwen3-coder:30b` is still the top pick for raw code quality. `devstral-small-2` is the pick for agentic workflows (the read, reason, edit, verify loop) and is the only local coder with a published agentic benchmark, at 46.8% SWE-Bench Verified in 15GB.
 >
-> **Note on the very large models:** GLM-5.2 and Kimi K3 lead the open-weight benchmarks, but GLM-5.2 is a ~744B/40B-active MoE and Kimi K3 is 2.8T parameters. Both need multi-GPU servers or a very large unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally.
+> **Note on the very large models:** GLM-5.2 and Kimi K3 lead the open-weight benchmarks, but GLM-5.2 is a ~744B/40B-active MoE and Kimi K3 is 2.8T parameters. Both need multi-GPU servers or a very large unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally. (Note that Kimi K3's NIM endpoint was returning backend errors as of 2026-08-20; GLM-5.2 was solid.)
 
 Browse all available models at [https://ollama.com/library](https://ollama.com/library).
 

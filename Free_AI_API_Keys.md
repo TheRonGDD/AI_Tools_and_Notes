@@ -12,7 +12,7 @@ A reference guide to AI providers offering free API access, no credit card requi
 
 | Provider | Notable Free Models | OpenAI-Compatible | Credit Card Required |
 |---|---|---|---|
-| [NVIDIA NIM](#nvidia-nim) | Kimi K3, DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Nemotron 3, 100+ more | Yes | No (phone verification) |
+| [NVIDIA NIM](#nvidia-nim) | DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Nemotron 3, Kimi K3, 100+ more | Yes | No (phone verification) |
 | [Groq](#groq) | GPT-OSS 120B/20B, Qwen3.6 27B, Compound | Yes | No |
 | [Google AI Studio](#google-ai-studio) | Gemini 3.7 / 3.6 / 3.5 Flash, Flash-Lite | Yes | No |
 | [SambaNova](#sambanova) | MiniMax M2.7, DeepSeek V3.1, Llama 3.3 70B, GPT-OSS 120B | Yes | No |
@@ -29,12 +29,12 @@ A reference guide to AI providers offering free API access, no credit card requi
 
 **URL:** https://build.nvidia.com
 
-The largest free catalog around. A live call to `GET /v1/models` on 2026-08-20 returned **103 models**, spanning chat, vision, embedding, and reranking. The current lineup includes Kimi K3, DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Step 3.7 Flash, the Nemotron 3 family, and GPT-OSS. New models land fast: Kimi K3 appeared on NIM within weeks of Moonshot publishing the weights.
+The largest free catalog around. A live call to `GET /v1/models` on 2026-08-20 returned **103 models**, spanning chat, vision, embedding, and reranking. The current lineup includes DeepSeek V4 Flash 0731, GLM-5.2, Kimi K3, MiniMax M3, Step 3.7 Flash, the Nemotron 3 family, and GPT-OSS. New models land fast: Kimi K3 appeared on NIM within weeks of Moonshot publishing the weights.
 
 - **Sign-up:** Free NVIDIA Developer account. No credit card, but **phone verification is required** at signup.
 - **Notable free models (verified callable 2026-08-20):**
-  - `moonshotai/kimi-k3` (2.8T params, 1M context, multimodal, the strongest free model here)
-  - `deepseek-ai/deepseek-v4-flash-0731` (284B MoE / 13B active, 1M context, fastest good coder)
+  - `deepseek-ai/deepseek-v4-flash-0731` (284B MoE / 13B active, 1M context, the most reliable pick here)
+  - `moonshotai/kimi-k3` (2.8T params, 1M context, multimodal, strongest on paper but **currently unstable**, see below)
   - `z-ai/glm-5.2` (744B MoE / 40B active, 1M context, MIT-licensed agentic coder)
   - `minimaxai/minimax-m3` (428B MoE / 23B active, 1M context, multimodal)
   - `stepfun-ai/step-3.7-flash` (198B MoE / 11B active, 256K context, vision)
@@ -66,6 +66,8 @@ NVIDIA's failure modes look similar from the outside but mean very different thi
 > **Recently retired on NIM (confirmed by live `410` responses):** `deepseek-ai/deepseek-v4-flash` and `deepseek-ai/deepseek-v4-pro` (both EOL 2026-08-07), `meta/llama-4-maverick-17b-128e-instruct` (2026-07-27), `qwen/qwen3-coder-480b-a35b-instruct` (2026-06-11), `moonshotai/kimi-k2-instruct` (2026-05-12). Kimi K2.5 no longer resolves at all. NVIDIA appears to have cleared capacity for Kimi K3 and the updated DeepSeek build.
 
 > **Expect to hit the registration gate on a fresh key.** This is not a rare edge case. Testing a brand-new key on 2026-08-20, four of the catalog's most popular models were unreachable on a key not yet registered for them: `openai/gpt-oss-120b`, `google/gemma-4-31b-it`, and `meta/llama-3.3-70b-instruct` each hung for a full four minutes with no response at all, and `moonshotai/kimi-k2.6` returned `Function ... Not found for account`. All of them are listed in `/v1/models`, so the catalog is not a reliable guide to what your key can actually call. Click "Try API" once on each model page you plan to use, before you wire it into a config. (The hang and the `Not found for account` error were both reproduced directly; the "Try API" step is NVIDIA's documented remedy for them.)
+
+> **Being listed does not mean it works, part two: `moonshotai/kimi-k3`.** K3 answered normally on the morning of 2026-08-20 and then, from mid-afternoon onward, returned `404` with an **empty body** and an `Nvcf-Status: errored` header on every attempt over several hours. That header is the tell: the request reached NVIDIA's function router and the backing function itself failed, which is a different failure from the per-account `Function ... Not found for account` gate above and cannot be fixed by clicking "Try API." Nothing about the catalog listing changed while this was happening. K3 is worth retrying periodically, but do not build a config around it yet. `deepseek-ai/deepseek-v4-flash-0731` answered on every attempt all day and is the dependable choice.
 
 ---
 
@@ -258,7 +260,7 @@ Most tools (Aider, OpenCode, and similar) let you switch models mid-session. If 
 Tools like Aider, OpenCode, and Codex work out of the box with any OpenAI-compatible endpoint. Set `OPENAI_BASE_URL` and `OPENAI_API_KEY` and you are done.
 
 **Watch for context window differences**
-Free-tier context limits vary widely. Kimi K3, DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Nemotron 3 Super, and Gemini Flash all reach 1M. Step 3.7 Flash and Nemotron 3 Ultra sit around 256K. Groq caps at 131K.
+Free-tier context limits vary widely. DeepSeek V4 Flash 0731, Kimi K3, GLM-5.2, MiniMax M3, Nemotron 3 Super, and Gemini Flash all reach 1M. Step 3.7 Flash and Nemotron 3 Ultra sit around 256K. Groq caps at 131K.
 
 **Check the daily cap, not just the per-minute one**
 The requests-per-minute number is rarely what stops you. The daily ceiling is: OpenRouter at 50/day unfunded, Groq at 1,000/day on the GPT-OSS models, Google at 1,500/day, SambaNova at 20M tokens/day. Budget against that.

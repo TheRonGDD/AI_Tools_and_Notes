@@ -15,7 +15,7 @@ A collection of free and open-source AI CLI tools, setup guides, and notes. Ever
 | [Free AI API Keys](Free_AI_API_Keys.md) | Reference guide to free AI API providers: NVIDIA, Groq, Google, SambaNova, OpenRouter, and more |
 | [Ollama — Local AI (Windows 11)](Ollama_Local_AI_Windows_11.md) | Run AI models locally with no API key, no rate limits, no internet required |
 | [LM Studio — Local AI (Windows 11)](LM_Studio_Local_AI_Windows_11.md) | GUI app for running local AI models with a built-in OpenAI-compatible API server |
-| [Aider + NVIDIA NIM](Aider_Setup_NVIDIA_NIM.md) | Set up Aider AI pair-programmer with NVIDIA's free 100+ model catalog (Kimi K3, DeepSeek V4 Flash 0731, GLM-5.2) |
+| [Aider + NVIDIA NIM](Aider_Setup_NVIDIA_NIM.md) | Set up Aider AI pair-programmer with NVIDIA's free 100+ model catalog (DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3) |
 | [OpenCode + NVIDIA NIM](OpenCode_Setup_NVIDIA_NIM.md) | Set up OpenCode (TUI, desktop, or IDE) with NVIDIA's free 100+ model catalog |
 | [Antigravity CLI (Windows 11)](Antigravity_CLI_Setup_Windows_11.md) | Google's replacement for the retired Gemini CLI: install, quota reality check, and migration notes |
 
@@ -39,7 +39,7 @@ A collection of free and open-source AI CLI tools, setup guides, and notes. Ever
 Model IDs and rate limits below were verified against live API calls on 2026-08-20, not taken from vendor blog posts.
 
 - **NVIDIA retired DeepSeek V4 Flash and V4 Pro on 2026-08-07.** Both now return `410 Gone`. These were the headline recommendation in the previous version of these guides, so anyone following the July instructions has a dead config. The successor is **`deepseek-ai/deepseek-v4-flash-0731`**, and it is an upgrade rather than a sidegrade: same 284B/13B-active architecture and 1M context, but re-post-trained for agentic work, scoring 50 on the Artificial Analysis Intelligence Index against 40 for the model it replaces.
-- **Kimi K3 landed on NVIDIA NIM** as `moonshotai/kimi-k3`. At 2.8T parameters it is the largest open-weight model released to date, with a 1M-token context window and native multimodality. Free on NIM, and currently the strongest free option in the catalog for long-horizon agentic coding.
+- **Kimi K3 landed on NVIDIA NIM** as `moonshotai/kimi-k3`. At 2.8T parameters it is the largest open-weight model released to date, with a 1M-token context window and native multimodality. **But it is not currently dependable there:** it answered normally on the morning of 2026-08-20 and then returned `404` with an empty body and an `Nvcf-Status: errored` header for the rest of the day. That is a backend function failure, not the per-account registration gate, so clicking "Try API" does not help. Retry it periodically; do not make it your default. `deepseek-ai/deepseek-v4-flash-0731` answered every request all day and is the recommendation.
 - **GLM-5.2's model ID was wrong in every previous version of these guides.** It is `z-ai/glm-5.2`, not `zai-org/glm-5.2` (the latter returns a bare `404 page not found`). Its context window is **1M**, not the ~200K previously listed.
 - **Cerebras is no longer a free provider.** The open free tier ended **2026-08-17**. Accounts moved to a credit model that requires adding a payment method to unlock $5 in credits, which then expire after 30 days. That fails this repo's "ongoing free tier, no credit card" bar, so Cerebras has moved to the retired list.
 - **Groq dropped every Llama chat model.** A live catalog call now returns 13 models, and the only Meta entries left are `llama-prompt-guard-2` safety classifiers. `llama-3.3-70b-versatile` and `llama-3.1-8b-instant`, both recommended here in July, are gone. Groq's usable free chat models are now `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.6-27b`, and the `groq/compound` pair.
@@ -67,7 +67,7 @@ This repo exists to document free or accessible AI tooling: the kind of thing th
 
 ## Free Resources Covered
 
-- **[NVIDIA NIM](https://build.nvidia.com)** — Free API access to 100+ frontier models (Kimi K3, DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Nemotron 3, GPT-OSS). Best free option available, by a wide margin.
+- **[NVIDIA NIM](https://build.nvidia.com)** — Free API access to 100+ frontier models (DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Nemotron 3, GPT-OSS, Kimi K3). Best free option available, by a wide margin.
 - **[Aider](https://aider.chat)** — Open-source AI pair-programmer, works with any OpenAI-compatible API
 - **[OpenCode](https://opencode.ai)** — Open-source (MIT) AI coding agent: TUI, desktop app, and IDE extension
 - **[Antigravity CLI](https://antigravity.google)** — Google's closed-source successor to Gemini CLI (`agy`). Small free quota.

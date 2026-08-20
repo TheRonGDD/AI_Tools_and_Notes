@@ -4,7 +4,9 @@ OpenCode is an open-source (MIT) AI coding agent from Anomaly. It supports any O
 
 **OpenCode runs natively on Windows 11** via Scoop, Chocolatey, or the universal installer. WSL is not required.
 
-> **Recommended model (August 2026):** `deepseek-ai/deepseek-v4-flash-0731` for everyday coding, or `moonshotai/kimi-k3` when you want the strongest free model available. Both are free on NVIDIA NIM with 1M-token context windows.
+> **Recommended model (August 2026):** `deepseek-ai/deepseek-v4-flash-0731`. Free on NVIDIA NIM, 1M-token context, and the most reliable model in the catalog in testing: it answered every request across a full day of probing.
+>
+> **Caveat on `moonshotai/kimi-k3` (observed 2026-08-20):** it is listed in `/v1/models` and answered normally in the morning, but by late afternoon it returned `404` with an empty body and an `Nvcf-Status: errored` header on every attempt across several hours. That header means the request reached NVIDIA's function router and the backing function failed, which is different from the per-account `Function ... Not found for account` gate. Treat K3 as **unstable on NIM right now**: worth trying, not worth making your default. `deepseek-ai/deepseek-v4-flash-0731` answered on every single attempt and is the safer primary.
 >
 > **If you followed the July version of this guide, your config is broken.** `deepseek-ai/deepseek-v4-flash` and `deepseek-ai/deepseek-v4-pro` both reached end of life on **2026-08-07** and now return `410 Gone`. The `zai-org/glm-5.2` entry was also wrong: the correct slug is `z-ai/glm-5.2`. Section 4 below has a corrected config you can paste over the old one.
 
@@ -43,7 +45,7 @@ Skip this if you install via Scoop, Chocolatey, or the binary download.
 
 1. Go to [https://build.nvidia.com](https://build.nvidia.com)
 2. Sign in or create a free NVIDIA Developer account (email plus **phone verification** — still no credit card)
-3. Pick any model, for example [Kimi K3](https://build.nvidia.com/moonshotai/kimi-k3)
+3. Pick any model, for example [DeepSeek V4 Flash 0731](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash-0731)
 4. Click **"Get API Key"** (or "Build with this NIM")
 5. Copy the key — it starts with `nvapi-`
 
@@ -142,13 +144,6 @@ Create or edit that file with the following content, replacing the API key with 
             "output": 32768
           }
         },
-        "moonshotai/kimi-k3": {
-          "name": "Kimi K3",
-          "limit": {
-            "context": 1048576,
-            "output": 32768
-          }
-        },
         "z-ai/glm-5.2": {
           "name": "GLM-5.2",
           "limit": {
@@ -235,7 +230,7 @@ NVIDIA NIM hosts 100+ models. A live catalog call on 2026-08-20 returned 103. Br
 | Model ID | Context | Best for |
 |---|---|---|
 | `deepseek-ai/deepseek-v4-flash-0731` | 1M | **Default recommendation.** Fast, strong coding, 284B MoE / 13B active |
-| `moonshotai/kimi-k3` | 1M | **Best available free model.** 2.8T params, multimodal, long-horizon agentic work. Slower than DeepSeek |
+| `moonshotai/kimi-k3` | 1M | 2.8T params, multimodal, strongest on paper. **Unstable on NIM, see the caveat at the top.** Left out of the config above deliberately |
 | `z-ai/glm-5.2` | 1M | Excellent agentic coder, MIT-licensed, 744B MoE / 40B active |
 | `minimaxai/minimax-m3` | 1M | 428B MoE / 23B active, multimodal, 59% on SWE-Bench Pro |
 | `nvidia/nemotron-3-super-120b-a12b` | 1M | NVIDIA's own MoE, good general coder, low latency |
@@ -253,10 +248,10 @@ These model IDs appeared in earlier versions of this guide and now fail. Confirm
 | Dead model ID | EOL date | Use instead |
 |---|---|---|
 | `deepseek-ai/deepseek-v4-flash` | 2026-08-07 | `deepseek-ai/deepseek-v4-flash-0731` |
-| `deepseek-ai/deepseek-v4-pro` | 2026-08-07 | `moonshotai/kimi-k3` or `z-ai/glm-5.2` |
+| `deepseek-ai/deepseek-v4-pro` | 2026-08-07 | `z-ai/glm-5.2` |
 | `meta/llama-4-maverick-17b-128e-instruct` | 2026-07-27 | `nvidia/nemotron-3-super-120b-a12b` |
 | `qwen/qwen3-coder-480b-a35b-instruct` | 2026-06-11 | `z-ai/glm-5.2` |
-| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `moonshotai/kimi-k3` |
+| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `deepseek-ai/deepseek-v4-flash-0731` |
 | `zai-org/glm-5.2` | never existed | `z-ai/glm-5.2` (note the hyphen) |
 
 > Model IDs change often, and without much warning. The authoritative list is the URL slug on the model card page at build.nvidia.com. Before committing a model ID into a config, send it one throwaway request: a `410` names the retirement date, a `404` means the slug is wrong.
@@ -304,7 +299,7 @@ OpenCode edits files directly. Review changes in your editor or with `git diff`.
 NVIDIA's free tier is roughly **40 requests per minute**, and that budget is **shared across all models** rather than allocated per model. If you get a 429, wait a minute and retry. Agentic tools like OpenCode burn requests faster than chat does, so this is a real ceiling on long autonomous runs.
 
 ### Context window
-DeepSeek V4 Flash 0731, Kimi K3, GLM-5.2, MiniMax M3, and Nemotron 3 Super all support **1,000,000 tokens** of context, which covers most full repos. OpenCode automatically includes relevant files. Note that the `limit.context` values in your config are what OpenCode uses to decide when to compact a session, so setting them accurately matters.
+DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Kimi K3, and Nemotron 3 Super all support **1,000,000 tokens** of context, which covers most full repos. OpenCode automatically includes relevant files. Note that the `limit.context` values in your config are what OpenCode uses to decide when to compact a session, so setting them accurately matters.
 
 ### Keep your API key out of git
 Your API key is stored in plain text in `opencode.json`. The default location (`~/.config/opencode/`) is outside any project, but double-check that you haven't accidentally checked in a copy.
@@ -397,7 +392,7 @@ opencode
 | API returns 403 on **every** model you try | Your key is invalid or expired, not a model problem. Generate a new one |
 | API returns 410 Gone | Model is retired. The error names the EOL date. See the retired-models table in Section 7 |
 | API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM, shared across models) — wait 60 seconds and retry |
-| Slow responses | Normal for large reasoning models. Kimi K3 is noticeably slower than DeepSeek V4 Flash 0731. Try `nvidia/nemotron-3.5-lightning-30b-a3b` if you want speed above all |
+| Slow responses | Normal for large reasoning models. Try `nvidia/nemotron-3.5-lightning-30b-a3b` if you want speed above all |
 | Config changes not picked up | Restart OpenCode after editing opencode.json |
 
 ---

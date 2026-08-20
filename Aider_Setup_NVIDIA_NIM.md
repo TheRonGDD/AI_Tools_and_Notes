@@ -4,7 +4,9 @@ Aider is a terminal-based AI pair-programming tool that edits code in your local
 
 **Aider runs natively on Windows 11.** No WSL (Windows Subsystem for Linux) needed. Everything below uses PowerShell, which comes built into Windows 11.
 
-> **Recommended model (August 2026):** `deepseek-ai/deepseek-v4-flash-0731` for everyday coding, or `moonshotai/kimi-k3` when you need the strongest free model available. Both are free on NVIDIA NIM with 1M-token context windows.
+> **Recommended model (August 2026):** `deepseek-ai/deepseek-v4-flash-0731`. Free on NVIDIA NIM, 1M-token context, and the most reliable model in the catalog in testing: it answered every request across a full day of probing.
+>
+> **Caveat on `moonshotai/kimi-k3` (observed 2026-08-20):** it is listed in `/v1/models` and answered normally in the morning, but by late afternoon it returned `404` with an empty body and an `Nvcf-Status: errored` header on every attempt across several hours. That header means the request reached NVIDIA's function router and the backing function failed, which is different from the per-account `Function ... Not found for account` gate. Treat K3 as **unstable on NIM right now**: worth trying, not worth making your default. `deepseek-ai/deepseek-v4-flash-0731` answered on every single attempt and is the safer primary.
 >
 > **If you followed the July version of this guide, your config is broken.** `deepseek-ai/deepseek-v4-flash` and `deepseek-ai/deepseek-v4-pro` both reached end of life on **2026-08-07** and now return `410 Gone`. Replace the model ID with `deepseek-ai/deepseek-v4-flash-0731`, which is the direct successor and benchmarks better than either retired model (Artificial Analysis Intelligence Index 50, against 40 for the old V4 Flash).
 
@@ -87,7 +89,7 @@ Most users will NOT need this step. Only do it if you see the error.
 
 1. Go to [https://build.nvidia.com](https://build.nvidia.com)
 2. Sign in or create a free NVIDIA Developer account (email plus **phone verification** — still no credit card)
-3. Pick any model, for example [Kimi K3](https://build.nvidia.com/moonshotai/kimi-k3)
+3. Pick any model, for example [DeepSeek V4 Flash 0731](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash-0731)
 4. Click **"Get API Key"** (or "Build with this NIM")
 5. Copy the key — it starts with `nvapi-`
 
@@ -219,7 +221,7 @@ NVIDIA NIM hosts 100+ models. A live catalog call on 2026-08-20 returned 103. Br
 | Model ID | Context | Best for |
 |---|---|---|
 | `deepseek-ai/deepseek-v4-flash-0731` | 1M | **Default recommendation.** Fast, strong coding, 284B MoE / 13B active |
-| `moonshotai/kimi-k3` | 1M | **Best available free model.** 2.8T params, multimodal, long-horizon agentic work. Slower than DeepSeek |
+| `moonshotai/kimi-k3` | 1M | 2.8T params, multimodal, strongest on paper. **Unstable on NIM, see the caveat at the top.** Do not make it a default |
 | `z-ai/glm-5.2` | 1M | Excellent agentic coder, MIT-licensed, 744B MoE / 40B active |
 | `minimaxai/minimax-m3` | 1M | 428B MoE / 23B active, multimodal, 59% on SWE-Bench Pro |
 | `nvidia/nemotron-3-super-120b-a12b` | 1M | NVIDIA's own MoE, good general coder, low latency |
@@ -231,7 +233,7 @@ NVIDIA NIM hosts 100+ models. A live catalog call on 2026-08-20 returned 103. Br
 To use any of these with Aider, swap the model ID:
 
 ```powershell
-aider --model openai/moonshotai/kimi-k3
+aider --model openai/z-ai/glm-5.2
 ```
 
 ### Retired, do not use
@@ -241,10 +243,10 @@ These model IDs appeared in earlier versions of this guide and now fail. Confirm
 | Dead model ID | EOL date | Use instead |
 |---|---|---|
 | `deepseek-ai/deepseek-v4-flash` | 2026-08-07 | `deepseek-ai/deepseek-v4-flash-0731` |
-| `deepseek-ai/deepseek-v4-pro` | 2026-08-07 | `moonshotai/kimi-k3` or `z-ai/glm-5.2` |
+| `deepseek-ai/deepseek-v4-pro` | 2026-08-07 | `z-ai/glm-5.2` |
 | `meta/llama-4-maverick-17b-128e-instruct` | 2026-07-27 | `nvidia/nemotron-3-super-120b-a12b` |
 | `qwen/qwen3-coder-480b-a35b-instruct` | 2026-06-11 | `z-ai/glm-5.2` |
-| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `moonshotai/kimi-k3` |
+| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `deepseek-ai/deepseek-v4-flash-0731` |
 | `zai-org/glm-5.2` | never existed | `z-ai/glm-5.2` (note the hyphen) |
 
 > Model IDs change often, and they change without much warning. The authoritative list is the URL slug on the model card page at build.nvidia.com. Before committing a model ID into a config, send it one throwaway request: a `410` names the retirement date, a `404` means the slug is wrong.
@@ -311,7 +313,7 @@ You type plain English to describe what you want changed. Aider edits the files 
 NVIDIA's free tier is roughly **40 requests per minute**, and that budget is **shared across all models** rather than allocated per model. If you get a 429, wait a minute and retry.
 
 ### Context windows
-DeepSeek V4 Flash 0731, Kimi K3, GLM-5.2, MiniMax M3, and Nemotron 3 Super all support **1,000,000 tokens** of context, which is enough for most full repos. Step 3.7 Flash and Nemotron 3 Ultra sit around 256K, and GPT-OSS at 131K. Across the whole catalog the range runs from 4K to 1M, so check the model card before assuming you can feed it a large repo.
+DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Kimi K3, and Nemotron 3 Super all support **1,000,000 tokens** of context, which is enough for most full repos. Step 3.7 Flash and Nemotron 3 Ultra sit around 256K, and GPT-OSS at 131K. Across the whole catalog the range runs from 4K to 1M, so check the model card before assuming you can feed it a large repo.
 
 ### Edit format
 If a model has trouble producing correct code edits (often happens with smaller / older models), try the `whole` format:
@@ -326,10 +328,10 @@ This makes the model output entire files instead of diffs. Uses more tokens but 
 Aider can use one model to plan and another to apply edits. This often produces better results:
 
 ```powershell
-aider --model openai/moonshotai/kimi-k3 --editor-model openai/deepseek-ai/deepseek-v4-flash-0731
+aider --model openai/z-ai/glm-5.2 --editor-model openai/deepseek-ai/deepseek-v4-flash-0731
 ```
 
-Kimi K3 plans, DeepSeek V4 Flash 0731 applies the edits. You get K3's reasoning without paying its latency on every mechanical file write.
+GLM-5.2 plans, DeepSeek V4 Flash 0731 applies the edits. You get the stronger model's reasoning without paying its latency on every mechanical file write.
 
 ---
 
