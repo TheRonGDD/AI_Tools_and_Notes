@@ -2,9 +2,11 @@
 
 A reference guide to AI providers offering free API access, no credit card required (unless noted). All entries have ongoing free tiers, not just one-time trial credits.
 
-> **Note:** Rate limits, model availability, and free tier terms change frequently. Always verify current limits on the provider's pricing page before building on a free tier. Last reviewed August 2026, with NVIDIA and Groq model IDs verified by live API call on 2026-08-20.
+> **Note:** Rate limits, model availability, and free tier terms change frequently. Always verify current limits on the provider's pricing page before building on a free tier. Last reviewed September 2026, with NVIDIA model IDs verified by live API call on 2026-09-20.
 
-> **Free tiers kept shrinking through 2026.** Cerebras removed its open free tier entirely on August 17, Groq dropped every Llama chat model, OpenRouter holds unfunded accounts at 50 requests/day, and Google's consumer CLI free tier moved to a much smaller compute-based quota. Anything you read about these providers from early 2026 is too generous.
+> **Free tiers kept shrinking through 2026.** Cerebras removed its open free tier entirely on August 17, OpenRouter holds unfunded accounts at 50 requests/day, and Google's consumer CLI free tier moved to a much smaller compute-based quota. Anything you read about these providers from early 2026 is too generous.
+
+> **NVIDIA's catalog turned over hard in the last month.** Six of the nine chat models this guide recommended in August are now `410 Gone`, including GLM-5.2, MiniMax M3, Step 3.7 Flash, GPT-OSS 120B and Llama 3.3 70B. If you built a config from the August version of this file, most of it is dead. See [NVIDIA NIM](#nvidia-nim) for the replacements.
 
 ---
 
@@ -12,7 +14,7 @@ A reference guide to AI providers offering free API access, no credit card requi
 
 | Provider | Notable Free Models | OpenAI-Compatible | Credit Card Required |
 |---|---|---|---|
-| [NVIDIA NIM](#nvidia-nim) | DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Nemotron 3, Kimi K3, 100+ more | Yes | No (phone verification) |
+| [NVIDIA NIM](#nvidia-nim) | GLM-5.3 and 5.3 Flash, Kimi K3, Nemotron 3, Gemma 4, Muse Glimmer, 80+ more | Yes | No (phone verification) |
 | [Groq](#groq) | GPT-OSS 120B/20B, Qwen3.6 27B, Compound | Yes | No |
 | [Google AI Studio](#google-ai-studio) | Gemini 3.7 / 3.6 / 3.5 Flash, Flash-Lite | Yes | No |
 | [SambaNova](#sambanova) | MiniMax M2.7, DeepSeek V3.1, Llama 3.3 70B, GPT-OSS 120B | Yes | No |
@@ -29,24 +31,25 @@ A reference guide to AI providers offering free API access, no credit card requi
 
 **URL:** https://build.nvidia.com
 
-The largest free catalog around. A live call to `GET /v1/models` on 2026-08-20 returned **103 models**, spanning chat, vision, embedding, and reranking. The current lineup includes DeepSeek V4 Flash 0731, GLM-5.2, Kimi K3, MiniMax M3, Step 3.7 Flash, the Nemotron 3 family, and GPT-OSS. New models land fast: Kimi K3 appeared on NIM within weeks of Moonshot publishing the weights.
+Still the largest free catalog around, but it is smaller than it was. A live call to `GET /v1/models` on 2026-09-20 returned **82 models**, down from 103 a month earlier, spanning chat, vision, embedding, and reranking. The chat lineup is now led by GLM-5.3, Kimi K3, the Nemotron 3 family, Gemma 4 and Muse Glimmer. New models land fast, and old ones leave just as fast — plan on re-checking your model IDs monthly.
 
 - **Sign-up:** Free NVIDIA Developer account. No credit card, but **phone verification is required** at signup.
-- **Notable free models (verified callable 2026-08-20):**
-  - `deepseek-ai/deepseek-v4-flash-0731` (284B MoE / 13B active, 1M context, the most reliable pick here)
-  - `moonshotai/kimi-k3` (2.8T params, 1M context, multimodal, strongest on paper but **currently unstable**, see below)
-  - `z-ai/glm-5.2` (744B MoE / 40B active, 1M context, MIT-licensed agentic coder)
-  - `minimaxai/minimax-m3` (428B MoE / 23B active, 1M context, multimodal)
-  - `stepfun-ai/step-3.7-flash` (198B MoE / 11B active, 256K context, vision)
+- **Notable free models (each verified callable by live API call on 2026-09-20):**
+  - `z-ai/glm-5.3` (MIT-licensed agentic coder, reasoning model, **the default recommendation here** — answered in ~4s on every attempt)
+  - `z-ai/glm-5.3-flash` (smaller sibling; answers reliably but took ~55s per call in testing)
+  - `moonshotai/kimi-k3` (2.8T params, 1M context, multimodal, strongest on paper; **now working again** after August's outage, but slow at 85–105s per call)
   - `nvidia/nemotron-3-super-120b-a12b` (120B / 12B active, 1M context)
   - `nvidia/nemotron-3-ultra-550b-a55b` (550B / 55B active, 262K context)
   - `nvidia/nemotron-3.5-lightning-30b-a3b` (small, fast, low-latency)
-  - `openai/gpt-oss-20b` (`openai/gpt-oss-120b` also exists, but needed the "Try API" registration below on a fresh key)
+  - `meta/muse-glimmer-30b` (new this cycle; fastest agentic model tested here at ~2s)
+  - `google/gemma-4-31b-it` (works, but slow and was previously gated — see the registration note below)
+  - `openai/gpt-oss-20b` (the 120B version is **retired** as of 2026-09-03)
+  - `deepseek-ai/deepseek-v4-flash-0731` (still listed and still answers, but **see the latency warning below** before making it a default)
 - **OpenAI-compatible:** Yes — `https://integrate.api.nvidia.com/v1`
 - **Key prefix:** `nvapi-`
 - **Rate limits:** ~40 requests/min, shared across all models rather than per-model. You can apply for a 200 RPM increase through the NVIDIA Developer Forums.
 - **Context range:** 4K to 1M tokens depending on model
-- **Standout feature:** One API key, 100+ models. Largest free hosted catalog available anywhere.
+- **Standout feature:** One API key, 80+ models. Largest free hosted catalog available anywhere.
 - **Guides in this repo:** [Aider + NVIDIA NIM](Aider_Setup_NVIDIA_NIM.md) | [OpenCode + NVIDIA NIM](OpenCode_Setup_NVIDIA_NIM.md)
 
 ### Reading NVIDIA's error codes (the 403 vs 410 diagnostic)
@@ -56,18 +59,26 @@ NVIDIA's failure modes look similar from the outside but mean very different thi
 | Response | What it actually means | Fix |
 |---|---|---|
 | `410 Gone` with an end-of-life date | The model is genuinely retired. Note that this is returned **even when your key is invalid**, because the EOL check runs before authentication. | Pick a current model ID |
-| `404 page not found` (bare) | The model slug does not exist. Usually a typo or a wrong org prefix, for example `zai-org/glm-5.2` instead of `z-ai/glm-5.2` | Check the URL slug on the model's page at build.nvidia.com |
+| `404 page not found` (bare) | The model slug does not exist. Usually a typo or a wrong org prefix, for example `zai-org/glm-5.3` instead of `z-ai/glm-5.3` | Check the URL slug on the model's page at build.nvidia.com |
 | `404` with `Function '<uuid>': Not found for account` | The model exists, but **your account is not registered for it** | Open its page on build.nvidia.com and click **"Try API"** once, then retry |
 | `403 Authorization failed` on **every** live model | Your key is invalid or **expired** | Generate a new key |
-| Request hangs indefinitely, no response at all | Same per-account registration gap as the `404 Function` case, just failing silently instead | Click **"Try API"** on that model's page |
+| `404` with an **empty body** and header `Nvcf-Status: errored` | The backing function itself is down. Not an account problem | Nothing you can do. Use another model and retry later |
+| `503 Service temporarily overloaded` | Transient capacity shortage on that model's pool | Retry in a few seconds; it usually clears |
+| `503 ResourceExhausted: Worker local total request limit reached (78/32)` | The model's **shared** worker pool is oversubscribed across all NVIDIA users, not a limit on your account | Retry later, or pick a less popular model. Raising your own RPM will not help |
+| `429` after several fast calls | Your own per-account rate limit | Space requests out. Do not mistake this for a model failure |
+| Request hangs with no response at all | **Two different causes.** On a *fresh* key it is the per-account registration gap failing silently. On a key that already worked, it is the model being slow enough to blow your client timeout | New key: click **"Try API"**. Otherwise raise your timeout before concluding it is broken |
 
-> **The key-expiry trap (new for August 2026):** NVIDIA keys now carry a time-to-live that you select when you generate them, from one hour up to "never expires." One year is a common choice. Because a dead key returns `403` on live models while retired models still return their `410` notice, an expired key looks exactly like "every model I want got deprecated at once." If you see `403 Authorization failed` across several unrelated models, the problem is your key, not the catalog.
+> **The key-expiry trap:** NVIDIA keys carry a time-to-live that you select when you generate them, from one hour up to "never expires." One year is a common choice. Because a dead key returns `403` on live models while retired models still return their `410` notice, an expired key looks exactly like "every model I want got deprecated at once." If you see `403 Authorization failed` across several unrelated models, the problem is your key, not the catalog.
 
-> **Recently retired on NIM (confirmed by live `410` responses):** `deepseek-ai/deepseek-v4-flash` and `deepseek-ai/deepseek-v4-pro` (both EOL 2026-08-07), `meta/llama-4-maverick-17b-128e-instruct` (2026-07-27), `qwen/qwen3-coder-480b-a35b-instruct` (2026-06-11), `moonshotai/kimi-k2-instruct` (2026-05-12). Kimi K2.5 no longer resolves at all. NVIDIA appears to have cleared capacity for Kimi K3 and the updated DeepSeek build.
+> **⚠️ The August recommendation is now a latency trap: `deepseek-ai/deepseek-v4-flash-0731`.** This was the headline pick in the previous version of this guide, chosen because it answered every request in under a second. On 2026-09-20 it is still listed and still returns `200` with correct output, but it has become drastically slower: four probes for a 16-token reply produced timeouts at 120s (twice), one success at **172s**, and a timeout at **300s**. There is no error code to catch here, which is what makes it nasty. An agent like Aider or OpenCode with a normal HTTP timeout will simply appear to hang, and you will go looking for a config bug that does not exist. Use `z-ai/glm-5.3` instead, which answered in about 4 seconds on every attempt.
 
-> **Expect to hit the registration gate on a fresh key.** This is not a rare edge case. Testing a brand-new key on 2026-08-20, four of the catalog's most popular models were unreachable on a key not yet registered for them: `openai/gpt-oss-120b`, `google/gemma-4-31b-it`, and `meta/llama-3.3-70b-instruct` each hung for a full four minutes with no response at all, and `moonshotai/kimi-k2.6` returned `Function ... Not found for account`. All of them are listed in `/v1/models`, so the catalog is not a reliable guide to what your key can actually call. Click "Try API" once on each model page you plan to use, before you wire it into a config. (The hang and the `Not found for account` error were both reproduced directly; the "Try API" step is NVIDIA's documented remedy for them.)
+> **Recently retired on NIM (each confirmed by a live `410` with its EOL date in the response body):** `meta/llama-3.3-70b-instruct` (EOL 2026-08-26), `stepfun-ai/step-3.7-flash` (2026-08-28), `openai/gpt-oss-120b` (2026-09-03), `minimaxai/minimax-m3` (2026-09-09), and `z-ai/glm-5.2` (2026-08-21, superseded by `z-ai/glm-5.3`). Earlier casualties: `deepseek-ai/deepseek-v4-flash` and `-v4-pro` (2026-08-07), `meta/llama-4-maverick-17b-128e-instruct` (2026-07-27), `qwen/qwen3-coder-480b-a35b-instruct` (2026-06-11), `moonshotai/kimi-k2-instruct` (2026-05-12). The `410` body names the exact retirement timestamp, which makes it the cheapest possible way to confirm a model is gone rather than merely misbehaving.
 
-> **Being listed does not mean it works, part two: `moonshotai/kimi-k3`.** K3 answered normally on the morning of 2026-08-20 and then, from mid-afternoon onward, returned `404` with an **empty body** and an `Nvcf-Status: errored` header on every attempt over several hours. That header is the tell: the request reached NVIDIA's function router and the backing function itself failed, which is a different failure from the per-account `Function ... Not found for account` gate above and cannot be fixed by clicking "Try API." Nothing about the catalog listing changed while this was happening. Re-tested twice more late in the day (13:44 and 13:58) with the same result, so this is a sustained failure of the backing function, not a brief blip. K3 is worth retrying periodically, but do not build a config around it yet. `deepseek-ai/deepseek-v4-flash-0731` answered on every attempt all day and is the dependable choice.
+> **Expect to hit the registration gate.** This is not a rare edge case, and it is not limited to new keys. On 2026-09-20, `moonshotai/kimi-k2.6` and `nvidia/nemotron-nano-3-30b-a3b` both returned `Function '<uuid>': Not found for account` on a key that had been in use for a month and worked fine against a dozen other models. Both are listed in `/v1/models`. The catalog is not a reliable guide to what your key can actually call, so click "Try API" once on each model page you plan to use before you wire it into a config.
+
+> **Good news on `moonshotai/kimi-k3`.** Throughout 2026-08-20 K3 returned `404` with an empty body and an `Nvcf-Status: errored` header, a backing-function failure that "Try API" could not fix. That outage is over: on 2026-09-20 it answered `200` on every attempt. It is slow, at 85 to 105 seconds for a short reply, so treat it as a model you reach for deliberately rather than a default. The wider lesson holds — a model can be listed, broken, and then quietly fixed, with no announcement either way. Re-probe before you trust a month-old note, including this one.
+
+> **`503` is two different problems.** Plain `Service temporarily overloaded` is a brief capacity blip and usually clears on an immediate retry; `nvidia/nemotron-3-ultra-550b-a55b` threw one and answered fine 30 seconds later. But `ResourceExhausted: Worker local total request limit reached (78/32)`, seen on `poolside/laguna-xs-2.1`, is a different animal: those numbers are the **shared** worker pool across all NVIDIA users, and 78 queued against 32 slots means the model is simply oversubscribed. No amount of retrying or rate-limit tuning on your end fixes that one.
 
 ---
 
@@ -77,8 +88,10 @@ NVIDIA's failure modes look similar from the outside but mean very different thi
 
 Extremely fast inference on custom LPU hardware, still the lowest-latency free API available. The catalog is now much narrower than it used to be.
 
+> **⚠️ This section was NOT re-verified in the September 2026 pass, and it is currently in dispute.** The model list below is the live-API result from 2026-08-20. As of 2026-09-20, Groq's own documentation at [console.groq.com/docs/models](https://console.groq.com/docs/models) lists **Llama 3.1 8B and Llama 3.3 70B as production models**, which directly contradicts the August finding that every Llama chat model had been removed. One of the two is wrong: either Groq restored them, or the docs page is stale. No Groq key was available to settle it during this review. **Send one throwaway request before trusting any Llama model ID here, in either direction.** Everything else in this section is unchanged from August and also unverified this cycle.
+
 - **Sign-up:** Free account, no credit card
-- **Full catalog as of 2026-08-20 (13 models, verified by live API call):**
+- **Catalog as of 2026-08-20 (13 models, verified by live API call **then**, not re-checked since):**
   - `openai/gpt-oss-120b` (131K context)
   - `openai/gpt-oss-20b` (131K context, fastest production model)
   - `openai/gpt-oss-safeguard-20b` (131K context)
@@ -94,7 +107,9 @@ Extremely fast inference on custom LPU hardware, still the lowest-latency free A
 - **Important:** limits are enforced **per organization, not per API key**. Extra keys under the same org share one bucket.
 - **Standout feature:** Lowest latency of any free provider. Every listed model is available on the free tier, gated by rate limits only, with no credits system and no per-token charge.
 
-> **All Llama chat models are gone.** `llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, and the Llama 4 previews have been removed from Groq. The only remaining Meta entries are the two `llama-prompt-guard-2` classifiers, which cannot hold a conversation. If you have a Groq config from earlier in 2026, it is almost certainly pointing at a dead model. `openai/gpt-oss-20b` is the closest replacement for the old 8B-instant slot, and `openai/gpt-oss-120b` for the 70B slot.
+> **The Llama question, unresolved.** On 2026-08-20 a live catalog call returned 13 models with no Llama chat models among them: `llama-3.3-70b-versatile`, `llama-3.1-8b-instant` and the Llama 4 previews were all absent, leaving only the two `llama-prompt-guard-2` classifiers, which cannot hold a conversation. On 2026-09-20 Groq's docs list Llama 3.1 8B and Llama 3.3 70B as current production models. This guide cannot tell you which is right without a key. If you need a Llama model on Groq, test the ID directly; if you just need something that works, `openai/gpt-oss-20b` and `openai/gpt-oss-120b` were confirmed live in August and are documented as current now, so they are the safer bet either way.
+
+> **Note the asymmetry with NVIDIA:** Groq's `/v1/models` does not report retirement dates the way NVIDIA's `410` responses do, so a missing model and a renamed model look identical from the outside. That is part of why the August reading was hard to pin down.
 
 > **Cheap upgrade:** adding a credit card with zero minimum spend unlocks up to 10x the free rate limits plus a 25% token discount. Worth knowing if 30 RPM is your only blocker.
 

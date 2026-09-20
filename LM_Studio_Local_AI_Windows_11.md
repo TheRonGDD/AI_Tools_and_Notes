@@ -4,7 +4,9 @@ LM Studio is a desktop application for running AI models locally. It provides a 
 
 Free for personal **and commercial** use. No API key, no internet required once models are downloaded, no rate limits.
 
-> **Current version (August 2026):** 0.4.16, released 2026-06-08. Recent releases added tensor parallelism for splitting one model across multiple GPUs (0.4.15), stable MTP speculative decoding for faster generation on models with multi-token-prediction heads (0.4.14), and OAuth support for MCP servers (0.4.10). 0.4.16 raised the default context length to 8K and shipped "Locally," a companion iPhone and iPad app.
+> **Current version (September 2026):** 0.4.25, released 2026-09-19, adding support for the Splash engine on Apple Silicon M3 and newer. 0.4.24 (2026-09-09) added advanced llama.cpp argument overrides for GGUF loading and fixed the Loaded Instances UI reporting a wrong context length. Earlier in the cycle: tensor parallelism for splitting one model across multiple GPUs (0.4.15), stable MTP speculative decoding (0.4.14), and OAuth for MCP servers (0.4.10).
+
+> **There is now a second LM Studio app: Bionic.** Announced 2026-07-16, Bionic is an agent rather than a chat window. It organizes work into **Code Projects** (point it at a local folder and it does agentic code search, multi-file editing, and inline diffs you approve before they apply) and **Work Projects** (document handling in a sandbox, with native web search). It is versioned separately from the main app, at **1.1.5** as of 2026-09-19, with its own [changelog](https://lmstudio.ai/changelog). The app is free to download and free when running models locally; only the optional LM Studio Secure Cloud needs billing set up. See [section 8](#8-lm-studio-bionic) below.
 
 > **It has been free for work use since July 2025.** The old requirement to request a separate commercial license is gone. There is a paid LM Studio Enterprise tier for organizations wanting SSO, model and MCP gating, and private collaboration, but the app itself is free.
 
@@ -205,6 +207,38 @@ Both are free local AI tools. Here is when to choose one over the other:
 **Use Ollama** if you prefer pure CLI, want simpler automation, or are running headless.
 
 Both can run simultaneously on different ports.
+
+---
+
+## 8. LM Studio Bionic
+
+Bionic is a separate app from LM Studio, announced 2026-07-16 and at version 1.1.5 as of 2026-09-19. Where LM Studio is a chat window plus a model runtime, Bionic is an **agent**: it takes a task, works through it across multiple files or documents, and shows you what it changed.
+
+It organizes work into two project types:
+
+- **Code Projects** — point it at a local folder. It does agentic code search across the project, multi-file editing, and code review, showing inline diffs so you can inspect every change before accepting it.
+- **Work Projects** — document work in a sandboxed environment, so it can organize directories, edit files, and summarize material without the rest of your machine being in scope. Includes native web search.
+
+Models can run locally, over LM Link, or against LM Studio Secure Cloud.
+
+### Bionic vs. Aider and OpenCode
+
+All three are agents that edit code, and Bionic is the newest of them. The tradeoffs, as of this review:
+
+| | Bionic | Aider | OpenCode |
+|---|---|---|---|
+| Interface | Desktop GUI | Terminal | TUI, desktop, IDE extension |
+| Open source | No | Yes (Apache 2.0) | Yes (MIT) |
+| Git integration | Inline diffs, approve per change | **Makes real git commits** | Yes |
+| Model source | Local, LM Link, or LM Studio Cloud | Any OpenAI-compatible API | Any OpenAI-compatible API |
+| Runs fully offline | Yes, on local models | Only against a local endpoint | Only against a local endpoint |
+| Actively developed | Yes | **No — no release since Feb 2026** | Yes, very |
+
+**Where Bionic fits:** it is the easiest of the three to get running if you already use LM Studio, and the only one built GUI-first. The document sandbox in Work Projects has no equivalent in Aider or OpenCode.
+
+**Where it does not:** it is closed source, and it does not make git commits the way Aider does. If you want an agent whose work lands as reviewable commits, Aider is still the tool for that — with the caveat that Aider has not shipped a release since February 2026.
+
+**Cost note for this repo's purposes:** Bionic qualifies as free because local models cost nothing to run. LM Studio Secure Cloud is a paid add-on and is not required.
 
 ---
 

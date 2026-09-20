@@ -1,16 +1,18 @@
 # OpenCode Setup with NVIDIA NIM Free API (Windows 11)
 
-OpenCode is an open-source (MIT) AI coding agent from Anomaly. It supports any OpenAI-compatible API — including NVIDIA's free NIM (NVIDIA Inference Microservices) endpoints, which host 100+ frontier models for free.
+OpenCode is an open-source (MIT) AI coding agent from Anomaly. It supports any OpenAI-compatible API — including NVIDIA's free NIM (NVIDIA Inference Microservices) endpoints, which host 80+ frontier models for free.
 
 **OpenCode runs natively on Windows 11** via Scoop, Chocolatey, or the universal installer. WSL is not required.
 
-> **Recommended model (August 2026):** `deepseek-ai/deepseek-v4-flash-0731`. Free on NVIDIA NIM, 1M-token context, and the most reliable model in the catalog in testing: it answered every request across a full day of probing.
+> **Recommended model (September 2026):** `z-ai/glm-5.3`. Free on NVIDIA NIM, MIT-licensed, and the best combination of reliability and speed in the catalog as of 2026-09-20: it answered every probe in roughly 4 seconds.
 >
-> **Caveat on `moonshotai/kimi-k3` (observed 2026-08-20):** it is listed in `/v1/models` and answered normally in the morning, but by late afternoon it returned `404` with an empty body and an `Nvcf-Status: errored` header on every attempt across several hours. That header means the request reached NVIDIA's function router and the backing function failed, which is different from the per-account `Function ... Not found for account` gate. Treat K3 as **unstable on NIM right now**: worth trying, not worth making your default. Re-tested at 13:44 and 13:58 the same day, after the guides were first corrected: still `404` with `Nvcf-Status: errored` every time, so this is a sustained outage of the backing function rather than a brief blip. `deepseek-ai/deepseek-v4-flash-0731` answered on every single attempt and is the safer primary.
+> **⚠️ If you followed the August version of this guide, change your model.** That version recommended `deepseek-ai/deepseek-v4-flash-0731`, which has not been retired but has become severely slow. Probing it on 2026-09-20 produced timeouts at 120 seconds (twice), one success at **172 seconds**, and another timeout at **300 seconds**, for a 16-token reply. It still returns a valid `200`, so there is no error for OpenCode to surface — the session simply appears to hang, and you go looking for a config bug that is not there. Switch to `z-ai/glm-5.3`.
 >
-> **If you followed the July version of this guide, your config is broken.** `deepseek-ai/deepseek-v4-flash` and `deepseek-ai/deepseek-v4-pro` both reached end of life on **2026-08-07** and now return `410 Gone`. The `zai-org/glm-5.2` entry was also wrong: the correct slug is `z-ai/glm-5.2`. Section 4 below has a corrected config you can paste over the old one.
+> **Retired since the August version:** `z-ai/glm-5.2` (EOL 2026-08-21, superseded by `glm-5.3`), `stepfun-ai/step-3.7-flash` (2026-08-28), `openai/gpt-oss-120b` (2026-09-03) and `minimaxai/minimax-m3` (2026-09-09), all now `410 Gone`. Three of those were in the config block the August guide told you to paste. Section 4 below has a corrected config.
+>
+> **`moonshotai/kimi-k3` is working again** after August's sustained backing-function outage, and is back in the config below. It is slow, at 85 to 105 seconds per call, but no longer broken.
 
-> **What's new in OpenCode:** now at **v1.18.19** (2026-08-20) and past **199K stars**. It is no longer terminal-only, shipping as a **TUI, a desktop app, and an IDE extension**, with tabbed multi-session management in the desktop build. There is also **OpenCode Zen**, a curated managed-access set of models the team benchmarked for coding agents, which is separate from the free NVIDIA NIM setup described here.
+> **What's new in OpenCode:** now at **v1.18.31** (2026-09-14) and past **208K stars**. It is no longer terminal-only, shipping as a **TUI, a desktop app, and an IDE extension**, with tabbed multi-session management in the desktop build. There is also **OpenCode Zen**, a curated managed-access set of models the team benchmarked for coding agents, which is separate from the free NVIDIA NIM setup described here.
 
 ---
 
@@ -45,15 +47,17 @@ Skip this if you install via Scoop, Chocolatey, or the binary download.
 
 1. Go to [https://build.nvidia.com](https://build.nvidia.com)
 2. Sign in or create a free NVIDIA Developer account (email plus **phone verification** — still no credit card)
-3. Pick any model, for example [DeepSeek V4 Flash 0731](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash-0731)
+3. Pick any model, for example [GLM-5.3](https://build.nvidia.com/z-ai/glm-5.3)
 4. Click **"Get API Key"** (or "Build with this NIM")
 5. Copy the key — it starts with `nvapi-`
 
-A single `nvapi-` key works for all 100+ models on NVIDIA's free tier.
+A single `nvapi-` key works for every model on NVIDIA's free tier.
 
 > **Choose your key's expiry deliberately.** NVIDIA now asks for a time-to-live when you generate a key, from one hour up to "never expires." Pick something long and note the date. An expired key returns `403 Authorization failed` on every live model, which reads like a catalog problem rather than an auth problem.
 
-> **If a model 404s or hangs forever:** some models need a one-time per-account registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. Expect this on a fresh key: it is common, not an edge case. On a brand-new key tested 2026-08-20, `openai/gpt-oss-120b`, `google/gemma-4-31b-it`, and `meta/llama-3.3-70b-instruct` each hung for a full four minutes with no response, and `moonshotai/kimi-k2.6` returned `Function '<uuid>': Not found for account`. All four are listed in the catalog, so `/v1/models` is not a reliable guide to what your key can actually call.
+> **If a model 404s or hangs forever:** some models need a one-time per-account registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. This is not limited to fresh keys. On 2026-09-20, on a key that had been working for a month, `moonshotai/kimi-k2.6` and `nvidia/nemotron-nano-3-30b-a3b` both returned `Function '<uuid>': Not found for account`. Both are listed in the catalog, so `/v1/models` is not a reliable guide to what your key can actually call.
+>
+> **A hang is not always the gate.** It can simply be a slow model. If something you have already used successfully starts hanging, raise your timeout before assuming a registration problem — see the `deepseek-v4-flash-0731` warning at the top.
 
 ### Decoding NVIDIA's error responses
 
@@ -63,7 +67,10 @@ A single `nvapi-` key works for all 100+ models on NVIDIA's free tier.
 | `404 page not found` | Slug does not exist, often a wrong org prefix | Verify the slug on build.nvidia.com |
 | `404` + `Function '<uuid>': Not found for account` | Model exists, your account is not registered for it | Click "Try API" on its model page |
 | `403 Authorization failed` on **every** live model | Key is invalid or expired | Generate a new key |
-| Hangs with no response | Same registration gap, failing silently | Click "Try API" on its model page |
+| `404` with an empty body + `Nvcf-Status: errored` | The backing function is down. Not an account problem | Use another model; retry later |
+| `503 Service temporarily overloaded` | Brief capacity blip | Retry immediately, it usually clears |
+| `503 ResourceExhausted: Worker local ... (78/32)` | That model's **shared** worker pool is oversubscribed across all users | Retry later or pick a less popular model |
+| Hangs with no response | Registration gap failing silently, **or** simply a slow model | New key: click "Try API". Otherwise raise your timeout |
 
 ---
 
@@ -124,13 +131,13 @@ C:\Users\YOUR_USERNAME\.config\opencode\opencode.json
 
 Use `.jsonc` on either name if you want comments in the file.
 
-> **If both files exist, OpenCode reads both and merges them.** Verified on OpenCode 1.18.19 (2026-08-20): a provider defined only in `opencode.json` showed up alongside everything in `config.json`, with no warning that two files were in play. That is an easy way to spend an hour wondering why an edit had no effect, or why a provider you thought you deleted is still listed. Pick one filename and confirm the other does not exist:
+> **If both files exist, OpenCode reads both and merges them.** Verified on OpenCode 1.18.19 (2026-08-20); not re-tested on 1.18.31, and nothing in the changelog suggests it changed: a provider defined only in `opencode.json` showed up alongside everything in `config.json`, with no warning that two files were in play. That is an easy way to spend an hour wondering why an edit had no effect, or why a provider you thought you deleted is still listed. Pick one filename and confirm the other does not exist:
 >
 > ```powershell
 > dir $env:USERPROFILE\.config\opencode\*.json*
 > ```
 
-Create or edit that file with the following content, replacing the API key with yours. Every model ID here was verified callable on 2026-08-20:
+Create or edit that file with the following content, replacing the API key with yours. Every model ID here was verified callable by live API call on 2026-09-20:
 
 ```json
 {
@@ -144,25 +151,11 @@ Create or edit that file with the following content, replacing the API key with 
         "apiKey": "nvapi-YOUR_KEY_HERE"
       },
       "models": {
-        "deepseek-ai/deepseek-v4-flash-0731": {
-          "name": "DeepSeek V4 Flash 0731",
-          "limit": {
-            "context": 1000000,
-            "output": 32768
-          }
-        },
-        "z-ai/glm-5.2": {
-          "name": "GLM-5.2",
+        "z-ai/glm-5.3": {
+          "name": "GLM-5.3",
           "limit": {
             "context": 1048576,
             "output": 131072
-          }
-        },
-        "minimaxai/minimax-m3": {
-          "name": "MiniMax M3",
-          "limit": {
-            "context": 1048576,
-            "output": 65536
           }
         },
         "nvidia/nemotron-3-super-120b-a12b": {
@@ -172,10 +165,24 @@ Create or edit that file with the following content, replacing the API key with 
             "output": 32768
           }
         },
-        "stepfun-ai/step-3.7-flash": {
-          "name": "Step 3.7 Flash",
+        "meta/muse-glimmer-30b": {
+          "name": "Muse Glimmer 30B",
           "limit": {
             "context": 262144,
+            "output": 32768
+          }
+        },
+        "nvidia/nemotron-3-ultra-550b-a55b": {
+          "name": "Nemotron 3 Ultra 550B",
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          }
+        },
+        "moonshotai/kimi-k3": {
+          "name": "Kimi K3",
+          "limit": {
+            "context": 1048576,
             "output": 65536
           }
         }
@@ -185,11 +192,13 @@ Create or edit that file with the following content, replacing the API key with 
 }
 ```
 
-> **Note the `z-ai/` prefix on GLM-5.2.** Earlier versions of this guide used `zai-org/glm-5.2`, which returns a bare `404 page not found`. If GLM is the only model that fails for you, this is why.
+> **Note the `z-ai/` prefix on GLM-5.3.** Earlier versions of this guide used `zai-org/glm-5.2`, which returns a bare `404 page not found`. The org prefix is `z-ai`, with a hyphen. If GLM is the only model that fails for you, this is why.
+
+> **Kimi K3 is in this config, but give it a long timeout.** It answers reliably now, but took 85 to 105 seconds per call in testing on 2026-09-20. If your OpenCode session appears to stall on K3, it is probably still working.
 
 > **Why the provider key above is `nim` and not `nvidia`.** OpenCode ships a built-in model catalog (from models.dev). If your provider key matches a provider that catalog already knows, your config is **merged into** it rather than replacing it. Naming the key `nvidia` is the intuitive choice and it is the wrong one: with a config listing 4 curated models, `/models` offered **99** NVIDIA entries, among them `deepseek-ai/deepseek-v4-flash`, `deepseek-ai/deepseek-v4-pro`, `meta/llama-4-maverick-17b-128e-instruct` and `qwen/qwen3-coder-480b-a35b-instruct` — all four retired, all four returning `410 Gone` the moment you pick one. Your `models` map does not restrict the picker, it only adds to it.
 >
-> Any key the built-in catalog does not recognise, such as `nim`, suppresses the merge, and the picker then shows exactly the models you listed. Verified both ways on 2026-08-20: key `nvidia` gave 99 models, key `nim` gave 4. The only cost is that model references become `nim/<model-id>`.
+> Any key the built-in catalog does not recognise, such as `nim`, suppresses the merge, and the picker then shows exactly the models you listed. Verified both ways on 2026-08-20: key `nvidia` gave 99 models, key `nim` gave 4. Worth re-checking after the September catalog churn, since a merged picker will now be offering you six model IDs that return `410 Gone`. The only cost is that model references become `nim/<model-id>`.
 
 ### Two places hold API keys, and they are not the same place
 
@@ -218,7 +227,7 @@ Add a `model` field at the top level so OpenCode picks it without prompting:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "nim/deepseek-ai/deepseek-v4-flash-0731",
+  "model": "nim/z-ai/glm-5.3",
   "provider": {
     ...
   }
@@ -256,34 +265,41 @@ Or type `/models` directly in the chat input.
 
 ## 7. Picking a Model
 
-NVIDIA NIM hosts 100+ models. A live catalog call on 2026-08-20 returned 103. Browse the full list at [https://build.nvidia.com/models](https://build.nvidia.com/models). These were verified callable on that date:
+NVIDIA NIM hosts 80+ models. A live catalog call on 2026-09-20 returned 82, down from 103 a month earlier. Browse the full list at [https://build.nvidia.com/models](https://build.nvidia.com/models). Each of these was sent a real completion request on 2026-09-20:
 
-| Model ID | Context | Best for |
-|---|---|---|
-| `deepseek-ai/deepseek-v4-flash-0731` | 1M | **Default recommendation.** Fast, strong coding, 284B MoE / 13B active |
-| `moonshotai/kimi-k3` | 1M | 2.8T params, multimodal, strongest on paper. **Unstable on NIM, see the caveat at the top.** Left out of the config above deliberately |
-| `z-ai/glm-5.2` | 1M | Excellent agentic coder, MIT-licensed, 744B MoE / 40B active |
-| `minimaxai/minimax-m3` | 1M | 428B MoE / 23B active, multimodal, 59% on SWE-Bench Pro |
-| `nvidia/nemotron-3-super-120b-a12b` | 1M | NVIDIA's own MoE, good general coder, low latency |
-| `nvidia/nemotron-3-ultra-550b-a55b` | 262K | NVIDIA's largest, 550B / 55B active |
-| `nvidia/nemotron-3.5-lightning-30b-a3b` | — | Fastest responses in the catalog, good for quick edits |
-| `stepfun-ai/step-3.7-flash` | 256K | 198B MoE with a vision encoder |
-| `openai/gpt-oss-20b` | 131K | Small, fast, OpenAI open weights |
+| Model ID | Context | Observed latency | Best for |
+|---|---|---|---|
+| `z-ai/glm-5.3` | 1M | ~4s | **Default recommendation.** MIT-licensed agentic coder |
+| `meta/muse-glimmer-30b` | 262K | ~2s | Fastest tested. Built for agent harnesses |
+| `nvidia/nemotron-3-super-120b-a12b` | 1M | ~1s | NVIDIA's own MoE, good general coder |
+| `nvidia/nemotron-3-ultra-550b-a55b` | 262K | ~3s | NVIDIA's largest, 550B / 55B active |
+| `nvidia/nemotron-3.5-lightning-30b-a3b` | — | ~1s | Built for always-on agents, very low latency |
+| `openai/gpt-oss-20b` | 131K | ~1s | Small, fast, OpenAI open weights |
+| `z-ai/glm-5.3-flash` | 1M | ~55s | Smaller GLM. Reliable but slow on NIM |
+| `moonshotai/kimi-k3` | 1M | 85–105s | 2.8T params, multimodal. Working again as of this review |
+| `deepseek-ai/deepseek-v4-flash-0731` | 1M | **172s or timeout** | Last month's default. **Avoid** — see the warning at the top |
+
+Latency on NIM is shared capacity, so your numbers will differ. The column is there for the order of magnitude, not the exact figure.
 
 To add more models, add entries to the `models` map in `config.json` and restart OpenCode.
 
 ### Retired, do not use
 
-These model IDs appeared in earlier versions of this guide and now fail. Confirmed by live `410 Gone` responses on 2026-08-20:
+These model IDs appeared in earlier versions of this guide and now fail. Each confirmed by a live `410 Gone` on 2026-09-20, with the EOL date read out of the response body:
 
 | Dead model ID | EOL date | Use instead |
 |---|---|---|
-| `deepseek-ai/deepseek-v4-flash` | 2026-08-07 | `deepseek-ai/deepseek-v4-flash-0731` |
-| `deepseek-ai/deepseek-v4-pro` | 2026-08-07 | `z-ai/glm-5.2` |
+| `z-ai/glm-5.2` | 2026-08-21 | `z-ai/glm-5.3` |
+| `meta/llama-3.3-70b-instruct` | 2026-08-26 | `nvidia/nemotron-3-super-120b-a12b` |
+| `stepfun-ai/step-3.7-flash` | 2026-08-28 | `moonshotai/kimi-k3` (also multimodal) |
+| `openai/gpt-oss-120b` | 2026-09-03 | `openai/gpt-oss-20b` |
+| `minimaxai/minimax-m3` | 2026-09-09 | `z-ai/glm-5.3` |
+| `deepseek-ai/deepseek-v4-flash` | 2026-08-07 | `z-ai/glm-5.3` |
+| `deepseek-ai/deepseek-v4-pro` | 2026-08-07 | `z-ai/glm-5.3` |
 | `meta/llama-4-maverick-17b-128e-instruct` | 2026-07-27 | `nvidia/nemotron-3-super-120b-a12b` |
-| `qwen/qwen3-coder-480b-a35b-instruct` | 2026-06-11 | `z-ai/glm-5.2` |
-| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `deepseek-ai/deepseek-v4-flash-0731` |
-| `zai-org/glm-5.2` | never existed | `z-ai/glm-5.2` (note the hyphen) |
+| `qwen/qwen3-coder-480b-a35b-instruct` | 2026-06-11 | `z-ai/glm-5.3` |
+| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `moonshotai/kimi-k3` |
+| `zai-org/glm-5.3` | never existed | `z-ai/glm-5.3` (note the hyphen) |
 
 > Model IDs change often, and without much warning. The authoritative list is the URL slug on the model card page at build.nvidia.com. Before committing a model ID into a config, send it one throwaway request: a `410` names the retirement date, a `404` means the slug is wrong.
 
@@ -330,7 +346,7 @@ OpenCode edits files directly. Review changes in your editor or with `git diff`.
 NVIDIA's free tier is roughly **40 requests per minute**, and that budget is **shared across all models** rather than allocated per model. If you get a 429, wait a minute and retry. Agentic tools like OpenCode burn requests faster than chat does, so this is a real ceiling on long autonomous runs.
 
 ### Context window
-DeepSeek V4 Flash 0731, GLM-5.2, MiniMax M3, Kimi K3, and Nemotron 3 Super all support **1,000,000 tokens** of context, which covers most full repos. OpenCode automatically includes relevant files. Note that the `limit.context` values in your config are what OpenCode uses to decide when to compact a session, so setting them accurately matters.
+GLM-5.3, GLM-5.3 Flash, Kimi K3, and Nemotron 3 Super all support **1,000,000 tokens** of context, which covers most full repos. OpenCode automatically includes relevant files. Note that the `limit.context` values in your config are what OpenCode uses to decide when to compact a session, so setting them accurately matters.
 
 ### Keep your API key out of git
 Your API key is stored in plain text in `config.json`. The default location (`~/.config/opencode/`) is outside any project, but double-check that you haven't accidentally checked in a copy.
@@ -352,7 +368,7 @@ $headers = @{
     "Content-Type"  = "application/json"
 }
 $body = @{
-    model      = "deepseek-ai/deepseek-v4-flash-0731"
+    model      = "z-ai/glm-5.3"
     messages   = @(@{ role = "user"; content = "Say hello in one sentence." })
     max_tokens = 50
 } | ConvertTo-Json -Depth 3
@@ -374,7 +390,7 @@ opencode run "Reply with exactly: OPENCODE OK"
 The header line names the model that actually answered, which is the quickest way to confirm your default `model` field took effect. To test one specific model without editing the config:
 
 ```powershell
-opencode run --model nim/z-ai/glm-5.2 "Reply with exactly: OPENCODE OK"
+opencode run --model nim/z-ai/glm-5.3 "Reply with exactly: OPENCODE OK"
 ```
 
 Then try the TUI:
@@ -433,7 +449,7 @@ opencode
 | `opencode is not recognized` | Close/reopen terminal. If using npm install, add npm global bin to PATH: run `npm config get prefix` and add its `\bin` folder to system PATH. If using binary, ensure it's in a PATH directory |
 | `/models` doesn't show NVIDIA NIM | Check that `config.json` is valid JSON (no trailing commas, correct path). Also check you do not have a second `opencode.json` in the same folder — both are read and merged |
 | API returns 401 Unauthorized | Double-check the `nvapi-` key in `config.json`. Also run `opencode auth list`: a stored credential for another provider can shadow what you expect (see Section 4) |
-| API returns 404 Not Found | Model slug is wrong. Check the URL slug on build.nvidia.com. A common one: it is `z-ai/glm-5.2`, not `zai-org/glm-5.2` |
+| API returns 404 Not Found | Model slug is wrong. Check the URL slug on build.nvidia.com. A common one: it is `z-ai/glm-5.3`, not `zai-org/glm-5.3` |
 | API returns 404 with `Function '<uuid>': Not found for account` | Model exists but your account is not registered for it. Click "Try API" on its model page |
 | Request hangs forever with no response | Same registration gap, failing silently. Click "Try API" on its model page |
 | API returns 403 on **every** model you try | Your key is invalid or expired, not a model problem. Generate a new one |
@@ -456,5 +472,5 @@ opencode
 - [OpenCode Docs: Models](https://opencode.ai/docs/models/)
 - [NVIDIA NIM Model Catalog](https://build.nvidia.com/models)
 - [Kimi K3 on NVIDIA NIM](https://build.nvidia.com/moonshotai/kimi-k3)
-- [DeepSeek V4 Flash 0731 on NVIDIA NIM](https://build.nvidia.com/deepseek-ai/deepseek-v4-flash-0731)
+- [GLM-5.3 on NVIDIA NIM](https://build.nvidia.com/z-ai/glm-5.3)
 - [NVIDIA NIM API Reference](https://docs.api.nvidia.com/nim/reference)

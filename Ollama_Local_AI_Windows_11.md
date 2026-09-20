@@ -39,7 +39,15 @@ ollama --version
 
 > Ollama runs as a system tray app and background service. It starts automatically with Windows. You do not need to manually start it before running commands.
 
-> **Current version as of this writing:** 0.32.14 (released 2026-08-15). Ollama updates itself; `ollama --version` shows what you have.
+> **Current version as of this writing:** 0.34.2 (released 2026-09-15). Ollama updates itself; `ollama --version` shows what you have.
+
+> **What changed since 0.32.x, in order of how likely it is to affect you:**
+>
+> - **`ollama create` from safetensors now needs llama.cpp tooling** (0.34.1, 2026-09-14). MLX safetensors creation left experimental status, but **GGUF** model creation now requires you to do safetensor conversion and quantization with llama.cpp yourself. If you have a script that built GGUF models through `ollama create`, this is the release that broke it.
+> - **First-run setup now offers a sign-in** (0.34.2). You can **continue locally** instead, and nothing in this guide requires an account. Worth knowing, since Ollama's whole appeal here is that it needs no key and no service.
+> - **Third-party app gateways.** 0.33.0 added configuring Claude Desktop to use Ollama as a provider, and 0.34.0 added using Ollama models inside ChatGPT Desktop (set up from the Ollama app on macOS).
+> - **Faster cold starts** (0.32.15): resolved model metadata is now cached between requests, roughly halving time-to-first-token in Ollama's own benchmarks (~995ms to ~524ms).
+> - **New models in the library this cycle:** Qwen 3.8 27B, NVIDIA Nemotron 3.5 Lightning, and Muse Glimmer.
 
 ### System Tray GUI
 

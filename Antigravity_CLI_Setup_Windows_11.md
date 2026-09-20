@@ -44,7 +44,7 @@ The Antigravity desktop app bundles the CLI.
 agy --version
 ```
 
-Current version as of 2026-08-20 is **1.1.15**. On Windows the binary installs under `%LOCALAPPDATA%`, in the `agy\bin` subfolder.
+Current version as of 2026-09-20 is **1.2.7** (released 2026-09-19), up from 1.1.15 a month earlier — Antigravity CLI is shipping releases most weekdays. On Windows the binary installs under `%LOCALAPPDATA%`, in the `agy\bin` subfolder.
 
 > **"agy is not recognized" error:** Close and reopen PowerShell so the PATH change takes effect. The binary is `agy`, not `antigravity` and not `gemini`.
 
@@ -153,6 +153,7 @@ The change was contentious. Gemini CLI was Apache 2.0 and had taken more than 6,
 | `agy` not recognized | Restart PowerShell. Confirm the installer completed and added it to PATH |
 | Quota exhausted after only a couple of prompts | Subagents consume quota in parallel. Run `/usage`, and prefer `/grill-me` over `/goal` for smaller tasks |
 | Quota did not refresh after 5 hours | Known and widely reported. You may be against the weekly ceiling, which has a longer cooldown |
+| Every model reports "Individual quota reached" | Reported again in September 2026, with baseline quota not restoring until a fixed date days out. That is the weekly ceiling, not a transient error, and waiting is the only fix |
 | Imported MCP server appears but does not work | Known limitation of `agy plugin import` |
 | Auth prompt repeats | Restart the terminal and re-run `agy` |
 
