@@ -47,7 +47,9 @@ ollama --version
 > - **First-run setup now offers a sign-in** (0.34.2). You can **continue locally** instead, and nothing in this guide requires an account. Worth knowing, since Ollama's whole appeal here is that it needs no key and no service.
 > - **Third-party app gateways.** 0.33.0 added configuring Claude Desktop to use Ollama as a provider, and 0.34.0 added using Ollama models inside ChatGPT Desktop (set up from the Ollama app on macOS).
 > - **Faster cold starts** (0.32.15): resolved model metadata is now cached between requests, roughly halving time-to-first-token in Ollama's own benchmarks (~995ms to ~524ms).
-> - **New models in the library this cycle:** Qwen 3.8 27B, NVIDIA Nemotron 3.5 Lightning, and Muse Glimmer.
+> - **New models in the library this cycle:** **Qwen 3.8 27B** (`ollama pull qwen3.8:27b`, 256K context — see the note below), NVIDIA Nemotron 3.5 Lightning, and Muse Glimmer.
+
+> **Qwen 3.8 27B, and the model ID people are getting wrong.** This is the model a lot of people are currently trying to get running, and there are two traps. Locally it is `qwen3.8:27b` (there is also a `qwen3.8:27b-mlx` build for Apple Silicon). On **Groq's free API** it is `qwen/qwen3.8-27b` — note that Groq's ID uses a hyphen where Ollama uses a colon, and that the **previous `qwen/qwen3.6-27b` ID is gone from Groq's catalog**, so guides written before September 2026 will hand you a dead ID. Context also differs by host: Ollama's library lists 256K, while Groq serves it at 131,042 tokens. Verified against Groq's live catalog on 2026-09-20.
 
 ### System Tray GUI
 
@@ -94,9 +96,9 @@ ollama rm llama3.2
 
 ---
 
-## 4. Recommended Free Models (August 2026)
+## 4. Recommended Free Models (September 2026)
 
-Sizes below are actual download sizes pulled from the Ollama registry on 2026-08-20, not estimates. Every tag was verified to exist.
+Sizes below are actual download sizes pulled from the Ollama registry on 2026-08-20, not estimates, and every tag was verified to exist on that date. The one exception is the Qwen 3.8 27B row added in the September 2026 refresh: its tag is confirmed to exist in Ollama's library, but its size is an estimate from the 3.6 build of the same size and is marked accordingly.
 
 | Model | Pull command | Size | Best for |
 |---|---|---|---|
@@ -108,7 +110,8 @@ Sizes below are actual download sizes pulled from the Ollama registry on 2026-08
 | Gemma 4 12B | `ollama pull gemma4:12b` | 7.6GB | Google's 2026 multimodal flagship, smallest size |
 | GPT-OSS 20B | `ollama pull gpt-oss:20b` | 13.8GB | OpenAI open weights, MXFP4, 128K context. Great 16GB pick |
 | Devstral Small 2 24B | `ollama pull devstral-small-2` | 15.2GB | Agentic coding, with vision + tools |
-| Qwen 3.6 27B | `ollama pull qwen3.6:27b` | 17.4GB | Best mid-range generalist |
+| **Qwen 3.8 27B** | `ollama pull qwen3.8:27b` | ~17GB *(est.)* | **Best mid-range generalist. New this cycle**, 256K context. Also on Groq's free API |
+| Qwen 3.6 27B | `ollama pull qwen3.6:27b` | 17.4GB | Previous generation; superseded by 3.8 above |
 | Gemma 4 26B | `ollama pull gemma4:26b` | 18.0GB | Frontier-ish quality on a 24GB card |
 | Qwen 3 Coder 30B | `ollama pull qwen3-coder` | 18.6GB | Code specialist, 256K context. Best local coding model |
 | Gemma 4 31B | `ollama pull gemma4:31b` | 19.9GB | Largest Gemma 4, needs a 24GB card |
@@ -124,7 +127,7 @@ Sizes below are actual download sizes pulled from the Ollama registry on 2026-08
 >
 > **For local coding specifically:** `qwen3-coder:30b` is still the top pick for raw code quality. `devstral-small-2` is the pick for agentic workflows (the read, reason, edit, verify loop) and is the only local coder with a published agentic benchmark, at 46.8% SWE-Bench Verified in 15GB.
 >
-> **Note on the very large models:** GLM-5.2 and Kimi K3 lead the open-weight benchmarks, but GLM-5.2 is a ~744B/40B-active MoE and Kimi K3 is 2.8T parameters. Both need multi-GPU servers or a very large unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally. (Note that Kimi K3's NIM endpoint was returning backend errors as of 2026-08-20; GLM-5.2 was solid.)
+> **Note on the very large models:** GLM-5.3 and Kimi K3 lead the open-weight benchmarks, but GLM-5.3 is a very large MoE and Kimi K3 is 2.8T parameters. Both need multi-GPU servers or a very large unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally. (As of 2026-09-20, `z-ai/glm-5.3` answers in about 4 seconds on NIM and Kimi K3 has recovered from August's outage, though it takes 85 to 105 seconds per call. GLM-5.2 reached end of life on NIM on 2026-08-21.)
 
 Browse all available models at [https://ollama.com/library](https://ollama.com/library).
 

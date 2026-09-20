@@ -2,9 +2,9 @@
 
 A reference guide to AI providers offering free API access, no credit card required (unless noted). All entries have ongoing free tiers, not just one-time trial credits.
 
-> **Note:** Rate limits, model availability, and free tier terms change frequently. Always verify current limits on the provider's pricing page before building on a free tier. Last reviewed September 2026, with NVIDIA model IDs verified by live API call on 2026-09-20.
+> **Note:** Rate limits, model availability, and free tier terms change frequently. Always verify current limits on the provider's pricing page before building on a free tier. Last reviewed September 2026, with NVIDIA and Groq model IDs verified by live API call on 2026-09-20.
 
-> **Free tiers kept shrinking through 2026.** Cerebras removed its open free tier entirely on August 17, OpenRouter holds unfunded accounts at 50 requests/day, and Google's consumer CLI free tier moved to a much smaller compute-based quota. Anything you read about these providers from early 2026 is too generous.
+> **Free tiers kept shrinking through 2026.** Cerebras removed its open free tier entirely on August 17, Groq still lists no Llama chat models, OpenRouter holds unfunded accounts at 50 requests/day, and Google's consumer CLI free tier moved to a much smaller compute-based quota. Anything you read about these providers from early 2026 is too generous.
 
 > **NVIDIA's catalog turned over hard in the last month.** Six of the nine chat models this guide recommended in August are now `410 Gone`, including GLM-5.2, MiniMax M3, Step 3.7 Flash, GPT-OSS 120B and Llama 3.3 70B. If you built a config from the August version of this file, most of it is dead. See [NVIDIA NIM](#nvidia-nim) for the replacements.
 
@@ -15,7 +15,7 @@ A reference guide to AI providers offering free API access, no credit card requi
 | Provider | Notable Free Models | OpenAI-Compatible | Credit Card Required |
 |---|---|---|---|
 | [NVIDIA NIM](#nvidia-nim) | GLM-5.3 and 5.3 Flash, Kimi K3, Nemotron 3, Gemma 4, Muse Glimmer, 80+ more | Yes | No (phone verification) |
-| [Groq](#groq) | GPT-OSS 120B/20B, Qwen3.6 27B, Compound | Yes | No |
+| [Groq](#groq) | GPT-OSS 120B/20B, Qwen3.8 27B, Compound | Yes | No |
 | [Google AI Studio](#google-ai-studio) | Gemini 3.7 / 3.6 / 3.5 Flash, Flash-Lite | Yes | No |
 | [SambaNova](#sambanova) | MiniMax M2.7, DeepSeek V3.1, Llama 3.3 70B, GPT-OSS 120B | Yes | No |
 | [OpenRouter](#openrouter) | Many (`:free` tagged models) | Yes | No |
@@ -86,30 +86,32 @@ NVIDIA's failure modes look similar from the outside but mean very different thi
 
 **URL:** https://console.groq.com
 
-Extremely fast inference on custom LPU hardware, still the lowest-latency free API available. The catalog is now much narrower than it used to be.
-
-> **⚠️ This section was NOT re-verified in the September 2026 pass, and it is currently in dispute.** The model list below is the live-API result from 2026-08-20. As of 2026-09-20, Groq's own documentation at [console.groq.com/docs/models](https://console.groq.com/docs/models) lists **Llama 3.1 8B and Llama 3.3 70B as production models**, which directly contradicts the August finding that every Llama chat model had been removed. One of the two is wrong: either Groq restored them, or the docs page is stale. No Groq key was available to settle it during this review. **Send one throwaway request before trusting any Llama model ID here, in either direction.** Everything else in this section is unchanged from August and also unverified this cycle.
+Extremely fast inference on custom LPU hardware, still the lowest-latency free API available. The catalog is narrow and has held steady at 13 models across the August and September reviews, though one model ID changed underneath.
 
 - **Sign-up:** Free account, no credit card
-- **Catalog as of 2026-08-20 (13 models, verified by live API call **then**, not re-checked since):**
-  - `openai/gpt-oss-120b` (131K context)
-  - `openai/gpt-oss-20b` (131K context, fastest production model)
-  - `openai/gpt-oss-safeguard-20b` (131K context)
-  - `qwen/qwen3.6-27b` (131K context)
-  - `groq/compound`, `groq/compound-mini` (131K context, Groq's agentic tool-using systems)
-  - `allam-2-7b` (4K context)
-  - `whisper-large-v3`, `whisper-large-v3-turbo` (speech-to-text)
-  - `canopylabs/orpheus-v1-english`, `canopylabs/orpheus-arabic-saudi` (text-to-speech)
-  - `meta-llama/llama-prompt-guard-2-22m`, `meta-llama/llama-prompt-guard-2-86m` (safety classifiers, not chat models)
+- **Full catalog as of 2026-09-20 (13 models, verified by live API call), with context windows as the API reports them:**
+  - `openai/gpt-oss-120b` (131,072)
+  - `openai/gpt-oss-20b` (131,072, fastest production model)
+  - `openai/gpt-oss-safeguard-20b` (131,072)
+  - `qwen/qwen3.8-27b` (131,042 — **renamed this cycle, see below**)
+  - `groq/compound`, `groq/compound-mini` (131,072, Groq's agentic tool-using systems)
+  - `allam-2-7b` (4,096)
+  - `canopylabs/orpheus-v1-english`, `canopylabs/orpheus-arabic-saudi` (4,000, text-to-speech)
+  - `whisper-large-v3`, `whisper-large-v3-turbo` (448, speech-to-text)
+  - `meta-llama/llama-prompt-guard-2-22m`, `meta-llama/llama-prompt-guard-2-86m` (512, safety classifiers, not chat models)
 - **OpenAI-compatible:** Yes — `https://api.groq.com/openai/v1`
 - **Key prefix:** `gsk_`
 - **Rate limits (August 2026):** 30 requests/min and 1,000 requests/day on the `openai/gpt-oss` models, at 8K TPM / 200K TPD. Other models vary; Whisper gets 2,000 audio requests/day.
 - **Important:** limits are enforced **per organization, not per API key**. Extra keys under the same org share one bucket.
 - **Standout feature:** Lowest latency of any free provider. Every listed model is available on the free tier, gated by rate limits only, with no credits system and no per-token charge.
 
-> **The Llama question, unresolved.** On 2026-08-20 a live catalog call returned 13 models with no Llama chat models among them: `llama-3.3-70b-versatile`, `llama-3.1-8b-instant` and the Llama 4 previews were all absent, leaving only the two `llama-prompt-guard-2` classifiers, which cannot hold a conversation. On 2026-09-20 Groq's docs list Llama 3.1 8B and Llama 3.3 70B as current production models. This guide cannot tell you which is right without a key. If you need a Llama model on Groq, test the ID directly; if you just need something that works, `openai/gpt-oss-20b` and `openai/gpt-oss-120b` were confirmed live in August and are documented as current now, so they are the safer bet either way.
+> **`qwen/qwen3.6-27b` is now `qwen/qwen3.8-27b`.** The 3.6 ID was listed here in August and is no longer in the catalog. This is the only model change on Groq this cycle, and it is the kind that is easy to miss: the slot is still there, doing the same job, under a different name.
 
-> **Note the asymmetry with NVIDIA:** Groq's `/v1/models` does not report retirement dates the way NVIDIA's `410` responses do, so a missing model and a renamed model look identical from the outside. That is part of why the August reading was hard to pin down.
+> **Groq's docs disagree with Groq's API, and the API wins.** As of 2026-09-20 the model page at [console.groq.com/docs/models](https://console.groq.com/docs/models) lists **Llama 3.1 8B and Llama 3.3 70B as current production models**. A live call to `/openai/v1/models` on that same date returned neither. The only Meta entries in the actual catalog are the two `llama-prompt-guard-2` classifiers, which have 512-token context windows and cannot hold a conversation. If you have a Groq config from earlier in 2026 pointing at `llama-3.3-70b-versatile` or `llama-3.1-8b-instant`, it is broken, and the documentation will not tell you so. `openai/gpt-oss-20b` is the closest replacement for the old 8B-instant slot, `openai/gpt-oss-120b` for the 70B slot.
+
+> **Groq gives you less to diagnose with than NVIDIA does.** NVIDIA returns `410 Gone` with an exact retirement timestamp, so a dead model announces itself. Groq's models simply stop appearing in the catalog, which makes a removal and a rename look identical from the outside — exactly what happened with `qwen3.6` → `qwen3.8`. Compare `/openai/v1/models` against your config directly rather than probing IDs one at a time.
+
+> **Same model, opposite fates on two free providers.** `openai/gpt-oss-120b` reached end of life on NVIDIA NIM on 2026-09-03 and returns `410 Gone` there, while remaining live on Groq on 2026-09-20. A model being retired by one host says nothing about the others. This is a good argument for keeping a second provider configured.
 
 > **Cheap upgrade:** adding a credit card with zero minimum spend unlocks up to 10x the free rate limits plus a 25% token discount. Worth knowing if 30 RPM is your only blocker.
 
