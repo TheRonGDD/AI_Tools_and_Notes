@@ -171,7 +171,18 @@ Free access to large open-weight models on high-speed reconfigurable dataflow ac
 A routing layer that aggregates many providers. Has a set of permanently free models tagged with `:free`.
 
 - **Sign-up:** Free account, no credit card needed to sign up or to call `:free` models at a $0 balance
-- **Notable free models:** 14–28 `:free`-tagged endpoints at any given time, including Nemotron 3 Super, DeepSeek, Llama, Gemma, and Gemini Flash
+- **Zero-priced models as of 2026-09-20 (24 of 446 total, verified against the public `/api/v1/models` endpoint):**
+  - `qwen/qwen3.8-27b:free` (262,144 — **the full context window**, unlike Groq's 131,042)
+  - `nvidia/nemotron-3-ultra-550b-a55b:free` and `nvidia/nemotron-3.5-lightning:free` (1,000,000 each)
+  - `nvidia/nemotron-3-super-120b-a12b:free` (262,144), `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (256,000)
+  - `thinkingmachines/inkling:free` and `inkling-small:free` (1,048,576 each)
+  - `google/gemma-4-31b-it:free` and `gemma-4-26b-a4b-it:free` (262,144 each)
+  - `poolside/laguna-s-2.1:free` and `laguna-xs-2.1:free` (262,144 each)
+  - `nex-agi/nex-n2.5-pro:free` and `nex-n2.5-mini:free` (262,144 each)
+  - `inclusionai/ling-3.0-flash-vl:free`, `-fin:free`, `-sante:free` (262,144 each)
+  - `dots-studio/dots-3-note-preview:free` (512,000), `cohere/north-mini-code:free` (256,000)
+  - `liquid/lfm-2.5-2.6b:free` (65,536), `z-ai/glm-5.2:free` (32,768)
+  - `openrouter/free` (200,000, OpenRouter's own auto-router across free endpoints)
 - **OpenAI-compatible:** Yes — `https://openrouter.ai/api/v1`
 - **Key prefix:** `sk-or-`
 - **Rate limits:** 20 requests/min always, plus **50 requests/day on an unfunded account**
@@ -180,6 +191,12 @@ A routing layer that aggregates many providers. Has a set of permanently free mo
 > **The $10 lever:** buying $10 in credits **once** raises the daily cap from 50 to 1,000 requests/day permanently, and the credits never expire. This is still the single best value unlock among the providers in this guide. (Minimum purchase is $5, but $10 is the threshold that moves the daily limit.) The 20 RPM cap does not change; only the daily ceiling moves.
 
 > Guides quoting "200 requests/day" for OpenRouter's free tier are out of date. The current tiers are 50/day and 1,000/day.
+
+> **OpenRouter's catalog is checkable without a key.** `GET https://openrouter.ai/api/v1/models` is public and unauthenticated. It returns every model with its pricing and context length, so a model whose `pricing.prompt` and `pricing.completion` are both `"0"` is genuinely free right now. This is the cheapest verification in this entire guide — no account, no key, no rate limit — and it settles "is this still free?" in one call.
+
+> **Two models worth noticing in that free list.** `qwen/qwen3.8-27b:free` is here at its **full 262,144 context**, where Groq serves the same model at 131,042 — so OpenRouter is the better free host if you need the long context. And `z-ai/glm-5.2:free` is still available at 32,768 context despite having reached end of life on NVIDIA NIM on 2026-08-21, another case of a model outliving its retirement on one host.
+
+> **⚠️ "Stealth models" on OpenRouter are temporary promotions, not a free tier.** OpenRouter periodically hosts unreleased models under anonymous aliases, free during a short preview while the vendor collects usage data. These are genuinely capable and genuinely free *while they last*, but they do not qualify under this guide's ongoing-free-tier rule, and they disappear without notice. See [Union Alpha](#retired-no-longer-free) in the retired section for how fast that can happen.
 
 ---
 
@@ -262,6 +279,18 @@ If you were using Cerebras for speed, the nearest free substitutes are Groq (`op
 New accounts receive $25 in promotional credits that expire after 30 days, then it is pay-per-token. The $150/month data-sharing credit program is no longer reliably available to new developers. xAI also retired eight models in May 2026, including `grok-3`, `grok-4-fast`, `grok-4-1-fast-reasoning`, and `grok-code-fast-1`; configs pointing at those will fail, and the migration target (`grok-4.3`) costs roughly 6x more per input token than the budget models it replaced.
 
 xAI's August 2026 [Grok Bot](https://x.ai/news/introducing-grok-bot) release is a paid agent product ($300/mo SuperGrok Heavy, $200/mo Cursor Ultra, or $120/seat/mo Cursor Teams Premium), closed source, and desktop and iOS rather than CLI, so it is out of scope for this repo on every axis.
+
+---
+
+### Union Alpha (stealth model, already over)
+
+**Status:** Was free for a preview period measured in days, not an ongoing free tier. **The alias is already dead.**
+
+Union Alpha appeared on OpenRouter around 2026-09-16 as an anonymous "stealth" model, promoted by OpenCode as free for the following week, with no training on your data, built for agentic coding, and accepting images. It was genuinely strong and it got heavy use.
+
+It is now gone. As of 2026-09-20, `stealth/union-alpha` returns **`404` from OpenRouter's model API**. The model was revealed as **Pareto**, from Unbiased, and now lives at `unbiased/pareto` — where it is **paid**: $2.50 per million input tokens and $7.50 per million output, with a 262,144-token context window and text-plus-image input. Its OpenRouter entry was created 2026-09-17.
+
+So the free window lasted a few days rather than the advertised week, which is the whole point of listing it here. **A stealth-model promotion is a vendor buying evaluation data, not a free tier.** If you build a config around one, you are writing code with a deadline you were never told. Enjoy them while they run, but keep a real free provider configured underneath — and check `GET /api/v1/models` before assuming one is still live, because that call is public and takes a second.
 
 ---
 
