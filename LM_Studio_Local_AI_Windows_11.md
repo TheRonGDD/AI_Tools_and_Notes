@@ -62,7 +62,7 @@ Models come in different quantized sizes. Higher Q = better quality but more RAM
 
 **Rule of thumb:** Start with **Q4_K_M** of your chosen model.
 
-### Recommended models to start with (August 2026)
+### Recommended models to start with (last reviewed August 2026)
 
 | Model | Size (Q4) | Best for |
 |---|---|---|
@@ -73,12 +73,15 @@ Models come in different quantized sizes. Higher Q = better quality but more RAM
 | Gemma 4 12B | ~8GB | Google's 2026 multimodal flagship, smallest size |
 | GPT-OSS 20B | ~14GB | OpenAI open weights, 128K context. Great 16GB pick |
 | Devstral Small 2 24B | ~15GB | Agentic coding, with vision + tools |
-| Qwen 3.6 27B | ~17GB | Best mid-range generalist |
+| **Qwen 3.8 27B** | ~17GB | **Best mid-range generalist**, 256K context. Search Discover for `qwen3.8` |
+| Qwen 3.6 27B | ~17GB | Previous generation; superseded by 3.8 above |
 | Gemma 4 26B | ~18GB | Frontier-ish quality on a 24GB card |
 | Qwen 3 Coder 30B | ~19GB | Best local coding model right now |
 | Gemma 4 31B | ~20GB | Largest Gemma 4, needs a 24GB card |
 
 > **For local coding specifically:** Qwen 3 Coder is the current top pick for code quality. Devstral Small 2 is the pick for agentic workflows, and is the only local coder with a published agentic score (46.8% SWE-Bench Verified at ~15GB).
+
+> **Qwen 3.8 27B sizes are estimates.** The row above was added in the September 2026 refresh from the model's published specs; unlike the rest of this table it was not confirmed against a downloaded GGUF. Treat ~17GB as approximate. The model ID differs by host — `qwen3.8:27b` under Ollama, `qwen/qwen3.8-27b` on Groq (131,042 context), `qwen/qwen3.8-27b:free` on OpenRouter (full 262,144). See the [Free AI API Keys guide](Free_AI_API_Keys.md#openrouter) if you would rather call it than run it.
 
 > **GGUF availability lags Ollama.** LM Studio pulls from Hugging Face, so a brand-new model is usable here as soon as someone publishes a GGUF quant — which is often the same week, but occasionally not at all for very large MoE models. If a model in this table does not appear in Discover yet, check back or use Ollama for that one.
 

@@ -124,7 +124,7 @@ Extremely fast inference on custom LPU hardware, still the lowest-latency free A
 Google's developer portal for Gemini models.
 
 - **Sign-up:** Google account, no credit card
-- **Notable free models (August 2026):**
+- **Notable free models (last verified August 2026 — *not* re-checked in the September pass):**
   - `gemini-3.7-flash` (current flagship Flash)
   - `gemini-3.6-flash`, `gemini-3.5-flash` (15 RPM / 1,500 RPD)
   - `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite` (1M context, fastest and cheapest)
@@ -150,7 +150,7 @@ Google's developer portal for Gemini models.
 Free access to large open-weight models on high-speed reconfigurable dataflow accelerators.
 
 - **Sign-up:** Free Developer tier, no credit card, no payment method required
-- **Notable free models (August 2026):**
+- **Notable free models (last verified August 2026 — *not* re-checked in the September pass):**
   - `MiniMax-M2.7` (192K context)
   - `DeepSeek-V3.1` (128K context, up to ~200 t/s)
   - `Meta-Llama-3.3-70B-Instruct` (128K context)
