@@ -4,15 +4,15 @@ Aider is a terminal-based AI pair-programming tool that edits code in your local
 
 **Aider runs natively on Windows 11.** No WSL (Windows Subsystem for Linux) needed. Everything below uses PowerShell, which comes built into Windows 11.
 
-> **Recommended model (September 2026):** `z-ai/glm-5.3`. Free on NVIDIA NIM, MIT-licensed, and the best combination of reliability and speed in the catalog as of 2026-09-20: it answered every probe in roughly 4 seconds.
+> **Recommended model (October 2026):** `z-ai/glm-5.3`, unchanged from September. Free on NVIDIA NIM, MIT-licensed, and it answered every probe on 2026-10-24, though at 7 to 27 seconds per reply rather than September's ~4s. **New fast option:** `minimaxai/minimax-m3.1-flash`, which answered in 0.2 to 0.7 seconds and made a correct tool call in 2.3s. It also makes a good editor model in [architect mode](#architect-mode-two-model-workflow).
 >
-> **⚠️ If you followed the August version of this guide, change your model.** That version recommended `deepseek-ai/deepseek-v4-flash-0731`, which has not been retired but has become severely slow. Probing it on 2026-09-20 produced timeouts at 120 seconds (twice), one success at **172 seconds**, and another timeout at **300 seconds**, for a 16-token reply. Because it eventually returns a valid `200` rather than an error, Aider just sits there, and it reads as a broken config rather than a slow model. Switch to `z-ai/glm-5.3`.
+> **⚠️ Retired since the September version:** `moonshotai/kimi-k3` (EOL **2026-10-15**) and `deepseek-ai/deepseek-v4-flash-0731` (EOL 2026-09-21), both now `410 Gone`. And the new `deepseek-ai/deepseek-v4.1-flash` has the **same problem its predecessor had**: one call timed out at 180 seconds and the next took **166 seconds**, for a two-token reply. Because it returns a valid `200` rather than an error, Aider just sits there, and it reads as a broken config rather than a slow model. Leave it alone.
 >
-> **Also retired since the August version:** `z-ai/glm-5.2` (EOL 2026-08-21, superseded by `glm-5.3`), `stepfun-ai/step-3.7-flash` (2026-08-28), `openai/gpt-oss-120b` (2026-09-03) and `minimaxai/minimax-m3` (2026-09-09). All four now return `410 Gone`.
->
-> **`moonshotai/kimi-k3` is working again.** The August guide flagged it as unstable after a sustained backing-function outage. That is over — it answered every probe on 2026-09-20. It is slow, at 85 to 105 seconds per call, so it is a deliberate choice rather than a default, but it is no longer broken.
+> **`nvidia/nemotron-3-super-120b-a12b` needs re-registering.** September's guide used it as the editor model in architect mode. It answered in about a second on 2026-09-20 and returned `Function '<uuid>': Not found for account` on 2026-10-24, on the same key. Clicking "Try API" on its model page should fix it; the architect example below now uses MiniMax M3.1 Flash instead.
 
-> **Aider version note (September 2026):** the current release is still **0.86.2** (2026-02-12), and the last commit to `main` is still 2026-05-22 — unchanged since the August review, now roughly seven months without a release and four without a commit. It still works well and remains the best git-native option, but treat it as maintenance-mode software rather than something that will gain features soon.
+> **Aider version note (October 2026):** the current release is still **0.86.2** (2026-02-12), and the last commit to `main` is still 2026-05-22. That is eight months without a release and five without a commit. It still works well and remains the best git-native option, but treat it as maintenance-mode software rather than something that will gain features soon.
+>
+> **There is an actively developed fork: [cecli](https://github.com/cecli-dev/cecli)** (formerly `aider-ce`), Apache 2.0, at **v1.9.0** (2026-10-17) with releases every week or two. It keeps Aider's repo map and edit loop and adds a TUI, MCP, an agent mode, subagents, hooks and skills. Its PyPI package (`cecli-dev`) requires Python `>=3.10` **with no upper cap**, so it does not have Aider's Python 3.13 problem. Install with `uv tool install --python python3.12 cecli-dev` and run `cecli`. **This guide has not tested it**, and it is a small project (about 400 GitHub stars against Aider's 49,700), so treat it as worth evaluating rather than a drop-in recommendation.
 
 ---
 
@@ -99,9 +99,9 @@ A single `nvapi-` key works for every model on NVIDIA's free tier. You do not ne
 
 > **Choose your key's expiry deliberately.** NVIDIA now asks for a time-to-live when you generate a key, anywhere from one hour to "never expires." Pick something long, and write down the date. An expired key is genuinely confusing to diagnose, see the table below.
 
-> **If a model 404s or hangs forever:** some models need a one-time per-account registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. This is not limited to fresh keys. On 2026-09-20, on a key that had been working for a month, `moonshotai/kimi-k2.6` and `nvidia/nemotron-nano-3-30b-a3b` both returned `Function '<uuid>': Not found for account`. Both are listed in the catalog, so `/v1/models` is not a reliable guide to what your key can actually call.
+> **If a model 404s or hangs forever:** some models need a one-time per-account registration before your key can reach them. Open that model's page on build.nvidia.com and click **"Try API"** once, then retry. This is not limited to fresh keys, and not even to models you have never used. On 2026-10-24, `nvidia/nemotron-3-super-120b-a12b`, which had answered on the same key a month earlier, returned `Function '<uuid>': Not found for account`, as did `moonshotai/kimi-k2.6` and `nvidia/nemotron-nano-3-30b-a3b`. All three are listed in the catalog, so `/v1/models` is not a reliable guide to what your key can actually call.
 >
-> **But check the clock before you blame the gate.** A hang can also just be a slow model. If a model you have already used successfully starts hanging, raise your timeout before you go hunting for a registration problem — see the `deepseek-v4-flash-0731` warning at the top of this guide.
+> **But check the clock before you blame the gate.** A hang can also just be a slow model. If a model you have already used successfully starts hanging, raise your timeout before you go hunting for a registration problem — see the `deepseek-v4.1-flash` warning at the top of this guide.
 
 ### Decoding NVIDIA's error responses
 
@@ -109,11 +109,12 @@ A single `nvapi-` key works for every model on NVIDIA's free tier. You do not ne
 |---|---|---|
 | `410 Gone` with an EOL date | Model is retired. Returned even if your key is bad, since the EOL check runs before auth. | Use a current model ID |
 | `404 page not found` | Slug does not exist, often a wrong org prefix | Verify the slug on build.nvidia.com |
-| `404` + `Function '<uuid>': Not found for account` | Model exists, your account is not registered for it | Click "Try API" on its model page |
+| `404` + `Function '<uuid>': Not found for account` | Model exists, your account is not registered for it (can happen to a model that used to work) | Click "Try API" on its model page |
 | `403 Authorization failed` on **every** live model | Key is invalid or expired | Generate a new key |
 | `404` with an empty body + `Nvcf-Status: errored` | The backing function is down. Not an account problem | Use another model; retry later |
+| `500 Failed to generate completions` | Backend generation failure on that model | Retry; switch models if it repeats |
 | `503 Service temporarily overloaded` | Brief capacity blip | Retry immediately, it usually clears |
-| `503 ResourceExhausted: Worker local ... (78/32)` | That model's **shared** worker pool is oversubscribed across all users | Retry later or pick a less popular model |
+| `503 ResourceExhausted` (`All workers are busy` or `... (108/32)`) | That model's **shared** worker pool is oversubscribed across all users | Retry later or pick a less popular model |
 | Hangs with no response | Registration gap failing silently, **or** simply a slow model | New key: click "Try API". Otherwise raise your timeout |
 
 ---
@@ -223,45 +224,50 @@ aider --model openai/z-ai/glm-5.3 --no-show-model-warnings
 
 ## 6. Picking a Model
 
-NVIDIA NIM hosts 80+ models. A live catalog call on 2026-09-20 returned 82, down from 103 a month earlier. Browse the full list at [https://build.nvidia.com/models](https://build.nvidia.com/models). Each of these was sent a real completion request on 2026-09-20, and the response time is what came back:
+NVIDIA NIM hosts 80+ models. A live catalog call on 2026-10-24 returned 85, up from 82 a month earlier. Browse the full list at [https://build.nvidia.com/models](https://build.nvidia.com/models). Each of these was sent a real completion request on 2026-10-24, and the response time is what came back. The fast ones were also handed a tool and checked for a correct tool call:
 
 | Model ID | Context | Observed latency | Best for |
 |---|---|---|---|
-| `z-ai/glm-5.3` | 1M | ~4s | **Default recommendation.** MIT-licensed agentic coder, reasoning model |
-| `meta/muse-glimmer-30b` | — | ~2s | Fastest thing tested here. Good for quick mechanical edits |
-| `nvidia/nemotron-3-super-120b-a12b` | 1M | ~1s | NVIDIA's own MoE, good general coder, low latency |
-| `nvidia/nemotron-3-ultra-550b-a55b` | 262K | ~3s | NVIDIA's largest, 550B / 55B active |
-| `nvidia/nemotron-3.5-lightning-30b-a3b` | — | ~1s | Built for always-on agents, very low latency |
-| `openai/gpt-oss-20b` | 131K | ~1s | Small, fast, OpenAI open weights |
-| `z-ai/glm-5.3-flash` | 1M | ~55s | Smaller GLM. Reliable but unexpectedly slow on NIM |
-| `moonshotai/kimi-k3` | 1M | 85–105s | 2.8T params, multimodal, strongest on paper. Working again, but slow |
-| `google/gemma-4-31b-it` | — | ~115s | Works, but slow, and may need the "Try API" click first |
-| `deepseek-ai/deepseek-v4-flash-0731` | 1M | **172s or timeout** | Last month's default. **Avoid** — see the warning at the top |
+| `z-ai/glm-5.3` | 1M | 7–27s | **Default recommendation.** MIT-licensed agentic coder, reasoning model, answered every probe |
+| `minimaxai/minimax-m3.1-flash` | 1M | 0.2–0.7s | **New, and the fast pick.** Great editor model for architect mode |
+| `nvidia/nemotron-3-ultra-550b-a55b` | 262K | 1–7s | NVIDIA's largest, 550B / 55B active |
+| `nvidia/nemotron-3.5-lightning-30b-a3b` | — | 1–2s | Built for always-on agents, very low latency |
+| `meta/muse-glimmer-30b` | 262K | 1–9s | Good for quick mechanical edits |
+| `nvidia/nemotron-3.5-super-vl-120b-a12b` | 1M | 1–3s, but flaky | **New.** Multimodal. One `500` and one 300s timeout in four calls |
+| `nvidia/nemotron-3.5-bolt-e4b` | 128K | 0.3s | **New.** Small and very fast |
+| `openai/gpt-oss-20b` | 131K | 1–2s | Small, fast, OpenAI open weights |
+| `stepfun-ai/step-5-preview` | 1M | 134s or timeout | **New** 600B preview. Too slow on NIM for now |
+| `z-ai/glm-5.3-flash` | 1M | ~136s | Smaller GLM. Much slower than its big sibling on NIM |
+| `google/gemma-4-31b-it` | — | timeout | Timed out at 150s and 180s on 2026-10-24 |
+| `deepseek-ai/deepseek-v4.1-flash` | 1M | **166s or timeout** | **Avoid**, see the warning at the top |
+| `nvidia/nemotron-3-super-120b-a12b` | 1M | — | Needs a "Try API" click as of 2026-10-24 |
 
-Latency on NIM is shared capacity, so your numbers will differ. The point of the column is the *order of magnitude*: the difference between `glm-5.3` and `deepseek-v4-flash-0731` is not noise.
+Latency on NIM is shared capacity, so your numbers will differ. The point of the column is the *order of magnitude*: the difference between `minimax-m3.1-flash` and `deepseek-v4.1-flash` is not noise.
 
 To use any of these with Aider, swap the model ID:
 
 ```powershell
-aider --model openai/nvidia/nemotron-3-super-120b-a12b
+aider --model openai/minimaxai/minimax-m3.1-flash
 ```
 
 ### Retired, do not use
 
-These model IDs appeared in earlier versions of this guide and now fail. Each confirmed by a live `410 Gone` response on 2026-09-20, with the EOL date read out of the response body:
+These model IDs appeared in earlier versions of this guide and now fail. Each confirmed by a live `410 Gone` response, with the EOL date read out of the response body:
 
 | Dead model ID | EOL date | Use instead |
 |---|---|---|
+| `moonshotai/kimi-k3` | **2026-10-15** | `z-ai/glm-5.3` or `minimaxai/minimax-m3.1-flash` (also multimodal) |
+| `deepseek-ai/deepseek-v4-flash-0731` | 2026-09-21 | `minimaxai/minimax-m3.1-flash` |
+| `minimaxai/minimax-m3` | 2026-09-09 | `minimaxai/minimax-m3.1-flash` |
+| `openai/gpt-oss-120b` | 2026-09-03 | `openai/gpt-oss-20b` (or `openai/gpt-oss-120b` on Groq) |
+| `stepfun-ai/step-3.7-flash` | 2026-08-28 | `nvidia/nemotron-3.5-super-vl-120b-a12b` (also multimodal) |
+| `meta/llama-3.3-70b-instruct` | 2026-08-26 | `nvidia/nemotron-3-ultra-550b-a55b` |
 | `z-ai/glm-5.2` | 2026-08-21 | `z-ai/glm-5.3` |
-| `meta/llama-3.3-70b-instruct` | 2026-08-26 | `nvidia/nemotron-3-super-120b-a12b` |
-| `stepfun-ai/step-3.7-flash` | 2026-08-28 | `moonshotai/kimi-k3` (also multimodal) |
-| `openai/gpt-oss-120b` | 2026-09-03 | `openai/gpt-oss-20b` |
-| `minimaxai/minimax-m3` | 2026-09-09 | `z-ai/glm-5.3` |
 | `deepseek-ai/deepseek-v4-flash` | 2026-08-07 | `z-ai/glm-5.3` |
 | `deepseek-ai/deepseek-v4-pro` | 2026-08-07 | `z-ai/glm-5.3` |
-| `meta/llama-4-maverick-17b-128e-instruct` | 2026-07-27 | `nvidia/nemotron-3-super-120b-a12b` |
+| `meta/llama-4-maverick-17b-128e-instruct` | 2026-07-27 | `nvidia/nemotron-3-ultra-550b-a55b` |
 | `qwen/qwen3-coder-480b-a35b-instruct` | 2026-06-11 | `z-ai/glm-5.3` |
-| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `moonshotai/kimi-k3` |
+| `moonshotai/kimi-k2-instruct` | 2026-05-12 | `z-ai/glm-5.3` |
 | `zai-org/glm-5.3` | never existed | `z-ai/glm-5.3` (note the hyphen) |
 
 > Model IDs change often, and they change without much warning. The authoritative list is the URL slug on the model card page at build.nvidia.com. Before committing a model ID into a config, send it one throwaway request: a `410` names the retirement date, a `404` means the slug is wrong.
@@ -328,7 +334,7 @@ You type plain English to describe what you want changed. Aider edits the files 
 NVIDIA's free tier is roughly **40 requests per minute**, and that budget is **shared across all models** rather than allocated per model. If you get a 429, wait a minute and retry.
 
 ### Context windows
-GLM-5.3, GLM-5.3 Flash, Kimi K3, and Nemotron 3 Super all support **1,000,000 tokens** of context, which is enough for most full repos. Nemotron 3 Ultra sits at 262K and GPT-OSS at 131K. Across the whole catalog the range runs from 4K to 1M, so check the model card before assuming you can feed it a large repo.
+GLM-5.3, MiniMax M3.1 Flash and Nemotron 3.5 Super VL all support about **1,000,000 tokens** of context, which is enough for most full repos. Nemotron 3 Ultra and Muse Glimmer sit at 262K and GPT-OSS at 131K. Across the whole catalog the range runs from 4K to 1M, so check the model card before assuming you can feed it a large repo.
 
 ### Edit format
 If a model has trouble producing correct code edits (often happens with smaller / older models), try the `whole` format:
@@ -343,10 +349,10 @@ This makes the model output entire files instead of diffs. Uses more tokens but 
 Aider can use one model to plan and another to apply edits. This often produces better results:
 
 ```powershell
-aider --model openai/z-ai/glm-5.3 --editor-model openai/nvidia/nemotron-3-super-120b-a12b
+aider --model openai/z-ai/glm-5.3 --editor-model openai/minimaxai/minimax-m3.1-flash
 ```
 
-GLM-5.3 plans, Nemotron 3 Super applies the edits. You get the stronger model's reasoning without paying its latency on every mechanical file write.
+GLM-5.3 plans, MiniMax M3.1 Flash applies the edits. You get the stronger model's reasoning without paying its 7 to 27 second latency on every mechanical file write. This pairing matters more in October than it did in September, because GLM-5.3 got slower and MiniMax M3.1 Flash is new and very fast.
 
 ---
 
@@ -364,13 +370,13 @@ $headers = @{
 $body = @{
     model      = "z-ai/glm-5.3"
     messages   = @(@{ role = "user"; content = "Say hello in one sentence." })
-    max_tokens = 50
+    max_tokens = 512
 } | ConvertTo-Json -Depth 3
 
-Invoke-RestMethod -Uri "https://integrate.api.nvidia.com/v1/chat/completions" -Method Post -Headers $headers -Body $body
+Invoke-RestMethod -Uri "https://integrate.api.nvidia.com/v1/chat/completions" -Method Post -Headers $headers -Body $body -TimeoutSec 120
 ```
 
-If you get a response with a message, your key is working.
+If you get a response with a message, your key is working. GLM-5.3 is a reasoning model, so `max_tokens` is set high enough for it to finish thinking before it writes the visible reply, and the timeout allows for its slower October response times.
 
 ### Test Aider end-to-end
 
@@ -422,12 +428,13 @@ aider --model openai/z-ai/glm-5.3
 | `setx` variables not working | You must close and reopen PowerShell after running setx |
 | API returns 401 Unauthorized | Double-check your `nvapi-` key is correct |
 | API returns 404 Not Found | Model slug is wrong. Check the URL slug on build.nvidia.com. A common one: it is `z-ai/glm-5.3`, not `zai-org/glm-5.3` |
-| API returns 404 with `Function '<uuid>': Not found for account` | Model exists but your account is not registered for it. Click "Try API" on its model page |
-| Request hangs forever with no response | Same registration gap, failing silently. Click "Try API" on its model page |
+| API returns 404 with `Function '<uuid>': Not found for account` | Model exists but your account is not registered for it, even if it worked last month. Click "Try API" on its model page |
+| Request hangs forever with no response | Either the same registration gap, failing silently, or a very slow model such as `deepseek-v4.1-flash`. Try a fast model first to tell which |
 | API returns 403 on **every** model you try | Your key is invalid or expired, not a model problem. Generate a new one |
-| API returns 410 Gone | Model is retired. The error names the EOL date. See the retired-models table in Section 6 |
+| API returns 410 Gone | Model is retired. The error names the EOL date. See the retired-models table in Section 6. Kimi K3 is the most likely culprit this month |
 | API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM, shared across models) — wait 60 seconds and retry |
-| `pip install aider-chat` fails on Python 3.13+ | Aider 0.86.2 requires Python <3.13 (its metadata pins `>=3.10,<3.13`). Use the uv or `aider-install` method, which brings its own 3.12 |
+| `pip install aider-chat` fails on Python 3.13+ | Aider 0.86.2 requires Python <3.13 (its metadata pins `>=3.10,<3.13`). Use the uv or `aider-install` method, which brings its own 3.12. The cecli fork has no upper cap |
+| Slow responses | GLM-5.3 takes 7 to 27 seconds per turn as of October. Use `openai/minimaxai/minimax-m3.1-flash`, or pair them in architect mode |
 | Aider shows model warnings | Add `--no-show-model-warnings` or set `show-model-warnings: false` in config |
 | Edits are garbled or wrong | Try `--edit-format whole` for more reliable (but token-heavy) edits |
 
@@ -441,8 +448,8 @@ aider --model openai/z-ai/glm-5.3
 - [Aider Configuration](https://aider.chat/docs/config/aider_conf.html)
 - [Aider In-Chat Commands](https://aider.chat/docs/usage/commands.html)
 - [Aider Release History](https://aider.chat/HISTORY.html)
+- [cecli (actively developed Aider fork)](https://github.com/cecli-dev/cecli)
 - [NVIDIA NIM Model Catalog](https://build.nvidia.com/models)
-- [Kimi K3 on NVIDIA NIM](https://build.nvidia.com/moonshotai/kimi-k3)
 - [GLM-5.3 on NVIDIA NIM](https://build.nvidia.com/z-ai/glm-5.3)
 - [NVIDIA NIM API Reference](https://docs.api.nvidia.com/nim/reference)
 - [Python Downloads](https://www.python.org/downloads/)

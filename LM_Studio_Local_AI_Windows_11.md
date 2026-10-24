@@ -4,9 +4,9 @@ LM Studio is a desktop application for running AI models locally. It provides a 
 
 Free for personal **and commercial** use. No API key, no internet required once models are downloaded, no rate limits.
 
-> **Current version (September 2026):** 0.4.25, released 2026-09-19, adding support for the Splash engine on Apple Silicon M3 and newer. 0.4.24 (2026-09-09) added advanced llama.cpp argument overrides for GGUF loading and fixed the Loaded Instances UI reporting a wrong context length. Earlier in the cycle: tensor parallelism for splitting one model across multiple GPUs (0.4.15), stable MTP speculative decoding (0.4.14), and OAuth for MCP servers (0.4.10).
+> **Current version (October 2026):** 0.4.26, per LM Studio's update server on 2026-10-24. Its four builds added **Bionic coexistence** (run both apps at once; Bionic borrows LM Studio's loaded models for local inference), new **`/v1/decisions`** (OpenAI-compatible) and **`/v1/systemone`** endpoints for the new class of decision models, CUDA 13 support on Windows ARM, and a llama.cpp runtime update to 2.50.0. September's 0.4.25 added the Splash engine on Apple Silicon M3 and newer; 0.4.24 added advanced llama.cpp argument overrides for GGUF loading. Earlier in 2026: tensor parallelism across multiple GPUs (0.4.15), stable MTP speculative decoding (0.4.14), and OAuth for MCP servers (0.4.10).
 
-> **There is now a second LM Studio app: Bionic.** Announced 2026-07-16, Bionic is an agent rather than a chat window. It organizes work into **Code Projects** (point it at a local folder and it does agentic code search, multi-file editing, and inline diffs you approve before they apply) and **Work Projects** (document handling in a sandbox, with native web search). It is versioned separately from the main app, at **1.1.5** as of 2026-09-19, with its own [changelog](https://lmstudio.ai/changelog). The app is free to download and free when running models locally; only the optional LM Studio Secure Cloud needs billing set up. See [section 8](#8-lm-studio-bionic) below.
+> **There is now a second LM Studio app: Bionic.** Announced 2026-07-16, Bionic is an agent rather than a chat window. It organizes work into **Code Projects** (point it at a local folder and it does agentic code search, multi-file editing, and inline diffs you approve before they apply) and **Work Projects** (document handling in a sandbox, with native web search). It is versioned separately from the main app, at **1.1.9** as of 2026-10-21, with its own [changelog](https://lmstudio.ai/changelog). The app is free to download and free when running models locally; only the optional LM Studio Secure Cloud needs billing set up. See [section 8](#8-lm-studio-bionic) below.
 
 > **It has been free for work use since July 2025.** The old requirement to request a separate commercial license is gone. There is a paid LM Studio Enterprise tier for organizations wanting SSO, model and MCP gating, and private collaboration, but the app itself is free.
 
@@ -62,7 +62,9 @@ Models come in different quantized sizes. Higher Q = better quality but more RAM
 
 **Rule of thumb:** Start with **Q4_K_M** of your chosen model.
 
-### Recommended models to start with (last reviewed August 2026)
+### Recommended models to start with (last reviewed October 2026)
+
+Sizes are approximate Q4 figures, cross-checked against Ollama's registry builds of the same models on 2026-10-24. Hugging Face GGUF quants of the same model vary by a gigabyte or so between uploaders.
 
 | Model | Size (Q4) | Best for |
 |---|---|---|
@@ -70,18 +72,20 @@ Models come in different quantized sizes. Higher Q = better quality but more RAM
 | Qwen 3.5 4B | ~3GB | Best tiny generalist right now |
 | DeepSeek R1 8B | ~5GB | Reasoning with visible thinking mode |
 | Qwen 3.5 9B | ~7GB | Strong all-around at single-GPU size |
+| **Nemotron 3.5 Bolt E4B** | ~8GB | **New.** Small vision + tool-use model, 128K context |
 | Gemma 4 12B | ~8GB | Google's 2026 multimodal flagship, smallest size |
 | GPT-OSS 20B | ~14GB | OpenAI open weights, 128K context. Great 16GB pick |
 | Devstral Small 2 24B | ~15GB | Agentic coding, with vision + tools |
-| **Qwen 3.8 27B** | ~17GB | **Best mid-range generalist**, 256K context. Search Discover for `qwen3.8` |
-| Qwen 3.6 27B | ~17GB | Previous generation; superseded by 3.8 above |
-| Gemma 4 26B | ~18GB | Frontier-ish quality on a 24GB card |
-| Qwen 3 Coder 30B | ~19GB | Best local coding model right now |
+| Qwen 3.8 27B | ~18GB | **Best mid-range generalist**, 256K context. Search Discover for `qwen3.8` |
+| Qwen 3.6 27B | ~18GB | Previous generation; superseded by 3.8 above |
+| Gemma 4 26B | ~19GB | Frontier-ish quality on a 24GB card |
+| Qwen 3 Coder 30B | ~19GB | Safest local coding pick |
 | Gemma 4 31B | ~20GB | Largest Gemma 4, needs a 24GB card |
+| **Flint 40B** | ~23GB | **New.** Coding-agent MoE with ~2.5B active, 262K context. Search Discover for `flint` |
 
-> **For local coding specifically:** Qwen 3 Coder is the current top pick for code quality. Devstral Small 2 is the pick for agentic workflows, and is the only local coder with a published agentic score (46.8% SWE-Bench Verified at ~15GB).
+> **For local coding specifically:** Qwen 3 Coder is the safe pick for code quality and Devstral Small 2 for agentic workflows (46.8% SWE-Bench Verified at ~15GB). **Flint** is the new one worth trying: Recursive reports 74.2% SWE-bench Verified, which would be a large jump at this size. That number is vendor-reported and not verified here, and a brand-new model's GGUF quants can take a while to settle on Hugging Face, so check the uploader before you download.
 
-> **Qwen 3.8 27B sizes are estimates.** The row above was added in the September 2026 refresh from the model's published specs; unlike the rest of this table it was not confirmed against a downloaded GGUF. Treat ~17GB as approximate. The model ID differs by host — `qwen3.8:27b` under Ollama, `qwen/qwen3.8-27b` on Groq (131,042 context), `qwen/qwen3.8-27b:free` on OpenRouter (full 262,144). See the [Free AI API Keys guide](Free_AI_API_Keys.md#openrouter) if you would rather call it than run it.
+> **Qwen 3.8 27B now has a confirmed size.** September's table marked it as an estimate. Ollama's Q4 build is 17.7GB, so ~18GB is right for a Q4_K_M GGUF. The model ID differs by host: `qwen3.8:27b` under Ollama, `qwen/qwen3.8-27b` on Groq (131,072 context). **OpenRouter's free endpoint for it is gone** as of 2026-10-24. See the [Free AI API Keys guide](Free_AI_API_Keys.md#groq) if you would rather call it than run it.
 
 > **GGUF availability lags Ollama.** LM Studio pulls from Hugging Face, so a brand-new model is usable here as soon as someone publishes a GGUF quant — which is often the same week, but occasionally not at all for very large MoE models. If a model in this table does not appear in Discover yet, check back or use Ollama for that one.
 
@@ -123,7 +127,7 @@ Replace `<your-model-name>` with the model identifier shown in LM Studio's Devel
 
 ### Use with OpenCode
 
-Add a provider to `~/.config/opencode/opencode.json`:
+Add a provider to `~/.config/opencode/opencode.json` (use that filename, not `config.json`, which OpenCode 2 ignores):
 
 ```json
 {
@@ -215,7 +219,9 @@ Both can run simultaneously on different ports.
 
 ## 8. LM Studio Bionic
 
-Bionic is a separate app from LM Studio, announced 2026-07-16 and at version 1.1.5 as of 2026-09-19. Where LM Studio is a chat window plus a model runtime, Bionic is an **agent**: it takes a task, works through it across multiple files or documents, and shows you what it changed.
+Bionic is a separate app from LM Studio, announced 2026-07-16 and at version **1.1.9** as of 2026-10-21. Where LM Studio is a chat window plus a model runtime, Bionic is an **agent**: it takes a task, works through it across multiple files or documents, and shows you what it changed.
+
+**What it gained since September (1.1.6 to 1.1.9):** a **Canvas**, an interactive board you and the agent both edit, exportable to PNG, SVG or editable Excalidraw; in-app previews for Word, Excel, PowerPoint, HTML, CSV and PDF files, including PDF comments and tracked changes; editable Markdown and source files in its built-in editor; on-device read-aloud; automatic context compaction for image-heavy sessions; and, as of 1.1.8, the ability to run alongside LM Studio 0.4.26+ and share its loaded models instead of fighting it for the GPU.
 
 It organizes work into two project types:
 
@@ -235,9 +241,9 @@ All three are agents that edit code, and Bionic is the newest of them. The trade
 | Git integration | Inline diffs, approve per change | **Makes real git commits** | Yes |
 | Model source | Local, LM Link, or LM Studio Cloud | Any OpenAI-compatible API | Any OpenAI-compatible API |
 | Runs fully offline | Yes, on local models | Only against a local endpoint | Only against a local endpoint |
-| Actively developed | Yes | **No — no release since Feb 2026** | Yes, very |
+| Actively developed | Yes | **No — no release since Feb 2026** (but see the [cecli fork](Aider_Setup_NVIDIA_NIM.md)) | Yes, very. OpenCode 2 shipped in September |
 
-**Where Bionic fits:** it is the easiest of the three to get running if you already use LM Studio, and the only one built GUI-first. The document sandbox in Work Projects has no equivalent in Aider or OpenCode.
+**Where Bionic fits:** it is the easiest of the three to get running if you already use LM Studio, and the only one built GUI-first. The document sandbox in Work Projects, and now the Canvas, have no equivalent in Aider or OpenCode.
 
 **Where it does not:** it is closed source, and it does not make git commits the way Aider does. If you want an agent whose work lands as reviewable commits, Aider is still the tool for that — with the caveat that Aider has not shipped a release since February 2026.
 
