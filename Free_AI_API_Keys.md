@@ -118,7 +118,9 @@ Extremely fast inference on custom LPU hardware, still the lowest-latency free A
 
 > **Same model, opposite fates on two free providers.** `openai/gpt-oss-120b` reached end of life on NVIDIA NIM on 2026-09-03 and returns `410 Gone` there, while still answering in under a third of a second on Groq on 2026-10-24. A model being retired by one host says nothing about the others. This is a good argument for keeping a second provider configured.
 
-> **Cheap upgrade:** adding a credit card with zero minimum spend unlocks up to 10x the free rate limits plus a 25% token discount. Worth knowing if 8K tokens/min is your only blocker.
+> **⚠️ Groq's free tier cannot drive OpenCode.** The per-minute token cap applies to a single request, and OpenCode's system prompt plus tool definitions is bigger than the cap before you type anything. On 2026-10-24, OpenCode 2.1.4 got `Request too large ... Limit 8000, Requested 8307` on `openai/gpt-oss-120b` and `Limit 7000, Requested 8718` (an input-tokens-per-minute limit) on `qwen/qwen3.8-27b`. Groq is still excellent for scripts, short chats and lighter tools, but use NVIDIA NIM for agent work. Separately, Groq caps `qwen/qwen3.8-27b` output at **16,384** tokens, so a config with a higher output limit fails with a `max_completion_tokens` error before it even reaches the TPM check.
+
+> **Cheap upgrade:** adding a credit card with zero minimum spend unlocks up to 10x the free rate limits plus a 25% token discount. Worth knowing if 8K tokens/min is your only blocker, and the only way to run an agent like OpenCode against Groq.
 
 ---
 
@@ -129,9 +131,9 @@ Extremely fast inference on custom LPU hardware, still the lowest-latency free A
 Google's developer portal for Gemini models.
 
 - **Sign-up:** Google account, no credit card
-- **Free models (per Google's pricing page, last updated 2026-10-22; not verified by live call, as this repo has no AI Studio key):**
-  - `gemini-3.8-flash` (**new**, now the top free Flash model)
-  - `gemini-3.6-flash`
+- **Free models (per Google's pricing page, last updated 2026-10-22; the four Flash models timed below were also called live on 2026-10-24):**
+  - `gemini-3.8-flash` (**new**, now the top free Flash model. 47s on one call, `503` "high demand" on the next)
+  - `gemini-3.6-flash` (1.3s, the fast pick)
   - `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite` (1M context, fastest and cheapest)
   - `gemini-3-flash-preview` (marked "legacy")
   - `gemini-2.5-flash`, `gemini-2.5-flash-lite`
@@ -142,7 +144,7 @@ Google's developer portal for Gemini models.
 - **Quota is per project, not per key.** Creating a second API key in the same project does not double your allowance.
 - **Standout feature:** 1M-token context on the free Flash models, and the free tier is permanent rather than trial-based
 
-> **`gemini-3.7-flash` and `gemini-3.5-flash` are no longer on the pricing page.** August's guide listed both as free. The October page lists 3.8 Flash and 3.6 Flash, but neither 3.7 nor 3.5 Flash. Google has not published a shutdown notice for them that this review could find, so test yours before assuming either way. `gemini-2.5-flash-image` was formally shut down on 2026-10-02.
+> **`gemini-3.7-flash` and `gemini-3.5-flash` are off the pricing page but still served.** August's guide listed both as free. The October pricing page lists 3.8 Flash and 3.6 Flash and neither 3.7 nor 3.5 Flash, yet the live `/v1beta/models` list on 2026-10-24 still includes both, and `gemini-3.7-flash` answered twice, at about 50 seconds each. No shutdown notice was found. Treat them as on their way out: a model that is served but no longer priced is not one to build on. `gemini-3.6-flash` answered in 1.3s and `gemini-3.5-flash-lite` in 3.2s. `gemini-2.5-flash-image` was formally shut down on 2026-10-02.
 
 > **Pro models are paid (since April 1, 2026).** The Pro series, the new top-end **Gemini 4 Argon**, and the image-generation models are paid-only. Only Flash, Flash-Lite and Gemma remain free.
 
@@ -307,7 +309,7 @@ Two months running, an NVIDIA model has passed every error check and still been 
 SambaNova's no-card path ended around August 14 and this guide carried it for two more months under a "not re-checked" label. A provider you are not actively verifying can be wrong for longer than you think.
 
 **Rotate providers to avoid rate limits**
-Most tools (Aider, OpenCode, and similar) let you switch models mid-session. If you hit a rate limit on one provider, switch to another. Groq is best for speed, NVIDIA NIM for variety and context length, OpenRouter for trying many models through one key.
+Most tools (Aider, OpenCode, and similar) let you switch models mid-session. If you hit a rate limit on one provider, switch to another. Groq is best for speed, NVIDIA NIM for variety and context length, OpenRouter for trying many models through one key. One exception: Groq's free per-minute token cap is smaller than OpenCode's system prompt, so Groq is not a fallback for OpenCode on the free tier.
 
 **Prefer OpenAI-compatible providers**
 Tools like Aider, OpenCode, and Codex work out of the box with any OpenAI-compatible endpoint. Set `OPENAI_BASE_URL` and `OPENAI_API_KEY` and you are done.

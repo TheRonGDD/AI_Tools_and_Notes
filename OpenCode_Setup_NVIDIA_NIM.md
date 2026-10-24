@@ -10,7 +10,7 @@ OpenCode is an open-source (MIT) AI coding agent from Anomaly. It supports any O
 >
 > **`nvidia/nemotron-3-super-120b-a12b` has been dropped from the config below.** It worked on 2026-09-20 and returned `Function '<uuid>': Not found for account` on 2026-10-24 on the same key. Clicking "Try API" on its model page should restore it, but a model that silently needs re-registration is not a good default.
 
-> **⚠️ OpenCode 2 is out, and it does not read `config.json`.** OpenCode 2.0.0 shipped 2026-09-11 and is at **2.1.4** (2026-10-23). It reads `opencode.json` / `opencode.jsonc` only. `config.json`, which earlier versions of this guide used, was [dropped from V2's config discovery](https://github.com/anomalyco/opencode/pull/34645) on purpose. If you upgrade with a `config.json`, your providers silently vanish. This guide now uses **`opencode.json`**, which works on both 1.x and 2. See [Section 12](#12-opencode-2) before upgrading.
+> **⚠️ OpenCode 2 is out, and it does not read `config.json`.** OpenCode 2.0.0 shipped 2026-09-11 and is at **2.1.4** (2026-10-23). It reads `opencode.json` / `opencode.jsonc` only. `config.json`, which earlier versions of this guide used, was [dropped from V2's config discovery](https://github.com/anomalyco/opencode/pull/34645) on purpose. If you upgrade with a `config.json`, your providers silently vanish. This guide now uses **`opencode.json`**, which works on both 1.x and 2. See [Section 12](#12-opencode-2) before upgrading. Once the file is renamed, the setup in this guide works on 2.1.4 unchanged (tested 2026-10-24).
 
 > **What's new in OpenCode 1.x:** now at **v1.19.4** (2026-10-22) and past **221K stars**, up from 208K. 1.x stays on its own release line: as of 1.19.2 it will never offer you a 2.x build as a routine update. Two changes in 1.19 are worth knowing. **Updates are no longer installed automatically** (1.19.0); run `/update` yourself. And **session sharing has been discontinued** (1.19.1): existing share links stop working and the share commands are gone. OpenCode ships as a **TUI, a desktop app, and an IDE extension**, and there is also **OpenCode Zen**, a curated managed-access model set that is separate from the free NVIDIA NIM setup described here.
 
@@ -437,7 +437,17 @@ Add it inside the `profiles.list` array in settings.json.
 
 ## 12. OpenCode 2
 
-OpenCode 2.0.0 shipped on 2026-09-11 and is at **2.1.4** (2026-10-23), published to npm as `@opencode/cli` rather than `opencode-ai`. It is a separate major line: 1.x keeps getting releases (1.19.4 on 2026-10-22) and will not upgrade itself to 2. **This guide has not been tested against 2.x**; everything below comes from OpenCode's own migration guide, its source, and its package manifests.
+OpenCode 2.0.0 shipped on 2026-09-11 and is at **2.1.4** (2026-10-23), published to npm as `@opencode/cli` rather than `opencode-ai`. It is a separate major line: 1.x keeps getting releases (1.19.4 on 2026-10-22) and will not upgrade itself to 2.
+
+**Tested on 2026-10-24** by upgrading a real Windows 11 install from 1.19.0 (npm) to 2.1.4, using the Section 4 config saved as `opencode.json` in V1 shape with no conversion:
+
+- The V1-shaped config loaded as-is. `opencode models` showed exactly the 5 models in the `nim` block, so the `nim` key still prevents the models.dev merge on V2.
+- `opencode run` worked on `nim/minimaxai/minimax-m3.1-flash` (~1s) and `nim/z-ai/glm-5.3` (~10s), and a real tool call (reading a file and answering from it) worked.
+- A local MCP server (`type: "local"`, launched via `npx`) connected without changes; check with `opencode mcp list`.
+- Credentials stored by V1's `opencode auth login` in `auth.json` were picked up (a Google API key, tested against `google/gemini-3.6-flash`).
+- `opencode run -m` now takes `provider/model#variant`; plain `provider/model` still works.
+
+The rest of this section comes from OpenCode's own migration guide, its source, and its package manifests.
 
 ### What breaks
 
@@ -455,8 +465,15 @@ V2 detects V1-shaped configuration and translates it in memory without rewriting
 
 ### Upgrading on Windows
 
+Back up first. Your config, `~\.local\share\opencode\auth.json`, and the session data in `~\.local\share\opencode\` are all worth a copy. Then rename `config.json` to `opencode.json` and check 1.x still loads it (`opencode models`) **before** you upgrade, so a problem afterwards is clearly a V2 problem.
+
 ```powershell
-# From inside OpenCode 1.19+ (the explicit opt-in)
+# npm install (this is the path tested above)
+npm uninstall -g opencode-ai
+npm install -g @opencode/cli
+opencode --version     # opencode v2.1.4
+
+# Or from inside OpenCode 1.19+ (the explicit opt-in)
 opencode upgrade --major
 
 # Or with Scoop, which ships 2.x as a separate package
@@ -465,9 +482,9 @@ scoop bucket add versions
 scoop install versions/opencode2
 ```
 
-Scoop's own note on the `opencode2` package says *"The v2 configuration is incompatible with v1. Uninstall 'opencode' first."* Do the `config.json` → `opencode.json` rename before you launch 2 for the first time.
+Scoop's own note on the `opencode2` package says *"The v2 configuration is incompatible with v1. Uninstall 'opencode' first."* The binary is still called `opencode`.
 
-> **Should you upgrade?** Not urgently. 1.x is still maintained and nothing in the NIM setup needs 2.x. If you rely on plugins, wait until they are ported.
+> **Should you upgrade?** If you do not rely on V1 plugins, it is safe: the NIM setup in this guide worked unchanged once the file was named `opencode.json`. If you do rely on plugins, wait until they are ported.
 
 ---
 
@@ -507,6 +524,8 @@ opencode
 | `/models` lists far more models than your config does | Your provider key collides with OpenCode's built-in models.dev catalog and got merged into it. Rename the key to something it does not know, e.g. `nim`. See Section 4 |
 | A model you picked from the list 410s immediately | Same cause: the built-in catalog still offers retired NVIDIA IDs. Pick from your own `models` map, not the merged list |
 | API returns 429 Too Many Requests | Hit free tier rate limit (~40 RPM, shared across models) — wait 60 seconds and retry |
+| Groq: `Request too large ... on tokens per minute (TPM): Limit 8000` | OpenCode's own prompt is bigger than Groq's free per-minute token cap, so every Groq model fails. Not fixable in config; use NVIDIA NIM, or add a card to Groq for higher limits |
+| Groq: `max_completion_tokens must be less than or equal to 16384` | Your `limit.output` for that Groq model is too high. Set it to 16384 for `qwen/qwen3.8-27b` |
 | Slow responses | GLM-5.3 takes 7 to 27 seconds per turn as of October. Switch to `nim/minimaxai/minimax-m3.1-flash` if you want speed above all |
 | A shared session link stopped working | Session sharing was discontinued in OpenCode 1.19.1. There is no replacement |
 | OpenCode stopped updating itself | Intentional as of 1.19.0. Run `/update` |
