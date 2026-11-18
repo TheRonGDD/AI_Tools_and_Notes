@@ -151,6 +151,8 @@ Sizes below are actual download sizes read from the Ollama registry manifests. E
 >
 > **For local coding specifically:** `qwen3-coder:30b` is still the safe pick for raw code quality. `devstral-small-2` is the pick for agentic workflows (the read, reason, edit, verify loop), at 46.8% SWE-Bench Verified in 15GB. **Flint is the one to try this month**: Recursive reports 74.2% SWE-bench Verified for a 22.9GB download with only ~2.5B parameters active per token, which would put it far ahead of Devstral Small 2 at a similar size. That is a vendor-reported number from its release, so treat it as a claim until independent results show up, but it is cheap to test.
 >
+> **Watch out for `:cloud` tags.** The registry also lists tags such as `glm-5.3:cloud`. These are not downloads: on 2026-11-18 the `glm-5.3:cloud` manifest contained no model files at all. They are pointers that send your prompts to Ollama's hosted cloud service, which needs an Ollama account, so they are not local or offline. Everything in the table above is a real local download.
+
 > **Note on the very large models:** the biggest open-weight models need multi-GPU servers or a very large unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally. GLM-5.3, which this note recommended through October, reached end of life on NIM on 2026-10-28. As of 2026-11-18 the fast large options there are `nvidia/nemotron-3-ultra-550b-a55b` (about 1 second per reply) and `mistralai/mistral-large-4-1t-a52b` (about 2 to 10 seconds).
 
 Browse all available models at [https://ollama.com/library](https://ollama.com/library).

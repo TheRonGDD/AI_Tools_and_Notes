@@ -99,17 +99,17 @@ This is the biggest practical difference from Gemini CLI, and the most common co
 |---|---|---|
 | Quota unit | Requests | Compute-based agent runs |
 | Free allowance | 1,000 requests/day | ~20 agent requests/day (community estimate; Google publishes no number) |
-| Refresh | Daily | Weekly ceiling. Older reports describe a ~5-hour rolling cycle under it; October reports mostly describe weekly only |
+| Refresh | Daily | **Weekly** for free accounts, per Google's own [plans page](https://antigravity.google/docs/plans) (2026-11-18). The 5-hour refresh is for Google AI Pro and Ultra |
 | Visible to the agent | Yes | **No** — check `/usage` yourself |
 
-> **Google still does not publish the free-tier numbers.** Every figure in this section comes from community reports (not re-checked in November), and as of October 2026 they disagree on whether there is still a 5-hour refresh at all. What they agree on: Tab completions and command requests are unmetered, only agent work counts, and a heavy session can lock the weekly bucket in under an hour. Run `agy -p "/usage"` to see your own reset time.
+> **Google still does not publish the free-tier numbers, but it has settled the refresh question.** Its [plans page](https://antigravity.google/docs/plans) (read 2026-11-18) says accounts without Google AI Pro or Ultra get "a meaningful quota, refreshed weekly" and "a weekly rate limit", while Pro and Ultra refresh every five hours. The ~20/day figure is still a community estimate, not re-checked in November. What they agree on: Tab completions and command requests are unmetered, only agent work counts, and a heavy session can lock the weekly bucket in under an hour. Run `agy -p "/usage"` to see your own reset time.
 
 Practical notes:
 
 - **Subagents consume quota in parallel.** A single `/goal` run that fans out to subagents can burn a large chunk of your allowance in one go.
 - **The agent cannot see its own remaining quota.** Run `/usage` regularly; there is no warning before you hit the wall.
 - Hitting the weekly ceiling can mean a multi-day cooldown, not a five-hour one.
-- Reports of the 5-hour refresh not landing on schedule are common.
+- On a free account there is no 5-hour refresh to wait for. Reports of it "not landing" were free users expecting a Pro-tier behaviour.
 
 ### If you need more quota
 
@@ -189,7 +189,7 @@ The change was contentious. Gemini CLI was Apache 2.0 and had taken more than 6,
 | `gemini` not recognized / stopped working | Expected. Gemini CLI retired June 18, 2026 for free and Pro/Ultra users. Install Antigravity CLI |
 | `agy` not recognized | Restart PowerShell. Confirm the installer completed and added it to PATH |
 | Quota exhausted after only a couple of prompts | Subagents consume quota in parallel. Run `/usage`, and prefer `/grill-me` over `/goal` for smaller tasks |
-| Quota did not refresh after 5 hours | Known and widely reported. You may be against the weekly ceiling, which has a longer cooldown |
+| Quota did not refresh after 5 hours | Expected on a free account: Google's plans page says free quota refreshes weekly. The 5-hour refresh is a Pro/Ultra feature |
 | Every model reports "Individual quota reached" | Reported in September and October 2026, with baseline quota not restoring until a fixed date days out. That is the weekly ceiling, not a transient error, and waiting is the only fix. `agy -p "/usage"` shows the reset time |
 | Shift+Tab does not enter Auto mode | Auto mode was Linux and macOS only as of 1.4.7, and no release note through 1.5.11 announces Windows support |
 | A headless `-p` run that used to stop at 30 minutes now runs longer | Since 1.5.0 it waits for background tasks. Pass `--print-timeout` to cap it |
