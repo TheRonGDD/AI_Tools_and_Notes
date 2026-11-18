@@ -44,9 +44,16 @@ The Antigravity desktop app bundles the CLI.
 agy --version
 ```
 
-Current version as of 2026-10-24 is **1.4.7**, read from the installer's own release manifest, up from 1.2.7 a month earlier. Antigravity CLI is still shipping releases most weekdays and updates itself in the background. On Windows the binary installs under `%LOCALAPPDATA%`, in the `agy\bin` subfolder.
+Current version as of 2026-11-18 is **1.5.11**, read from the installer's own release manifest, up from 1.4.7 a month earlier. Release notes are on [GitHub](https://github.com/google-antigravity/antigravity-cli/releases). Antigravity CLI is still shipping releases most weekdays and updates itself in the background. On Windows the binary installs under `%LOCALAPPDATA%`, in the `agy\bin` subfolder.
 
-> **What changed since 1.2.7 that you will notice:**
+> **What changed since 1.4.7 that you will notice (November 2026):**
+>
+> - **The default Agent Mode is now Auto** (1.5.7), including for headless `-p` runs, "wherever Auto mode is available and in Default elsewhere". No release note through 1.5.11 says Auto mode reached Windows, so on Windows you should still get Default. To pin the old behaviour, choose Default for `Agent Mode` in `/config`.
+> - **Good for Windows:** files saved as "UTF-8 with BOM" by PowerShell, Visual Studio or Notepad (`settings.json`, `hooks.json`, agent files, `plugin.json`) are no longer silently ignored (1.5.8, 1.5.11); `!` shell commands no longer hang on heavy stderr output; Windows paths in `EDITOR` work; browser sign-in no longer fails on an IPv4/IPv6 mismatch (1.5.7); and always-allow command rules can no longer be bypassed through `cmd`, `powershell.exe` or `pwsh.exe` (1.5.8).
+> - **New:** `agy acp` runs it as an Agent Client Protocol server for editors, plus `--remote-agent` and `/projects` (1.5.0); `/swarm`, a multi-agent preview (1.5.5); Gemini 4 Hydrogen and Gemini 4 Carbon in `/model` when you connect with a `GEMINI_API_KEY` (1.5.8, see [below](#using-a-gemini-api-key-instead)).
+> - **Breaking, if you script it:** headless `-p` runs without `--print-timeout` now wait for background tasks instead of stopping at a hidden 30-minute limit (1.5.0). With a `GEMINI_API_KEY`, `/usage`, `/quota` and `/credits` are hidden, and exit with code 2 in `-p` runs (1.5.11).
+
+> **What changed from 1.2.7 to 1.4.7 (October 2026):**
 >
 > - **Good for Windows:** the command sandbox now runs **without administrator rights**, with Python, Git and npm working inside it (1.2.17). Plugin install and removal got more reliable on Windows (1.3.1, 1.3.2), and if PowerShell 7 from the Microsoft Store fails, it now falls back to Windows PowerShell (1.3.3).
 > - **New:** `/compact` to shrink context on demand (1.3.5), `--effort` and `/effort` for reasoning effort (1.2.11), a `/plugin` marketplace manager (1.3.2), a built-in `image-generator` subagent (1.2.16), and `@name` to message a subagent directly (1.2.9). `-p "/usage"` now prints quota reset times in your local time (1.2.15), which helps with the quota problem below.
@@ -70,6 +77,18 @@ Sign in with your Google account when prompted. Credentials are cached in the sy
 
 Once you are in a session, `/config` shows your current setup.
 
+### Using a Gemini API key instead
+
+Since 1.1.13 (2026-08-14), Antigravity CLI can run directly against the Gemini API without a Google sign-in: set `"modelProvider": "gemini"` in `settings.json` and set a `GEMINI_API_KEY` environment variable (an `AIza...` key from [AI Studio](https://aistudio.google.com)). Requests then count against that key's project limits instead of the account agent quota in Section 4. As of 1.5.8 the model list on this path includes **Gemini 4 Hydrogen**, which Google's free API tier covers, and Gemini 4 Carbon, which it does not.
+
+```powershell
+$env:GEMINI_API_KEY = "AIza-YOUR_KEY_HERE"
+agy
+# then, inside the session, pick Gemini 4 Hydrogen with /model
+```
+
+> **Not tested here.** Whether a *free-tier* AI Studio key gives you a workable agent has not been verified. Two cautions: the CLI's built-in `pro` subagent uses Gemini 4 Argon on this path (per the 1.5.0 notes), which is paid-only, so pin your model to a free one; and Google may use free-tier prompts to improve its models. Check the key's usage in AI Studio, since `/usage` does not work with an API key.
+
 ---
 
 ## 4. Free Tier Limits (Read This Before You Rely On It)
@@ -83,7 +102,7 @@ This is the biggest practical difference from Gemini CLI, and the most common co
 | Refresh | Daily | Weekly ceiling. Older reports describe a ~5-hour rolling cycle under it; October reports mostly describe weekly only |
 | Visible to the agent | Yes | **No** — check `/usage` yourself |
 
-> **Google still does not publish the free-tier numbers.** Every figure in this section comes from community reports, and as of October 2026 they disagree on whether there is still a 5-hour refresh at all. What they agree on: Tab completions and command requests are unmetered, only agent work counts, and a heavy session can lock the weekly bucket in under an hour. Run `agy -p "/usage"` to see your own reset time.
+> **Google still does not publish the free-tier numbers.** Every figure in this section comes from community reports (not re-checked in November), and as of October 2026 they disagree on whether there is still a 5-hour refresh at all. What they agree on: Tab completions and command requests are unmetered, only agent work counts, and a heavy session can lock the weekly bucket in under an hour. Run `agy -p "/usage"` to see your own reset time.
 
 Practical notes:
 
@@ -102,7 +121,7 @@ Practical notes:
 | Google AI Ultra Max | $200/mo | ~20x Pro |
 | Credits | ~$0.01 each | Bulk, roughly $199 for 20,000 |
 
-Treat the free tier as enough to evaluate the multi-agent workflow, not as a daily driver. If you want a free terminal coding agent you can lean on all day, use [Aider](Aider_Setup_NVIDIA_NIM.md) or [OpenCode](OpenCode_Setup_NVIDIA_NIM.md) against NVIDIA NIM instead.
+Treat the free tier as enough to evaluate the multi-agent workflow, not as a daily driver. A [Gemini API key](#using-a-gemini-api-key-instead) on Gemini 4 Hydrogen may stretch it further, but that path is untested here. If you want a free terminal coding agent you can lean on all day, use [Aider](Aider_Setup_NVIDIA_NIM.md) or [OpenCode](OpenCode_Setup_NVIDIA_NIM.md) against NVIDIA NIM instead.
 
 > **The 20/day figure is not new, and not a Gemini CLI migration penalty.** Antigravity launched in November 2025 with 250 requests/day and was cut to ~20/day by December 2025, six months before Gemini CLI shut down. What changed in June 2026 is that Gemini CLI users lost their 1,000/day and landed on a quota that had already been reduced.
 
@@ -123,7 +142,8 @@ Type these inside an `agy` session:
 | `/effort` | Set reasoning effort (1.2.11+) |
 | `/diff` | Review changes, with a colored commit tree (1.3.6+) |
 | `/plugin` | Browse and manage plugins (1.3.2+) |
-| `/usage` | Show quota and rate-limit status |
+| `/swarm` | Coordinator plus parallel worker agents (preview, 1.5.5+) |
+| `/usage` | Show quota and rate-limit status (hidden when using a `GEMINI_API_KEY`, 1.5.11+) |
 | `/model` | Switch models mid-session |
 | `/config` | Show current configuration |
 
@@ -151,7 +171,7 @@ Google announced at I/O 2026 that Gemini CLI was folding into the Antigravity ag
 
 The change was contentious. Gemini CLI was Apache 2.0 and had taken more than 6,000 merged pull requests from outside contributors over roughly a year. Antigravity CLI is a **closed-source Go binary**, so those contributors ended up having donated work to a product whose successor they cannot inspect or use for free at the same level.
 
-> **The Gemini CLI repo is not dead, though.** It still ships nightly builds (`v0.67.0-nightly` on 2026-10-24), because Gemini Code Assist Standard and Enterprise customers and paid API-key users kept access. What ended in June was the free Google-account login. This review found no reliable confirmation that a free AI Studio key works with it, so do not count on that.
+> **The Gemini CLI repo is not dead, though.** It still ships releases (v0.67.0 on 2026-11-04, v0.68.0 on 2026-11-10), because Gemini Code Assist Standard and Enterprise customers and paid API-key users kept access. What ended in June was the free Google-account login. This review found no reliable confirmation that a free AI Studio key works with it, so do not count on that.
 
 ### Migrating a Gemini CLI setup
 
@@ -171,7 +191,8 @@ The change was contentious. Gemini CLI was Apache 2.0 and had taken more than 6,
 | Quota exhausted after only a couple of prompts | Subagents consume quota in parallel. Run `/usage`, and prefer `/grill-me` over `/goal` for smaller tasks |
 | Quota did not refresh after 5 hours | Known and widely reported. You may be against the weekly ceiling, which has a longer cooldown |
 | Every model reports "Individual quota reached" | Reported in September and October 2026, with baseline quota not restoring until a fixed date days out. That is the weekly ceiling, not a transient error, and waiting is the only fix. `agy -p "/usage"` shows the reset time |
-| Shift+Tab does not enter Auto mode | Auto mode is Linux and macOS only as of 1.4.7. Windows support is "coming later" |
+| Shift+Tab does not enter Auto mode | Auto mode was Linux and macOS only as of 1.4.7, and no release note through 1.5.11 announces Windows support |
+| A headless `-p` run that used to stop at 30 minutes now runs longer | Since 1.5.0 it waits for background tasks. Pass `--print-timeout` to cap it |
 | A script that used `--dangerously-skip-permissions` now stops at plans | Intentional since 1.3.2: it no longer auto-approves `/plan` mode |
 | Headless run exits with code 3 | Since 1.2.10, a run that ends on a model or agent error exits 3. Check the output for the model error |
 | Imported MCP server appears but does not work | Known limitation of `agy plugin import` |
@@ -182,6 +203,7 @@ The change was contentious. Gemini CLI was Apache 2.0 and had taken more than 6,
 ## References
 
 - [Antigravity Download](https://antigravity.google/download)
+- [Antigravity CLI release notes](https://github.com/google-antigravity/antigravity-cli/releases)
 - [Transitioning Gemini CLI to Antigravity CLI (official announcement)](https://github.com/google-gemini/gemini-cli/discussions/27274)
 - [Google blog: an important update on Gemini CLI](https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/)
 - [Antigravity usage and rate limits](https://antigravity.im/limits)

@@ -39,9 +39,20 @@ ollama --version
 
 > Ollama runs as a system tray app and background service. It starts automatically with Windows. You do not need to manually start it before running commands.
 
-> **Current version as of this writing:** 0.40.11 (released 2026-10-24), up from 0.34.2 a month ago. That is 17 releases in five weeks. Ollama updates itself; `ollama --version` shows what you have.
+> **Current version as of this writing:** 0.40.16 (released 2026-11-09, checked 2026-11-18), up from 0.40.11 a month ago. 0.40.17 is in release candidate. Ollama updates itself; `ollama --version` shows what you have.
 
-> **What changed since 0.34.2, in order of how likely it is to affect you:**
+> **What changed since 0.40.11 (November 2026):**
+>
+> - **New small agent model from Liquid AI: LFM3** (0.40.12, Windows from 0.40.13). `lfm3` is a 1.7B text model with a 256K context, built for tool calling and structured output, and a **1.1GB** download. There are also `lfm3-vl` (images), `lfm3-audio` and `lfm3-omni`.
+> - **MiMo V2.6** (0.40.15): Xiaomi's 9B code and agent model, 6.6GB.
+> - **Ripple Preview** (0.40.16): a 65B dense agentic-coding model, 38.8GB.
+> - **`ollama launch` now works with OpenCode 2** (0.40.12).
+> - **OpenAI-compatible endpoints stop overriding a model's own sampler defaults** (0.40.14). If your client sends no `temperature` or `top_p`, you now get the model's packaged values instead of 1.0, which can change output from Aider and OpenCode against Ollama.
+> - Running `ollama` with no arguments opens a welcome launcher (0.40.15). `/v1/models` returns an empty list instead of `null` when nothing is installed, and `/v1/responses` truncation is fixed (0.40.16).
+> - More decision models: Liquid's `d1:2b` and `d1-omni` (0.40.12), and the AutoTrust family (0.40.15, Apple Silicon only in that release).
+> - **Still pending:** no release since 0.40.11 mentions removing the 0.40.2 conversion backups automatically, so the double-disk warning below still applies.
+
+> **What changed from 0.34.2 to 0.40.11 (October 2026), in order of how likely it is to affect you:**
 >
 > - **⚠️ Your existing models get re-converted in the background, and temporarily take double the disk** (0.40.2, 2026-10-08). From 0.40 on, models downloaded with older versions are upgraded to run on llama.cpp the first time you run them, and Ollama **keeps the original copy as a backup** so a downgrade stays safe. Ollama says a future release will delete those backups automatically; until then, if you have a large library, watch your free space. The 0.40.2 release notes include a `jq` one-liner to remove the backups by hand. After that, downgrading below 0.40 means re-pulling.
 > - **The account step is gone from CLI onboarding** (0.40.1). 0.34.2 had added a sign-in prompt on first run; that has been removed again. Nothing in this guide ever needed an account, and now Ollama does not ask.
@@ -53,7 +64,7 @@ ollama --version
 > - **Smaller fixes that matter on Windows:** orphaned runner processes are prevented (0.40.6), manifests no longer use symlinks (0.40.1), and streaming OpenAI Responses and Anthropic Messages requests now report a generation failure instead of ending silently after partial output (0.40.9).
 > - **Still in force from September:** since 0.34.1, `ollama create` no longer converts and quantizes safetensors into GGUF for you. Use llama.cpp tooling for that step.
 
-> **Qwen 3.8 27B, and the model ID people get wrong.** Locally it is `qwen3.8:27b` (17.7GB; plain `qwen3.8` pulls the same thing). On **Groq's free API** it is `qwen/qwen3.8-27b`, with a hyphen where Ollama uses a colon, and the previous `qwen/qwen3.6-27b` ID was shut down on Groq on 2026-09-14. Context differs by host: Ollama's library lists 256K, Groq serves 131,072. **OpenRouter's free endpoint for it is gone** as of 2026-10-24, so for a free hosted copy, Groq is now the only option, at about 0.2 seconds per call. There is no `qwen3.8:9b` or `:4b` tag; the 3.5 family is still the small option.
+> **Qwen 3.8 27B, and the model ID people get wrong.** Locally it is `qwen3.8:27b` (17.7GB; plain `qwen3.8` pulls the same thing). On **Groq's free API** it is `qwen/qwen3.8-27b`, with a hyphen where Ollama uses a colon, and the previous `qwen/qwen3.6-27b` ID was shut down on Groq on 2026-09-14. Context differs by host: Ollama's library lists 256K, Groq serves 131,072. **OpenRouter's free endpoint for it is gone** (still paid only on 2026-11-18), so for a free hosted copy, Groq is the only option, at about 0.2 seconds per call. There is no `qwen3.8:9b` or `:4b` tag; the 3.5 family is still the small option.
 
 ### System Tray GUI
 
@@ -100,17 +111,19 @@ ollama rm llama3.2
 
 ---
 
-## 4. Recommended Free Models (October 2026)
+## 4. Recommended Free Models (November 2026)
 
-Sizes below are actual download sizes read from the Ollama registry manifests on 2026-10-24, and every tag was verified to exist on that date. Several sizes moved slightly since August, as models were repackaged for the 0.40 llama.cpp runner.
+Sizes below are actual download sizes read from the Ollama registry manifests. Every tag was re-checked on 2026-11-18 and every size was unchanged from 2026-10-24; three new models were added.
 
 | Model | Pull command | Size | Best for |
 |---|---|---|---|
+| **LFM3 1.7B** | `ollama pull lfm3` | 1.1GB | **New.** Tiny tool-calling and structured-output model, 256K context |
 | Qwen 3.5 0.8B | `ollama pull qwen3.5:0.8b` | 1.3GB | Very fast, minimal hardware |
 | Llama 3.2 3B | `ollama pull llama3.2` | 2.0GB | Fast everyday tasks, low RAM |
 | Qwen 3.5 4B | `ollama pull qwen3.5:4b` | 3.3GB | Best tiny generalist right now |
 | DeepSeek R1 8B | `ollama pull deepseek-r1:8b` | 5.2GB | Reasoning model with visible thinking |
 | Qwen 3.5 9B | `ollama pull qwen3.5:9b` | 6.6GB | Strong all-around coding/reasoning at single-GPU size |
+| **MiMo V2.6 9B** | `ollama pull mimo-v2.6` | 6.6GB | **New.** Xiaomi's code and agent model |
 | **Nemotron 3.5 Bolt E4B** | `ollama pull nemotron-3.5-bolt:e4b` | 7.9GB | **New.** Small vision + tool-use model, 128K context, speculative decoding built in |
 | Gemma 4 12B | `ollama pull gemma4:12b` | 8.0GB | Google's 2026 multimodal flagship, smallest size |
 | GPT-OSS 20B | `ollama pull gpt-oss:20b` | 13.8GB | OpenAI open weights, MXFP4, 128K context. Great 16GB pick |
@@ -125,6 +138,7 @@ Sizes below are actual download sizes read from the Ollama registry manifests on
 | **Flint 40B** | `ollama pull flint` | 22.9GB | **New. Most promising local coder this cycle**: only ~2.5B active, so it runs fast for its size. 262K context |
 | **Nemotron 3.5 Bolt** | `ollama pull nemotron-3.5-bolt` | 24.8GB | **New.** 74B / 9B active, tuned for a 24GB NVIDIA card |
 | Nemotron 3.5 Lightning | `ollama pull nemotron-3.5-lightning` | 25.4GB | Low-latency agent model, also free on NVIDIA NIM |
+| **Ripple Preview 65B** | `ollama pull ripple-preview` | 38.8GB | **New.** Dense agentic coder; needs 48GB+ of VRAM or unified memory |
 | Devstral 2 123B | `ollama pull devstral-2` | 74.9GB | Large agentic coder, multi-GPU territory |
 | Qwen 3.5 122B | `ollama pull qwen3.5:122b` | 81.4GB | Largest Qwen 3.5, multi-GPU territory |
 | **Nemotron 3.5 Super** | `ollama pull nemotron-3.5-super` | 90.2GB | **New.** 120B / 12B-active vision model, up to 1M context. Multi-GPU or large unified memory |
@@ -137,7 +151,7 @@ Sizes below are actual download sizes read from the Ollama registry manifests on
 >
 > **For local coding specifically:** `qwen3-coder:30b` is still the safe pick for raw code quality. `devstral-small-2` is the pick for agentic workflows (the read, reason, edit, verify loop), at 46.8% SWE-Bench Verified in 15GB. **Flint is the one to try this month**: Recursive reports 74.2% SWE-bench Verified for a 22.9GB download with only ~2.5B parameters active per token, which would put it far ahead of Devstral Small 2 at a similar size. That is a vendor-reported number from its release, so treat it as a claim until independent results show up, but it is cheap to test.
 >
-> **Note on the very large models:** GLM-5.3 leads the open-weight models this repo tracks, but it is a very large MoE that needs multi-GPU servers or a very large unified-memory machine. On normal desktop hardware, run it through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally. (As of 2026-10-24, `z-ai/glm-5.3` answers in 7 to 27 seconds on NIM, and the new `minimaxai/minimax-m3.1-flash` in under a second. Kimi K3, which this note also mentioned in September, reached end of life on NIM on 2026-10-15.)
+> **Note on the very large models:** the biggest open-weight models need multi-GPU servers or a very large unified-memory machine. On normal desktop hardware, run them through [NVIDIA NIM](Free_AI_API_Keys.md#nvidia-nim) for free instead of locally. GLM-5.3, which this note recommended through October, reached end of life on NIM on 2026-10-28. As of 2026-11-18 the fast large options there are `nvidia/nemotron-3-ultra-550b-a55b` (about 1 second per reply) and `mistralai/mistral-large-4-1t-a52b` (about 2 to 10 seconds).
 
 Browse all available models at [https://ollama.com/library](https://ollama.com/library).
 
