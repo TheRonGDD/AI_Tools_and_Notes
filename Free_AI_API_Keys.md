@@ -2,11 +2,11 @@
 
 A reference guide to AI providers offering free API access, no credit card required (unless noted). All entries have ongoing free tiers, not just one-time trial credits.
 
-> **Note:** Rate limits, model availability, and free tier terms change frequently. Always verify current limits on the provider's pricing page before building on a free tier. Last reviewed October 2026, with NVIDIA, Groq and OpenRouter model IDs verified by live API call on 2026-10-24.
+> **Note:** Rate limits, model availability, and free tier terms change frequently. Always verify current limits on the provider's pricing page before building on a free tier. Last reviewed November 2026. NVIDIA and OpenRouter model IDs verified by live API call on 2026-11-18; Groq and Google checked against their own documentation only this cycle (no key was available for a live call).
 
-> **Free tiers kept shrinking through 2026, and October claimed another one.** SambaNova's Free plan now requires a payment method before your first request, so it has moved to the [retired section](#sambanova) alongside Cerebras. Groq is down to 11 models, OpenRouter's zero-priced list dropped from 24 to 18 usable models, and both of September's slow-but-working NVIDIA picks (Kimi K3 and DeepSeek V4 Flash 0731) have been retired outright.
+> **November's loss was NVIDIA's catalog.** It fell from 85 models to **32**, and the model every guide in this repo recommended, `z-ai/glm-5.3`, reached end of life on **2026-10-28**, four days after October's review re-verified it. GPT-OSS 20B, DeepSeek V4.1 Flash and Kimi K2.6 followed in mid-November. OpenRouter's usable free list dropped from 18 to 15.
 
-> **But it was not all loss.** NVIDIA added a genuinely fast new model, `minimaxai/minimax-m3.1-flash`, which answered in 0.2 to 0.7 seconds with correct tool calls, and its catalog grew from 82 to 85. Groq answered every chat request in under a third of a second. OpenRouter picked up three new free models, including NVIDIA's multimodal Nemotron 3.5 Super VL at a 1M context. Google added Gemini 3.8 Flash to its free tier.
+> **What arrived:** Mistral Large 4 and Kimi K3.1 Pro on NVIDIA NIM, Gemini 4 Hydrogen on Google's free tier (docs only), and new free models on OpenRouter (ERNIE 5.5 Flash Preview, Ling 3.2 Flash, Particle-1, LFM 3 1.7B). Nemotron 3 Ultra, now the default in this repo, answered every call in under 2 seconds and made a correct tool call in 1.0s.
 
 ---
 
@@ -14,10 +14,10 @@ A reference guide to AI providers offering free API access, no credit card requi
 
 | Provider | Notable Free Models | OpenAI-Compatible | Credit Card Required |
 |---|---|---|---|
-| [NVIDIA NIM](#nvidia-nim) | GLM-5.3, MiniMax M3.1 Flash, Nemotron 3 / 3.5, Muse Glimmer, 80+ more | Yes | No (phone verification) |
+| [NVIDIA NIM](#nvidia-nim) | Nemotron 3 Ultra / 3.5, Mistral Large 4, Gemma 4, Muse Glimmer, ~30 total | Yes | No (phone verification) |
 | [Groq](#groq) | GPT-OSS 120B/20B, Qwen3.8 27B | Yes | No |
-| [Google AI Studio](#google-ai-studio) | Gemini 3.8 / 3.6 Flash, 3.5 / 3.1 Flash-Lite, Gemma 4 | Yes | No |
-| [OpenRouter](#openrouter) | 18 `:free` models, including Nemotron 3.5 Super VL, Flint, Inkling | Yes | No |
+| [Google AI Studio](#google-ai-studio) | Gemini 4 Hydrogen, 3.8 / 3.6 Flash, 3.5 / 3.1 Flash-Lite, Gemma 4 | Yes | No |
+| [OpenRouter](#openrouter) | 15 `:free` models, including Nemotron 3 Ultra, Flint, ERNIE 5.5 Flash Preview | Yes | No |
 | [Hugging Face](#hugging-face) | Thousands of models | Partial | No |
 | [Cloudflare Workers AI](#cloudflare-workers-ai) | Llama, Mistral, image-gen, and more | Partial | No (Cloudflare account) |
 | [Mistral AI](#mistral-ai) | Mistral Small and others | Yes | No |
@@ -31,29 +31,31 @@ A reference guide to AI providers offering free API access, no credit card requi
 
 **URL:** https://build.nvidia.com
 
-Still the largest free catalog around. A live call to `GET /v1/models` on 2026-10-24 returned **85 models**, up from 82 in September, spanning chat, vision, embedding, and reranking. The turnover underneath that number is heavy: both of the slow-but-working models September's guide covered are gone, and several new ones arrived. New models land fast and old ones leave just as fast, so plan on re-checking your model IDs monthly.
+Still the best free catalog for agent work, but much smaller than it was. A live call to `GET /v1/models` on 2026-11-18 returned **32 models**, down from 85 on 2026-10-24, and that count includes embedding, safety, translation and video-detection models; about 15 are general chat models. The default this repo recommended for three months, `z-ai/glm-5.3`, is among the losses. New models land fast and old ones leave just as fast, so plan on re-checking your model IDs monthly.
 
 - **Sign-up:** Free NVIDIA Developer account. No credit card, but **phone verification is required** at signup.
-- **Notable free models (each sent a real completion on 2026-10-24, latency is what came back):**
-  - `z-ai/glm-5.3` (MIT-licensed agentic coder, reasoning model, **still the default recommendation here**. Answered every probe, but at 7 to 27 seconds rather than September's ~4s)
-  - `minimaxai/minimax-m3.1-flash` (**new this cycle, and the fastest capable model tested**: 0.2 to 0.7s on chat, 2.3s on a tool call, 1M context, text + image + video input)
-  - `nvidia/nemotron-3-ultra-550b-a55b` (550B / 55B active, 262K context, 0.9 to 6.7s)
-  - `nvidia/nemotron-3.5-lightning-30b-a3b` (small, fast, ~1–2s)
-  - `nvidia/nemotron-3.5-super-vl-120b-a12b` (**new**: multimodal 120B / 12B active, 1M context. Fast when it answers, but one `500` and one 300s timeout in four calls)
-  - `nvidia/nemotron-3.5-bolt-e4b` (**new**: small Gemma 4-based vision model, 0.3s)
-  - `meta/muse-glimmer-30b` (1 to 9s, built for agent harnesses)
-  - `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning` (~1s, text + audio + image)
-  - `openai/gpt-oss-20b` (~1–2s)
-  - `stepfun-ai/step-5-preview` (**new**: 600B / 27B active preview, but 134s on one call and a timeout on another)
-  - `deepseek-ai/deepseek-v4.1-flash` (**new**, and **a latency trap just like its predecessor**, see below)
+- **Notable free models (each sent a real completion and a `read_file` tool call on 2026-11-18; latency is what came back):**
+  - `nvidia/nemotron-3-ultra-550b-a55b` (550B / 55B active, 262K context. **The default recommendation here from November.** 0.8 to 1.9s on chat, 1.0s on a correct tool call)
+  - `mistralai/mistral-large-4-1t-a52b` (**new**: Mistral Large 4, 1T / 52B active, text + image. 1.8 to 10s on chat, 2.8 to 4.8s on a tool call. OpenRouter lists 1M context for the same model; NVIDIA's figure not confirmed)
+  - `nvidia/nemotron-3.5-lightning-30b-a3b` (small and fast: 1.3 to 1.9s chat, 0.5 to 0.8s tool call)
+  - `nvidia/nemotron-3.5-super-vl-120b-a12b` (multimodal 120B / 12B active, 1M context, 0.6 to 0.9s. October's `500` and timeout did not recur)
+  - `nvidia/nemotron-3.5-bolt-e4b` (small Gemma 4-based vision model, 0.2 to 0.5s)
+  - `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning` (text + audio + image, 0.8 to 1.7s)
+  - `google/gemma-4-31b-it` (0.6s chat, 1.6s tool call)
+  - `poolside/laguna-xs-2.1` (0.2 to 0.7s)
+  - `meta/muse-glimmer-30b` (8 to 13s, built for agent harnesses)
+  - `stepfun-ai/step-5-preview` (600B / 27B active preview. 1.1 to 17.5s on chat, 36s on a tool call. Much better than October's 134s, still uneven)
+  - `minimaxai/minimax-m3.1-flash` (still correct, but **48 to 75 seconds** per reply and 64s for a tool call, against 0.2 to 0.7s in October. **No longer the fast pick**)
+  - `moonshotai/kimi-k3.1-pro` (**new**: successor to the retired Kimi K3, 1M context per OpenRouter's listing. 119s on chat, 30s on a tool call. Works, but too slow for a default)
+  - `z-ai/glm-5.3-flash` (timed out at 200s and 300s. The only GLM left on NIM, and not usable)
 - **OpenAI-compatible:** Yes — `https://integrate.api.nvidia.com/v1`
 - **Key prefix:** `nvapi-`
 - **Rate limits:** ~40 requests/min, shared across all models rather than per-model. You can apply for a 200 RPM increase through the NVIDIA Developer Forums.
 - **Context range:** 4K to 1M tokens depending on model
-- **Standout feature:** One API key, 80+ models. Largest free hosted catalog available anywhere.
+- **Standout feature:** One API key, about 30 models including several frontier-class agents. Still the strongest free option for agent work.
 - **Guides in this repo:** [Aider + NVIDIA NIM](Aider_Setup_NVIDIA_NIM.md) | [OpenCode + NVIDIA NIM](OpenCode_Setup_NVIDIA_NIM.md)
 
-> **Every fast model above can actually drive an agent.** A model that answers "OK" quickly is not necessarily one that emits proper tool calls, so on 2026-10-24 each of MiniMax M3.1 Flash, Nemotron 3 Ultra, Nemotron 3.5 Lightning, Nemotron 3.5 Super VL, Nemotron 3.5 Bolt E4B, Muse Glimmer and GPT-OSS 20B was handed a `read_file` tool and asked to open a file. All seven returned `finish_reason: tool_calls` with correct arguments, in 0.6 to 3.2 seconds.
+> **Most fast models above can actually drive an agent.** A model that answers "OK" quickly is not necessarily one that emits proper tool calls, so on 2026-11-18 each of Nemotron 3 Ultra, Mistral Large 4, Nemotron 3.5 Lightning, Super VL and Bolt E4B, Nemotron 3 Nano Omni, Gemma 4 31B, Laguna XS 2.1 and Muse Glimmer was handed a `read_file` tool and asked to open a file. All nine returned `finish_reason: tool_calls` with correct arguments, in 0.5 to 8.3 seconds (0.5 to 4.8s without Glimmer). Give reasoning models room: with `max_tokens` of 64 or less, Mistral Large 4 ran out of tokens before calling the tool.
 
 ### Reading NVIDIA's error codes (the 403 vs 410 diagnostic)
 
@@ -62,11 +64,11 @@ NVIDIA's failure modes look similar from the outside but mean very different thi
 | Response | What it actually means | Fix |
 |---|---|---|
 | `410 Gone` with an end-of-life date | The model is genuinely retired. Note that this is returned **even when your key is invalid**, because the EOL check runs before authentication. | Pick a current model ID |
-| `404 page not found` (bare) | The model slug does not exist. Usually a typo or a wrong org prefix, for example `zai-org/glm-5.3` instead of `z-ai/glm-5.3` | Check the URL slug on the model's page at build.nvidia.com |
-| `404` with `Function '<uuid>': Not found for account` | The model exists, but **your account is not registered for it** | Open its page on build.nvidia.com and click **"Try API"** once, then retry |
+| `404 page not found` (bare) | The model slug does not exist. Usually a typo or a wrong org prefix, for example `nemotron/...` instead of `nvidia/...` | Check the URL slug on the model's page at build.nvidia.com |
+| `404` with `Function '<uuid>': Not found for account` | Usually the model exists but **your account is not registered for it**. Sometimes the model was **recently retired** and NVIDIA has not switched it to `410` yet (see below) | Open its page on build.nvidia.com and click **"Try API"** once, then retry. If that does not help, treat it as retired |
 | `403 Authorization failed` on **every** live model | Your key is invalid or **expired** | Generate a new key |
 | `404` with an **empty body** and header `Nvcf-Status: errored` | The backing function itself is down. Not an account problem | Nothing you can do. Use another model and retry later |
-| `500 Failed to generate completions` with `Nvcf-Status: errored` | A backend generation failure on that model. Seen once on `nemotron-3.5-super-vl` on 2026-10-24, which then answered in 3.4s | Retry; switch models if it repeats |
+| `500 Failed to generate completions` with `Nvcf-Status: errored` | A backend generation failure on that model. Seen once on `nemotron-3.5-super-vl` on 2026-10-24 (not seen in November) | Retry; switch models if it repeats |
 | `503 Service temporarily overloaded` | Transient capacity shortage on that model's pool | Retry in a few seconds; it usually clears |
 | `503 ResourceExhausted: Worker local total request limit reached (108/32)` or `All workers are busy` | The model's **shared** worker pool is oversubscribed across all NVIDIA users, not a limit on your account | Retry later, or pick a less popular model. Raising your own RPM will not help |
 | `429` after several fast calls | Your own per-account rate limit | Space requests out. Do not mistake this for a model failure |
@@ -74,15 +76,13 @@ NVIDIA's failure modes look similar from the outside but mean very different thi
 
 > **The key-expiry trap:** NVIDIA keys carry a time-to-live that you select when you generate them, from one hour up to "never expires." One year is a common choice. Because a dead key returns `403` on live models while retired models still return their `410` notice, an expired key looks exactly like "every model I want got deprecated at once." If you see `403 Authorization failed` across several unrelated models, the problem is your key, not the catalog.
 
-> **⚠️ `deepseek-ai/deepseek-v4.1-flash` repeats last month's trap.** September's guide warned that `deepseek-v4-flash-0731` still answered but took minutes. That model has since been retired (`410`, EOL 2026-09-21), and its replacement behaves the same way: on 2026-10-24, one call timed out at 180 seconds and the next succeeded after **166 seconds**, for a two-token reply. It returns a valid `200` with no error, so an agent simply appears to hang. Do not make it a default.
+> **Retired since the October review (each confirmed by a live `410` with its EOL date in the response body on 2026-11-18):** `z-ai/glm-5.3` (EOL **2026-10-28**), `openai/gpt-oss-20b` (**2026-11-18**), `deepseek-ai/deepseek-v4.1-flash` (2026-11-16; October flagged it as a 166-second latency trap) and `moonshotai/kimi-k2.6` (2026-11-15). Two models October described as needing a "Try API" click are also retired, with EOL dates that predate October's test: `nvidia/nemotron-3-super-120b-a12b` (2026-10-03) and `nvidia/nemotron-nano-3-30b-a3b` (2026-09-01). Earlier casualties: `moonshotai/kimi-k3` (2026-10-15), `deepseek-ai/deepseek-v4-flash-0731` (2026-09-21), `minimaxai/minimax-m3` (2026-09-09), `openai/gpt-oss-120b` (2026-09-03), `stepfun-ai/step-3.7-flash` (2026-08-28), `meta/llama-3.3-70b-instruct` (2026-08-26), `z-ai/glm-5.2` (2026-08-21), `deepseek-ai/deepseek-v4-flash` and `-v4-pro` (2026-08-07), `meta/llama-4-maverick-17b-128e-instruct` (2026-07-27), `qwen/qwen3-coder-480b-a35b-instruct` (2026-06-11), `moonshotai/kimi-k2-instruct` (2026-05-12).
 
-> **Retired since the September review (each confirmed by a live `410` with its EOL date in the response body on 2026-10-24):** `moonshotai/kimi-k3` (EOL **2026-10-15**) and `deepseek-ai/deepseek-v4-flash-0731` (EOL 2026-09-21). Kimi K3's model page now marks its free endpoint "Deprecated" while the paid partner endpoint stays up, so this looks like a decision rather than an outage. Earlier casualties: `minimaxai/minimax-m3` (2026-09-09), `openai/gpt-oss-120b` (2026-09-03), `stepfun-ai/step-3.7-flash` (2026-08-28), `meta/llama-3.3-70b-instruct` (2026-08-26), `z-ai/glm-5.2` (2026-08-21), `deepseek-ai/deepseek-v4-flash` and `-v4-pro` (2026-08-07), `meta/llama-4-maverick-17b-128e-instruct` (2026-07-27), `qwen/qwen3-coder-480b-a35b-instruct` (2026-06-11), `moonshotai/kimi-k2-instruct` (2026-05-12).
+> **Correction to October: `Not found for account` can also mean "already retired".** October's review reported that `nvidia/nemotron-3-super-120b-a12b`, `moonshotai/kimi-k2.6` and `nvidia/nemotron-nano-3-30b-a3b` returned `Function '<uuid>': Not found for account` on 2026-10-24, and read that as the registration gate catching models that used to work. On 2026-11-18 all three return `410 Gone`, and two of them carry end-of-life dates **before** October's test: Nemotron 3 Super on 2026-10-03 and Nemotron Nano 3 on 2026-09-01. So for a while after retirement, NVIDIA can answer a dead model with the account-gate message instead of `410`. This is an inference from the dates, not something NVIDIA documents. If "Try API" does not fix a `Not found for account`, assume the model is gone and check again in a week.
 
-> **The registration gate now reaches models that already worked.** `nvidia/nemotron-3-super-120b-a12b` answered in about a second on 2026-09-20. On 2026-10-24, on the same key, it returned `Function '<uuid>': Not found for account` on all three attempts, as did `moonshotai/kimi-k2.6` and `nvidia/nemotron-nano-3-30b-a3b`. All three are still listed in `/v1/models`. So the catalog is not a reliable guide to what your key can call, and a model that worked last month can need a fresh "Try API" click this month. If one of your configured models suddenly 404s with that message, click "Try API" on its page before you assume it is gone.
+> **GLM-5.3 is gone.** It was the default here from September to October and retired on 2026-10-28. For a strong reasoning-and-coding default, use `nvidia/nemotron-3-ultra-550b-a55b` (fast) or `mistralai/mistral-large-4-1t-a52b`.
 
-> **GLM-5.3 got slower, not worse.** It answered all four probes on 2026-10-24 with correct output, at 27, 11, 7 and 10 seconds, against roughly 4 seconds a month ago. That is still usable as an agent default, and it is still the strongest reliable coder in the catalog, but if you want speed above all, `minimaxai/minimax-m3.1-flash` is now the better pick. `z-ai/glm-5.3-flash` took 136 seconds, so the "Flash" name is no guide here.
-
-> **`503` is two different problems.** Plain `Service temporarily overloaded` is a brief capacity blip and usually clears on an immediate retry. `ResourceExhausted` is the **shared** worker pool across all NVIDIA users. On 2026-10-24 `poolside/laguna-xs-2.1` returned both `All workers are busy` and `Worker local total request limit reached (108/32)`, up from September's 78/32. No amount of retrying or rate-limit tuning on your end fixes that one.
+> **`503` is two different problems.** Plain `Service temporarily overloaded` is a brief capacity blip and usually clears on an immediate retry. `ResourceExhausted` is the **shared** worker pool across all NVIDIA users. On 2026-10-24 `poolside/laguna-xs-2.1` returned both `All workers are busy` and `Worker local total request limit reached (108/32)`, up from September's 78/32 (no `503` of either kind appeared in about 40 calls on 2026-11-18, and Laguna answered in 0.2s). No amount of retrying or rate-limit tuning on your end fixes that one.
 
 ---
 
@@ -90,7 +90,7 @@ NVIDIA's failure modes look similar from the outside but mean very different thi
 
 **URL:** https://console.groq.com
 
-Extremely fast inference on custom LPU hardware, still the lowest-latency free API available. The catalog shrank from 13 models to **11** this cycle, but what remains is very fast: every chat model answered in 0.2 to 0.3 seconds on 2026-10-24.
+Extremely fast inference on custom LPU hardware, still the lowest-latency free API available. Every chat model answered in 0.2 to 0.3 seconds on 2026-10-24. *(Not re-checked live in November: no key was available. The November notes below come from Groq's own docs on 2026-11-18.)*
 
 - **Sign-up:** Free account, no credit card
 - **Full catalog as of 2026-10-24 (11 models, verified by live API call), with context windows as the API reports them:**
@@ -98,13 +98,13 @@ Extremely fast inference on custom LPU hardware, still the lowest-latency free A
   - `openai/gpt-oss-20b` (131,072, 0.29s)
   - `openai/gpt-oss-safeguard-20b` (131,072)
   - `qwen/qwen3.8-27b` (131,072, 0.20s, the fastest response in this whole review)
-  - `allam-2-7b` (4,096)
+  - `allam-2-7b` (4,096; **no longer listed in Groq's docs as of 2026-11-18**, with no deprecation notice. Not verified against the API)
   - `canopylabs/orpheus-v1-english`, `canopylabs/orpheus-arabic-saudi` (4,000, text-to-speech)
   - `whisper-large-v3`, `whisper-large-v3-turbo` (448, speech-to-text)
   - `meta-llama/llama-prompt-guard-2-22m`, `meta-llama/llama-prompt-guard-2-86m` (512, safety classifiers, not chat models)
 - **OpenAI-compatible:** Yes — `https://api.groq.com/openai/v1`
 - **Key prefix:** `gsk_`
-- **Rate limits (read from the response headers on 2026-10-24):** 1,000 requests/day and 8,000 tokens/min on the `openai/gpt-oss` models and on `qwen/qwen3.8-27b`. Whisper gets 2,000 audio requests/day.
+- **Rate limits (read from the response headers on 2026-10-24):** 1,000 requests/day, 8,000 tokens/min and 200,000 tokens/day on the `openai/gpt-oss` models and on `qwen/qwen3.8-27b`. Whisper gets 2,000 audio requests/day. Groq's docs still listed the same free-plan numbers on 2026-11-18, and no deprecation has been announced since 2026-09-21.
 - **Important:** limits are enforced **per organization, not per API key**. Extra keys under the same org share one bucket.
 - **Standout feature:** Lowest latency of any free provider. Every listed model is available on the free tier, gated by rate limits only, with no credits system and no per-token charge.
 
@@ -131,22 +131,25 @@ Extremely fast inference on custom LPU hardware, still the lowest-latency free A
 Google's developer portal for Gemini models.
 
 - **Sign-up:** Google account, no credit card
-- **Free models (per Google's pricing page, last updated 2026-10-22; the four Flash models timed below were also called live on 2026-10-24):**
-  - `gemini-3.8-flash` (**new**, now the top free Flash model. 47s on one call, `503` "high demand" on the next)
-  - `gemini-3.6-flash` (1.3s, the fast pick)
-  - `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite` (1M context, fastest and cheapest)
+- **Free models (per Google's [pricing](https://ai.google.dev/gemini-api/docs/pricing) and [deprecations](https://ai.google.dev/gemini-api/docs/deprecations) pages, read 2026-11-18; not called live this month, no key was available):**
+  - `gemini-4-hydrogen` (**new, 2026-11-12**: the first free Gemini 4 model, 1M context, aimed at "everyday coding and agentic workflows")
+  - `gemini-3.8-flash` (47s on one call and a `503` "high demand" on the next, on 2026-10-24)
+  - `gemini-3.6-flash` (1.3s on 2026-10-24, the fast pick)
+  - `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite` (1M context, fastest and cheapest. 3.1 Flash-Lite has a shutdown date of **2027-05-07**)
   - `gemini-3-flash-preview` (marked "legacy")
-  - `gemini-2.5-flash`, `gemini-2.5-flash-lite`
+  - `gemini-2.5-flash-lite`
   - Gemma 4, plus TTS, live-audio, transcription and `gemini-embedding-2` models
 - **OpenAI-compatible:** Yes — `https://generativelanguage.googleapis.com/v1beta/openai/`
 - **Key prefix:** `AIza`
-- **Rate limits:** Google's rate-limit page (updated 2026-10-15) no longer publishes free-tier numbers and says to view your active limits in AI Studio. Third-party reports for the newest Flash models range from about 20 to 1,500 requests/day, which is too wide to quote. Check your own project in AI Studio. RPD resets at midnight Pacific.
+- **Rate limits:** Google's rate-limit page (updated 2026-10-15) no longer publishes free-tier numbers and says to view your active limits in AI Studio. Third-party reports for the newest Flash models range from about 20 to 1,500 requests/day, which is too wide to quote. Check your own project in AI Studio. RPD resets at midnight Pacific. Google's usage-tier table also says some new projects must complete a verification step before the free tier works (docs, 2026-11-18).
 - **Quota is per project, not per key.** Creating a second API key in the same project does not double your allowance.
 - **Standout feature:** 1M-token context on the free Flash models, and the free tier is permanent rather than trial-based
 
-> **`gemini-3.7-flash` and `gemini-3.5-flash` are off the pricing page but still served.** August's guide listed both as free. The October pricing page lists 3.8 Flash and 3.6 Flash and neither 3.7 nor 3.5 Flash, yet the live `/v1beta/models` list on 2026-10-24 still includes both, and `gemini-3.7-flash` answered twice, at about 50 seconds each. No shutdown notice was found. Treat them as on their way out: a model that is served but no longer priced is not one to build on. `gemini-3.6-flash` answered in 1.3s and `gemini-3.5-flash-lite` in 3.2s. `gemini-2.5-flash-image` was formally shut down on 2026-10-02.
+> **`gemini-3.7-flash` and `gemini-3.5-flash` are aliases now, not dying models.** October found both off the pricing page but still answering. Google's deprecations page now lists their shutdown date as "N/A" and says each endpoint "is not shutting down and automatically routes API requests" to `gemini-3.8-flash` and `gemini-3.6-flash` respectively. That probably explains why 3.7 Flash answered at about 50 seconds in October, the same speed as 3.8 Flash. Old configs keep working, but you are really getting the newer model.
 
-> **Pro models are paid (since April 1, 2026).** The Pro series, the new top-end **Gemini 4 Argon**, and the image-generation models are paid-only. Only Flash, Flash-Lite and Gemma remain free.
+> **`gemini-2.5-pro` and `gemini-2.5-flash` are deprecated and re-route on 2026-12-01.** From that date, requests to `gemini-2.5-pro` go to `gemini-3.8-flash` and requests to `gemini-2.5-flash` go to `gemini-3.5-flash-lite`. `gemini-2.5-flash-image` was shut down on 2026-10-02.
+
+> **Pro and top-end models are paid (since April 1, 2026).** Gemini 4 Carbon (the new top model, 2026-11-10), Gemini 4 Argon, the Pro series and the image-generation models are all "Not available" on the free tier. **Gemini 4 Hydrogen is the exception.** Note that Carbon's paid price doubles on 2026-12-01, so an accidental paid key costs more next month.
 
 > **Privacy caveat:** Google may use free-tier inputs and outputs to improve its models. Commercial use is allowed, but if your prompts are sensitive, use the paid tier or Vertex AI, neither of which trains on your data.
 
@@ -161,25 +164,27 @@ Google's developer portal for Gemini models.
 A routing layer that aggregates many providers. Has a set of permanently free models tagged with `:free`.
 
 - **Sign-up:** Free account, no credit card needed to sign up or to call `:free` models at a $0 balance
-- **Zero-priced models as of 2026-10-24 (20 of 466 total, verified against the public `/api/v1/models` endpoint).** Two of those 20 are Google's Lyria music models, which show $0 token prices but bill $0.04 per clip, so they are not free. That leaves **18**:
-  - `nvidia/nemotron-3.5-super-vl:free` (1,000,000, text + image + video, **new 2026-10-15**)
-  - `recursive/flint-v1.0:free` (262,144, **new 2026-10-21**, a 40B / 2.5B-active coding model, also runnable locally under [Ollama](Ollama_Local_AI_Windows_11.md))
-  - `xingchen-agi/xing4.0-29b-a4b:free` (262,144, **new 2026-10-16**, China Telecom's successor to TeleChat)
-  - `nvidia/nemotron-3-ultra-550b-a55b:free` and `nvidia/nemotron-3.5-lightning:free` (1,000,000 each)
-  - `nvidia/nemotron-3-super-120b-a12b:free` (262,144), `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (256,000)
-  - `nvidia/nemotron-3.5-content-safety:free` (128,000, a classifier, not a chat model)
-  - `thinkingmachines/inkling:free` and `inkling-small:free` (1,048,576 each)
+- **Zero-priced models as of 2026-11-18 (17 of 478 total, verified against the public `/api/v1/models` endpoint).** Two are still Google's Lyria music models, which show $0 token prices but bill $0.04 per clip, so they are not free. That leaves **15**:
+  - `baidu/ernie-5.5-flash-preview:free` (1,024,000, **new 2026-11-10**, Baidu's coding and agent model. A "preview", so expect it to be temporary)
+  - `inclusionai/ling-3.2-flash:free` (1,048,576, text + image, **new 2026-11-13**)
+  - `particle-ai/particle-1:free` (1,048,576, text + image, **new 2026-10-28**, an agentic coding model post-trained on DeepSeek V4.1 Flash)
+  - `liquid/lfm-3-1.7b:free` (262,144, **new 2026-11-06**; output capped at 8,192; the listing says prompts may be retained)
+  - `nvidia/nemotron-3-ultra-550b-a55b:free`, `nvidia/nemotron-3.5-super-vl:free`, `nvidia/nemotron-3.5-lightning:free` (1,000,000 each)
+  - `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (256,000)
+  - `recursive/flint-v1.0:free` (262,144, a 40B / 2.5B-active coding model, also runnable locally under [Ollama](Ollama_Local_AI_Windows_11.md))
   - `google/gemma-4-31b-it:free` and `gemma-4-26b-a4b-it:free` (262,144 each)
-  - `poolside/laguna-s-2.1:free` and `laguna-xs-2.1:free` (262,144 each)
   - `dots-studio/dots-3-note-preview:free` (512,000), `cohere/north-mini-code:free` (256,000)
-  - `liquid/lfm-2.5-2.6b:free` (65,536)
+  - `thinkingmachines/inkling-2-small:free` (1,048,576, **new 2026-11-09**, but restricted to agent apps, see below)
   - `openrouter/free` (200,000, OpenRouter's own auto-router across free endpoints)
+- **Tool calls checked on 2026-11-18:** ERNIE 5.5 Flash Preview (0.8s), Particle-1 (0.8s), Ling 3.2 Flash (1.7s) and Flint (0.9s) all returned correct tool calls.
 - **OpenAI-compatible:** Yes — `https://openrouter.ai/api/v1`
 - **Key prefix:** `sk-or-`
-- **Rate limits:** 20 requests/min always, plus **50 requests/day on an unfunded account**
+- **Rate limits:** 20 requests/min always, plus **50 requests/day on an unfunded account** *(not re-checked in November: the docs table renders client-side and this repo's key is funded)*. `GET /api/v1/key` now returns `free_model_daily_requests` with `used`, `limit` and `remaining`, so you can see your own daily ceiling (it showed `limit: 1000` on a funded key).
 - **Standout feature:** A single API key works across dozens of models and providers, which makes it the easiest way to test many models without juggling keys
 
-> **Seven free models from September are gone, including the two this repo singled out.** `qwen/qwen3.8-27b:free` and `z-ai/glm-5.2:free` both lost their free endpoints; the paid versions remain. Also gone: `nex-agi/nex-n2.5-pro:free`, `nex-n2.5-mini:free`, and all three `inclusionai/ling-3.0-*:free` models. If you need Qwen 3.8 27B free, Groq still has it, at 131,072 context and 0.2 seconds per call.
+> **Eight free models from October are gone.** `thinkingmachines/inkling:free` and `inkling-small:free`, `nvidia/nemotron-3-super-120b-a12b:free` and `nvidia/nemotron-3.5-content-safety:free` lost their free endpoints (paid versions remain). `poolside/laguna-s-2.1:free`, `laguna-xs-2.1:free`, `xingchen-agi/xing4.0-29b-a4b:free` and `liquid/lfm-2.5-2.6b:free` left OpenRouter entirely. Laguna XS 2.1 is still free on NVIDIA NIM. `qwen/qwen3.8-27b` is still paid only here; Groq still lists it free (docs, 2026-11-18).
+
+> **New: a free model that refuses plain API calls.** `thinkingmachines/inkling-2-small:free` is zero-priced, but a direct call on 2026-11-18 returned `403`: *"only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps"*. Zero-priced is necessary, not sufficient.
 
 > **The $10 lever:** buying $10 in credits **once** raises the daily cap from 50 to 1,000 requests/day permanently, and the credits never expire. This is still the single best value unlock among the providers in this guide. (Minimum purchase is $5, but $10 is the threshold that moves the daily limit.) The 20 RPM cap does not change; only the daily ceiling moves.
 
@@ -226,7 +231,7 @@ Run AI models on Cloudflare's edge network. Free tier included with any Cloudfla
 
 **URL:** https://console.mistral.ai
 
-Mistral's own API platform. Offers a free experimentation tier. *(Not re-verified in the October pass.)*
+Mistral's own API platform. Offers a free experimentation tier. *(Not re-verified in the October or November passes.)*
 
 - **Sign-up:** Free account, no credit card for free tier (phone verification required)
 - **Notable free models:** Mistral Small, Codestral, open-weight models
@@ -240,7 +245,7 @@ Mistral's own API platform. Offers a free experimentation tier. *(Not re-verifie
 
 **URL:** https://dashboard.cohere.com
 
-Specializes in text generation, embeddings, and retrieval. Good free trial keys for non-commercial use. *(Not re-verified in the October pass.)*
+Specializes in text generation, embeddings, and retrieval. Good free trial keys for non-commercial use. *(Not re-verified in the October or November passes.)*
 
 - **Sign-up:** Free account, no credit card
 - **Notable free models:** Command, Command R+, Embed, Rerank
@@ -263,7 +268,7 @@ SambaNova was listed here through September as a no-card Developer tier with Min
 
 Its October free-tier table also reportedly narrowed to three production models (Llama 3.3 70B, DeepSeek V3.1, GPT-OSS 120B) plus two previews, with MiniMax M2.7 moved to the paid Developer tier. That is moot if you cannot make a request without a card.
 
-If you were using SambaNova for large open models, the nearest free substitutes are NVIDIA NIM (`z-ai/glm-5.3`, `nvidia/nemotron-3-ultra-550b-a55b`) and Groq (`openai/gpt-oss-120b`).
+If you were using SambaNova for large open models, the nearest free substitutes are NVIDIA NIM (`nvidia/nemotron-3-ultra-550b-a55b`, `mistralai/mistral-large-4-1t-a52b`) and Groq (`openai/gpt-oss-120b`).
 
 ### Cerebras
 
@@ -291,7 +296,7 @@ xAI's August 2026 [Grok Bot](https://x.ai/news/introducing-grok-bot) release is 
 
 Union Alpha appeared on OpenRouter around 2026-09-16 as an anonymous "stealth" model, promoted by OpenCode as free for the following week, with no training on your data, built for agentic coding, and accepting images. It was genuinely strong and it got heavy use.
 
-By 2026-09-20, `stealth/union-alpha` returned **`404` from OpenRouter's model API**. The model was revealed as **Pareto**, from Unbiased, and is **paid**. As of 2026-10-24 there are two dated versions: `unbiased/pareto-26.9` at $2.50 per million input tokens (262,144 context) and a newer `unbiased/pareto-26.10` at $0.80 input / $3.20 output with a 1,048,576 context.
+By 2026-09-20, `stealth/union-alpha` returned **`404` from OpenRouter's model API**. The model was revealed as **Pareto**, from Unbiased, and is **paid**. As of 2026-11-18 (unchanged since 2026-10-24) there are two dated versions: `unbiased/pareto-26.9` at $2.50 per million input tokens (262,144 context) and a newer `unbiased/pareto-26.10` at $0.80 input / $3.20 output with a 1,048,576 context.
 
 So the free window lasted a few days rather than the advertised week, which is the whole point of listing it here. **A stealth-model promotion is a vendor buying evaluation data, not a free tier.** If you build a config around one, you are writing code with a deadline you were never told. Enjoy them while they run, but keep a real free provider configured underneath, and check `GET /api/v1/models` before assuming one is still live, because that call is public and takes a second.
 
@@ -303,7 +308,10 @@ So the free window lasted a few days rather than the advertised week, which is t
 Free hosted models churn fast enough that any written guide is partly stale the week it is published. The cheapest check is a one-token request against the endpoint. A `410` tells you the model is retired and usually names the EOL date; a `404` tells you the slug is wrong. Both take a second to test and save a long debugging session.
 
 **Time your calls, not just their status codes**
-Two months running, an NVIDIA model has passed every error check and still been unusable: `deepseek-v4-flash-0731` in September, `deepseek-v4.1-flash` in October, each taking around three minutes per reply. An agent with a normal timeout presents that as its own hang.
+Two months running, an NVIDIA model passed every error check and was still unusable: `deepseek-v4-flash-0731` in September and `deepseek-v4.1-flash` in October, each taking around three minutes per reply. In November it was October's fast pick, `minimax-m3.1-flash`, which went from under a second to about a minute. A model's latency can change a hundredfold between monthly checks, and an agent with a normal timeout presents that as its own hang.
+
+**A retirement can land days after a review**
+GLM-5.3 was re-verified on 2026-10-24 and retired on 2026-10-28. Before you trust any model ID, here or anywhere, send it one request. A `410` names the date.
 
 **Re-check providers you have stopped checking**
 SambaNova's no-card path ended around August 14 and this guide carried it for two more months under a "not re-checked" label. A provider you are not actively verifying can be wrong for longer than you think.
@@ -315,7 +323,7 @@ Most tools (Aider, OpenCode, and similar) let you switch models mid-session. If 
 Tools like Aider, OpenCode, and Codex work out of the box with any OpenAI-compatible endpoint. Set `OPENAI_BASE_URL` and `OPENAI_API_KEY` and you are done.
 
 **Watch for context window differences**
-Free-tier context limits vary widely. GLM-5.3, MiniMax M3.1 Flash, Nemotron 3.5 Super VL, Nemotron 3.5 Lightning and Gemini Flash all reach 1M. Nemotron 3 Ultra sits at 262K on NIM (1M on OpenRouter's free endpoint). Groq caps at 131K.
+Free-tier context limits vary widely. Nemotron 3.5 Super VL, MiniMax M3.1 Flash, Kimi K3.1 Pro, Gemini Flash and Gemini 4 Hydrogen all reach 1M. Nemotron 3 Ultra sits at 262K on NIM (1M on OpenRouter's free endpoint). Groq caps at 131K.
 
 **Check the daily cap, not just the per-minute one**
 The requests-per-minute number is rarely what stops you. The daily ceiling is: OpenRouter at 50/day unfunded, Groq at 1,000/day on the GPT-OSS and Qwen models, Google at whatever AI Studio shows for your project. Budget against that.
@@ -327,24 +335,24 @@ Store keys as environment variables or in config files outside your git repos. N
 NVIDIA keys now expire on a schedule you choose at generation time. Set a calendar reminder, or pick "never expires" if the account is only used for personal projects. An expired key produces a `403` that reads like a model problem rather than an auth problem.
 
 **Assume free tiers shrink**
-Every provider in this guide that changed its free tier during 2026 made it smaller, not larger, and three of them (Cerebras, SambaNova, Groq) did so with little warning. If a free tier is load-bearing for something you care about, have a second provider configured before you need it.
+Every provider in this guide that changed its free tier during 2026 made it smaller, not larger, and several of them (Cerebras, SambaNova, Groq, and in November NVIDIA's catalog, 85 models down to 32) did so with little warning. If a free tier is load-bearing for something you care about, have a second provider configured before you need it.
 
 ---
 
 ## Datacenter Location vs. Model Origin
 
-All providers listed in this guide operate US or EU-based datacenters, so your prompts and data are processed on Western infrastructure. However, several of the strongest open-weight models were created by Chinese organizations:
+The direct providers listed in this guide operate US or EU-based datacenters, so your prompts and data are processed on Western infrastructure. However, several of the strongest open-weight models were created by Chinese organizations:
 
 | Model | Made by | Served via (in this guide) | Data goes to |
 |---|---|---|---|
-| GLM-5.3 | Zhipu AI / Z.ai (China) | NVIDIA NIM (US) | US |
 | MiniMax M3.1 Flash | MiniMax (China) | NVIDIA NIM (US) | US |
-| DeepSeek V4.1 Flash | DeepSeek (China) | NVIDIA NIM (US) | US |
 | Step 5 Preview | StepFun (China) | NVIDIA NIM (US) | US |
-| Kimi K2.6 | Moonshot AI (China) | NVIDIA NIM (US) | US |
+| Kimi K3.1 Pro | Moonshot AI (China) | NVIDIA NIM (US) | US |
 | Qwen 3.8 / 3.6 / 3.5 | Alibaba (China) | Groq (US) or Ollama (local) | Local or US |
-| Xing4.0 | TeleAI / China Telecom (China) | OpenRouter | Depends on the upstream provider OpenRouter routes to |
+| ERNIE 5.5 Flash Preview | Baidu (China) | OpenRouter | Upstream provider reported as "Baidu" on 2026-11-18 |
+| Ling 3.2 Flash | inclusionAI / Ant Group (China) | OpenRouter | Upstream provider reported as "Ant Digital" on 2026-11-18 |
+| Particle-1 | Particle AI (post-trained on DeepSeek V4.1 Flash) | OpenRouter | Depends on the upstream provider OpenRouter routes to |
 
-The model weights being of Chinese origin does not mean your data leaves US/EU infrastructure when using the providers above. The distinction matters if you are working with sensitive or proprietary code and your compliance team has views on either model lineage or data location. OpenRouter is a router, so for any model there, check which upstream provider served the request.
+The model weights being of Chinese origin does not mean your data leaves US/EU infrastructure when using the providers above. The distinction matters if you are working with sensitive or proprietary code and your compliance team has views on either model lineage or data location. OpenRouter is a router, so for any model there, check which upstream provider served the request. For ERNIE and Ling, the provider in the response was the model's own vendor, so assume your data may leave US/EU infrastructure (where those endpoints are hosted was not verified).
 
 **One exception to be aware of:** DeepSeek offers their own direct API at `api.deepseek.com`. That endpoint is hosted in China, so data sent there goes to Chinese servers. The guides in this repo do not use that endpoint, but it is worth knowing if you encounter it elsewhere.
