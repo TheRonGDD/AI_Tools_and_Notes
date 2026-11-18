@@ -139,6 +139,7 @@ Google's developer portal for Gemini models.
   - `gemini-3-flash-preview` (marked "legacy")
   - `gemini-2.5-flash-lite`
   - Gemma 4, plus TTS, live-audio, transcription and `gemini-embedding-2` models
+  - `gemini-decision-1` (**new**: a decision model for yes/no, categorical and rubric evaluations over text, images, video, audio and PDFs, served on the separate [Decisions API](https://ai.google.dev/gemini-api/docs/decisions-api), not the chat endpoint. Unusually, Google publishes its free-tier limits: **200 RPM, 50,000 TPM, 10,000 RPD**)
 - **OpenAI-compatible:** Yes — `https://generativelanguage.googleapis.com/v1beta/openai/`
 - **Key prefix:** `AIza`
 - **Rate limits:** Google's rate-limit page (updated 2026-10-15) no longer publishes free-tier numbers and says to view your active limits in AI Studio. Third-party reports for the newest Flash models range from about 20 to 1,500 requests/day, which is too wide to quote. Check your own project in AI Studio. RPD resets at midnight Pacific. Google's usage-tier table also says some new projects must complete a verification step before the free tier works (docs, 2026-11-18).

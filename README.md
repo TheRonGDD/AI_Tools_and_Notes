@@ -52,8 +52,9 @@ Every NVIDIA and OpenRouter model ID below was checked with a live API call on 2
 - **Nemotron 3 Ultra is the new default, and it is fast:** 0.8 to 1.9 seconds per reply and 1.0s for a correct tool call. The Nemotron 3.5 family, Gemma 4 31B and Laguna XS 2.1 also made correct tool calls in under 2 seconds.
 - **New strong model on NIM: Mistral Large 4** (`mistralai/mistral-large-4-1t-a52b`, 1T / 52B active). Correct tool calls in 2.8 to 4.8s. It is the planner in Aider's new [architect-mode](Aider_Setup_NVIDIA_NIM.md#architect-mode-two-model-workflow) pairing. `moonshotai/kimi-k3.1-pro`, successor to the retired Kimi K3, also arrived, but takes about two minutes per reply.
 - **Step 5 Preview and Gemma 4 31B recovered on NIM.** October measured 134 seconds or a timeout for both; both answered in seconds this month.
-- **Google added Gemini 4 Hydrogen to its free tier** (2026-11-12, 1M context; docs only). And `gemini-3.7-flash` / `gemini-3.5-flash` are not dying after all: they now route to 3.8 Flash and 3.6 Flash.
+- **Google added Gemini 4 Hydrogen to its free tier** (2026-11-12, 1M context; docs only), plus `gemini-decision-1`, a free decision/classifier model with published limits of 10,000 requests/day. And `gemini-3.7-flash` / `gemini-3.5-flash` are not dying after all: they now route to 3.8 Flash and 3.6 Flash.
 - **New free OpenRouter models:** Baidu's `ernie-5.5-flash-preview:free`, inclusionAI's `ling-3.2-flash:free`, Particle AI's `particle-1:free` (all 1M context, all made correct tool calls) and Liquid's tiny `lfm-3-1.7b:free`.
+- **Google settled the Antigravity quota question:** its plans page says free accounts refresh **weekly**; the 5-hour refresh is for Pro and Ultra.
 - **Antigravity CLI can run on a Gemini API key** instead of the small account quota, and has been able to since August. This repo missed it. Now [documented](Antigravity_CLI_Setup_Windows_11.md#using-a-gemini-api-key-instead), untested with a free key.
 - **New local models under Ollama:** Liquid's LFM3 (1.7B, 1.1GB, built for tool calling), Xiaomi's MiMo V2.6 (9B, 6.6GB) and Ripple Preview (65B, 38.8GB). Every existing model size re-measured unchanged.
 
@@ -75,6 +76,7 @@ Every NVIDIA and OpenRouter model ID below was checked with a live API call on 2
 - **Step 5 Preview on NIM.** Much better than October, but a 36-second tool call keeps it on the watch list.
 - **OpenCode Zen's rotating free models and OpenRouter stealth models.** Promotional windows, not a free tier.
 - **Pareto (formerly Union Alpha).** Unchanged: `unbiased/pareto-26.10` at $0.80/M input and $3.20/M output. Still paid.
+- **Groq's new preview listings** (`minimaxai/minimax-m2.7`, `meta-models/muse-spark-open`). On its models page, but Enterprise-only or contact-sales, not the free tier.
 - **LM Studio Secure Cloud.** Requires billing (not re-checked). Bionic itself stays, because local models cost nothing.
 
 ---
